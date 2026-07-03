@@ -1,0 +1,24 @@
+-- Entités
+comptes
+boutiques
+users
+tokens
+roles
+abonnements
+type_abonements
+fournisseurs
+clients
+achats
+ventes
+produits
+categories
+marks
+unites
+paiement_abonnements
+versements_ventes
+depenses
+type_depenses
+-- les modification db
+libelle_mark
+libelle_unite
+description_produit

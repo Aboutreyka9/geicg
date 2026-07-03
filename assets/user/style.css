@@ -1,0 +1,224 @@
+/* body { */
+    /* overflow: auto !important; Pour Chrome, Safari et Edge le scroll reste actif */
+    /* scrollbar-width: none !important; cache la scrollbar Pour Firefox */
+    /* -ms-overflow-style: none !important; Pour IE et Edge Legacy */
+    /* overflow-y: hidden; */
+/* } */
+
+
+
+body::-webkit-scrollbar {
+    display: none !important;
+    /*cache la scrollbar*/
+}
+
+.bd-placeholder-img {
+    font-size: 1.125rem;
+    text-anchor: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+@media (min-width: 768px) {
+    .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+    }
+}
+
+.b-example-divider {
+    height: 3rem;
+    background-color: rgba(0, 0, 0, .1);
+    border: solid rgba(0, 0, 0, .15);
+    border-width: 1px 0;
+    box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+}
+
+.b-example-vr {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 100vh;
+}
+
+.bi {
+    vertical-align: -.125em;
+    fill: currentColor;
+}
+
+.nav-scroller {
+    position: relative;
+    z-index: 2;
+    height: 2.75rem;
+    overflow-y: hidden;
+}
+
+.nav-scroller .nav {
+    display: flex;
+    flex-wrap: nowrap;
+    padding-bottom: 1rem;
+    margin-top: -1px;
+    overflow-x: auto;
+    text-align: center;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+}
+
+.bg-login {
+    background-color: #f3f4f6;
+}
+
+.login-wrapper {
+    
+    height: 100vh;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.content-left {
+    background-color: #f2f6ff;
+    width: 60%;
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .content-left {
+        display: none;
+    }
+
+    .content-right {
+        width: 100% !important;
+
+    }
+
+    .logo-wrapper-loing>img {
+        border-radius: 50% !important;
+    }
+
+}
+
+.image-wrapper {
+    /* background-image: url('../images/shop/product10.jpg'); */
+    background-image: linear-gradient(rgba(122, 122, 122, 0.2), rgba(155, 88, 88, 0.3), rgba(2, 1, 1, 0.2)), url(http://localhost/hotel/assets/guest/images/h3.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+
+}
+
+
+.content-right {
+    width: 40%;
+    background-color: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.wrap-content {
+    margin-top: 2%;
+    padding-top: 3%;
+    width: 87%;
+}
+
+.logo-wrapper-loing {
+    display: flex;
+    justify-content: center;
+    margin: 45px 5px 0px 5px;
+    padding: 1px;
+    height: 16%;
+}
+
+.logo-wrapper-loing>img {
+    border-radius: 50px;
+    border: #000 dashed 1px;
+    cursor: pointer;
+}
+
+.title-login>h3 {
+    letter-spacing: 2px;
+}
+
+.writer-login {
+    background-color: #f2f6ff;
+    display: grid;
+    justify-items: center;
+    margin: 3.5em 5px 5px 5px;
+    padding: 2px;
+    height: 65%;
+    border-radius: 8px;
+    box-shadow: 0px 1px 1px #c5c6c7;
+
+}
+
+.title-login>h3 {
+    color: #464c5c;
+    font-size: 2em;
+    font-weight: 900;
+    text-align: center;
+}
+
+.title-login>p {
+    color: #464c5c;
+    /* font-size: 2em; */
+    font-weight: 700;
+    margin-top: -5px;
+    text-align: center;
+}
+
+.input-wrapper {
+    width: 80%;
+}
+
+.input-control {
+    margin-top: 1.6em;
+    margin-bottom: 10px;
+}
+
+.inscrit-login {
+    font-weight: 700;
+    color: #464c5c;
+}
+
+.divider-login {
+    height: 1px;
+    margin-bottom: 15px;
+    background-color: #464c5c;
+}
+
+/* register */
+
+.writer-register {
+    background-color: #f2f6ff;
+    display: grid;
+    justify-items: center;
+    margin: 1.7em 5px 5px 5px;
+    padding: 2px;
+    height: 80%;
+    border-radius: 8px;
+    box-shadow: 0px 1px 1px #c5c6c7;
+}
+
+
+.role-container {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #fff;
+}
+.permissions {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease, opacity 0.5s ease;
+}
+.role-title {
+    font-weight: bold;
+    /* color: #e91616; */
+    font-size: 14px;
+}
