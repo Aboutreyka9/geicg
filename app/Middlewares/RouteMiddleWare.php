@@ -23,7 +23,9 @@ class RouteMiddleWare
     public static function isLogged(): void
     {
         if (Auth::check()) {
-            self::redirectBack();
+            // self::redirectBack();
+            self::redirect('dashboard');
+
         }
     }
 

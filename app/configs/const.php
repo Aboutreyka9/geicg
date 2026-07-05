@@ -9,6 +9,8 @@ define('TWO_PIP', '/../../');
 define('THREE_PIP', '/../../');
 
 // const etat and status
+define('STATUT_ACTIF', "actif");
+define('STATUT_INACTIF', "inactif");
 define('ETAT_INACTIF', "0");
 define('ETAT_ACTIF', "1");
 define('ETAT_ATTENTE', "2");
@@ -45,7 +47,6 @@ class TABLES
     public const SALLES = 'salles';
     public const SCOLARITES = 'scolarites';
     public const SEMESTRES = 'semestres';
-    public const SERVICES = 'services';
     public const USERS = 'users';
     public const USER_ROLES = 'user_roles';
 }

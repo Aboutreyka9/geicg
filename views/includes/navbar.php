@@ -2,7 +2,7 @@
     <!-- Logo Header -->
     <div class="logo-header" data-background-color="dark">
 
-        <a href="<?= route('home') ?>" class="logo">
+        <a href="<?= url('home') ?>" class="logo">
 
 
             <span style="color: #fff; font-size:18px" class="navbar-brand"><?= getDataEnv('APP_NAME') ?></span>
@@ -30,7 +30,7 @@
 
             <div class="collapse" id="search-nav">
                 <marquee behavior="" scrollamount="2" direction="">
-                    <h3 class="text-light text-uppercase"> Espace : <span id="schopIdentity">Boutique 002</span> </h3>
+                    <h3 class="text-light text-uppercase"> <span id="schopIdentity">GROUPE EICG année académique 2025 - 2026 </span> </h3>
                 </marquee>
                 <!-- <form class="navbar-left navbar-form nav-search mr-md-3">
                             <div class="input-group">

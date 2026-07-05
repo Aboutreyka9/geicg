@@ -5,7 +5,7 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title><?= $data['title'] ?? "Mon espace" ?> || <?= getDataEnv('APP_NAME') ?> APPLICATION</title>
-   <?php include "src/includes/style.php" ?>
+   <?php include "includes/style.php" ?>
 
     <!-- CSS Just for demo purpose, don't include it in your project -->
 </head>
@@ -23,11 +23,11 @@
 
     <div class="wrapper sidebar_minimize">
         <!-- header -->
-        <?php include "src/includes/navbar.php" ?>
+        <?php include "includes/navbar.php" ?>
         <!-- end header -->
 
         <!-- Sidebar -->
-        <?php include "src/includes/sidebar.php" ?>
+        <?php include "includes/sidebar.php" ?>
         <!-- end sidebar -->
 
 
@@ -149,7 +149,7 @@
 
 
     <!--   Core JS Files   -->
-    <?php include 'src/includes/script.php' ?>
+    <?php include 'includes/script.php' ?>
      <!-- QRCode.js (librairie légère pour générer les QR codes côté navigateur) -->
   <script src="<?= ASSETS ?>js/qrcode.min.js"></script>
 

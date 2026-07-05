@@ -9,7 +9,7 @@ class Response
     public static function json(bool $success, int $code, string $message, array $data = [], array $errors = []): void
     {
         header('Content-Type: application/json; charset=utf-8');
-        http_response_code($code);
+        // http_response_code($code);
 
         $payload = [
             'success' => $success,

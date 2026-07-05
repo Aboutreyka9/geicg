@@ -1,6 +1,6 @@
 <?php
 // if (session_status() === PHP_SESSION_NONE) {
-session_name("APP6846534_SESSION");
+session_name("APP675444554_SESSION");
 session_start();
 include __DIR__ . '/app/Core/security.php';
 
@@ -17,22 +17,15 @@ include __DIR__ . '/app/Core/security.php';
 
 require __DIR__ . '/vendor/autoload.php';
 
-use App\Controllers\BoutiqueController;
-use App\Controllers\CategorieController;
-use App\Controllers\ClientController;
+use App\Controllers\AuthController;
 use App\Controllers\Controller;
 use App\Controllers\ControllerException;
-use App\Controllers\ControllerMailer;
-use App\Controllers\FournisseurController;
-use App\Controllers\UserController;
+use App\Controllers\DashboardController;
 use App\Controllers\HomeController;
-use App\Controllers\MarkController;
-use App\Controllers\UniteController;
-use App\Controllers\ProduitController;
 use App\Controllers\SettingController;
+use App\Controllers\UserController;
 use App\Core\Router;
 use App\Middlewares\RouteMiddleWare;
-use App\Models\User;
 use Phroute\Phroute\Dispatcher;
 
 
@@ -66,39 +59,29 @@ $router->filter('guest', [RouteMiddleWare::class, 'isLogged']);
  * ************************************************
  */
 
+
+/**
+ * ************************************************
+ * DEBUT SEXION ROUTES 
+ * ************************************************
+ */
+
+
 $router->group(['before' => '', 'prefix' => 'geicg'], function ($router) {
 
-    $router->get('/login', [UserController::class, 'login'], ['before' => 'guest'])->name('login');
+    // ─── Auth ───────────────────────────────────────────────────────────────────
+    // $router->post('auth/logout',  [AuthController::class, 'logout']);
+    // $router->get('auth/check',    [AuthController::class, 'check']);
 
-    $router->get('/categorie', [CategorieController::class, 'categorie']);
-
-    $router->get('/mark', [MarkController::class, 'mark']);
-
-    $router->get('/unite', [UniteController::class, 'unite']);
-    $router->get('/produit', [ProduitController::class, 'produit']);
-
-    $router->get('/', [HomeController::class, 'acueil'], ['before' => 'auth']);
+    // $router->get('/register', [UserController::class, 'register'], ['before' => 'guest']);
+    // $router->get('/user', [UserController::class, 'userListe'], ['before' => 'auth'])->name('home');
 
 
-    $router->get('/client/liste', [ClientController::class, 'client'], ['before' => 'auth']);
-    $router->get('/fournisseur', [FournisseurController::class, 'fournisseur'], ['before' => 'auth']);
-    $router->get('/fournisseur/order', [FournisseurController::class, 'order'], ['before' => 'auth']);
-    $router->get('/fournisseur/addOrder', [FournisseurController::class, 'addOrder'], ['before' => 'auth']);
-    $router->get('/register', [UserController::class, 'register'], ['before' => 'guest']);
-    $router->get('/user', [UserController::class, 'userListe'], ['before' => 'auth'])->name('home');
+    // $router->get('/admin/role', [UserController::class, 'role'], ['before' => 'auth'])->name('admin.role');
+
+    // $router->get('/setting', [SettingController::class, 'setting'], ['before' => 'auth'])->name('setting');
 
 
-    $router->get('/boutique', [BoutiqueController::class, 'boutique'], ['before' => 'auth']);
-
-
-    $router->get('/admin/role', [UserController::class, 'role'], ['before' => 'auth'])->name('admin.role');
-
-    $router->get('/setting', [SettingController::class, 'setting'], ['before' => 'auth'])->name('setting');
-});
-
-$router->group(['before' => '', 'prefix' => 'gestock/test'], function ($router) {
-    $router->get('/admin/role', [UserController::class, 'role'], ['before' => 'auth'])->name('admin.role');
-});
 
 /**
  * ************************************************
@@ -126,7 +109,6 @@ $router->group(['before' => '', 'prefix' => 'gestock/test'], function ($router) 
  * ************************************************
  */
 
-$router->group(['before' => '', 'prefix' => 'hotel/print'], function ($router) {});
 
 
 
@@ -138,47 +120,30 @@ $router->group(['before' => '', 'prefix' => 'hotel/print'], function ($router) {
 
 /**
  * ************************************************
- *  Routes SEXION HOTEL AUTRES
+ *  Routes SEXION VUES 
  * ************************************************
  */
 
-
-// Route pour les utilisateurs connectés
-
-
-$router->get('hotel/', [UserController::class, 'acueil'], ['before' => 'auth'])->name('home');
-
-// Route pour sexion admin
+    $router->get('/', [AuthController::class, 'login'], ['before' => 'auth']);
+    $router->get('login', [AuthController::class, 'login'], ['before' => 'guest']);
+    $router->get('dashboard', [HomeController::class, 'acueil']);
+    $router->get('utilisateurs/liste-employes',[UserController::class, 'liste']);
 
 
 
-// Route pour les visiteurs
-$router->group(["prefix" => 'hotel/welcome'], function ($router) {
-    $router->get('/', [UserController::class, 'home']);
-});
 
-/*
-je
-*/
-/**
- * Page for test
- */
-$router->get('hotel/test', [Controller::class, 'testing']);
-
-
-/*
-je
-*/
 /**
  * Page not found
  */
-$router->get('hotel/page-not-found', [ControllerException::class, 'notFound'])->name('page.notfound');
+$router->get('page-not-found', [ControllerException::class, 'notFound']);
 
 /**
  * ************************************************
  *  FIN Routes SEXION HOTEL AUTRES
  * ************************************************
  */
+
+});
 
 
 $dispatcher = new Dispatcher($router->getData());
@@ -189,5 +154,5 @@ echo $response;
 
 
 // session_destroy();
-
 var_dump($_SESSION);
+

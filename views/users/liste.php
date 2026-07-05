@@ -15,7 +15,7 @@
     <div class="card-body">
         <div class="table-responsive table-responsive-md " id="sexion_user">
 
-            <table id="data-table-user" class="table table-striped table-bordered  table-hover table-sm table-data">
+            <table id="data-table-utilisateur" class="table table-striped table-bordered  table-hover table-sm table-data">
                 <thead class="">
                     <tr>
                         <th>#</th>

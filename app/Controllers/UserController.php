@@ -5,7 +5,7 @@ namespace App\Controllers;
 use Roles;
 use App\Core\Gqr;
 use App\Core\Auth;
-use App\Models\User;
+use App\Models\UserModel;
 use App\Models\Factory;
 use App\Services\Service;
 use App\Core\MainController;
@@ -28,7 +28,7 @@ class UserController extends MainController
     public function role()
     {
         $users = [];
-        $fc = new User();
+        $fc = new UserModel();
         $users = Auth::hasGroupe(Groupes::SUPER) ?
             $fc->getSupUserWithFoction() :
             $fc->getUserWithFoction();
@@ -75,7 +75,7 @@ class UserController extends MainController
         return $this->view('welcome', ["result" => $result, "title", 'title' => "Mon espace"]);
     }
 
-    public function userListe()
+    public function liste()
     {
         $this->view('users/liste', ['title' => "Liste des utilisateurs"]);
     }
@@ -146,7 +146,8 @@ class UserController extends MainController
 
         extract($_POST);
         $output = "";
-        $user = new User();
+        $user = new UserModel();
+
 
         $likeParams = [];
         $whereParams = ['boutique_code' => Auth::user('boutique_code'), 'etat_user' => ETAT_ACTIF];
@@ -209,7 +210,7 @@ class UserController extends MainController
         $msg['type'] = "warning";
 
         $_POST = sanitizePostData($_POST);
-        $user = new User();
+        $user = new UserModel();
         // var_dump($_POST);
         // return;
         if (!empty($_POST['nom_user']) && !empty($_POST['prenom_user']) && !empty($_POST['telephone_user']) && !empty($_POST['email_user']) && !empty($_POST['sexe_user']) && !empty($_POST['fonction_user']) && !empty($_POST['matricule_user'])) {
@@ -483,7 +484,7 @@ class UserController extends MainController
         } elseif (empty($password)) {
             $result['msg'] = "Veuillez renseigner votre mot de passe.";
         } else {
-            $fc = new User();
+            $fc = new UserModel();
             // $fc->setKey('code_user');
             $user = [];
 
@@ -560,7 +561,7 @@ class UserController extends MainController
         } elseif (empty($password)) {
             $result['msg'] = "Veuillez renseigner votre mot de passe.";
         } else {
-            $fc = new User();
+            $fc = new UserModel();
             // $fc->setKey('code_user');
             $user = [];
 
@@ -1132,7 +1133,7 @@ class UserController extends MainController
         $code_role = $_POST['code_role'];
         $code_user = $_POST['code_user'];
 
-        $fc = new User();
+        $fc = new UserModel();
 
 
         $roles = $fc->getRolesByGroupe($code_role);
@@ -1221,7 +1222,7 @@ class UserController extends MainController
 
         $code = $_POST['code_user'];
         $html = "";
-        $fc = new User();
+        $fc = new UserModel();
 
         $user = $fc->getUser('code_user', $code);
 

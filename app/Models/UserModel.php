@@ -8,7 +8,7 @@ use Exception;
 use PDO;
 use TABLES;
 
-class User extends Model
+class UserModel extends Model
 {
     protected string $table = "users";
     public string $id = 'code_user';
@@ -85,18 +85,30 @@ class User extends Model
         return $data;
     }
 
-    public function getUserDataForLogin(string $login, $value)
+     public function updateLastConnexion(string $code): void
+    {
+        $sql = "UPDATE " . TABLES::USERS . " SET last_connexion = NOW() WHERE code_user = ?";
+        $stmt = $this->db->prepare(
+            "UPDATE {$this->table} SET last_connexion = NOW() WHERE code_user = ?"
+        );
+        $stmt->execute([$code]);
+    }
+
+    public function getUserDataForLogin(string $email, string $value)
     {
         $data = [];
         try {
-            $sql = "SELECT fn.libelle_fonction, cpt.etat_compte, u.* FROM " . TABLES::USERS . " AS u
-            JOIN " . TABLES::COMPTES . " AS cpt ON cpt.code_compte = u.compte_code 
-            JOIN " . TABLES::FONCTIONS . " AS fn ON fn.code_fonction = u.fonction_code 
-        WHERE {$login} = :login AND etat_user = :etat_user  LIMIT 1";
+            $sql = "SELECT fn.libelle_fonction,COALESCE(en.id_enseignant,null) AS enseignant, u.* FROM " . TABLES::USERS . " AS u 
+            LEFT JOIN " . TABLES::FONCTIONS . " AS fn ON fn.code_fonction = u.fonction_code
+            LEFT JOIN " . TABLES::ENSEIGNANTS . " AS en ON en.user_code = u.code_user AND en.statut_enseignant = :statut
+         WHERE {$email} = :email AND statut_user = :statut  LIMIT 1
+
+        ";
 
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['login' => $value, 'etat_user' => ETAT_ACTIF]);
-            $data = $stmt->fetch();
+            $stmt->execute(['email' => $value, 'statut' => STATUT_ACTIF]);
+            $data = $stmt->rowCount() > 0 ? $stmt->fetch() : [];
+            
         } catch (Exception $e) {
             die($e->getMessage());
         }

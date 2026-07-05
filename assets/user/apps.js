@@ -6,48 +6,51 @@ const URL_AJAX = URL_HOME + "app/controllers/ajx.php";
 
 let rolesPermissions = [];
 let dataCheck = [];
+let charts = {}; // stocker les graphiques par ID
 
 
 // ## SEXION CONNEXION
-// btnLoginUser();
+btnLoginUser();
 
 function btnLoginUser() {
     $("body").delegate("#frmLogin", "submit", function (e) {
         e.preventDefault();
         var form = $(this).serialize();
-        
+
         $.ajax({
             url: URL_AJAX,
             method: 'POST',
             data: form,
             dataType: 'JSON',
             
-
             beforeSend: function () {
+
                 $("#btn_login").html(
                     '<i class="fa fa-refresh fa-spin fa-2x"></i> &nbsp; Connexion...'
                 );
                 $("#btn_login").attr("disabled", "disabled");
             },
             success: function (data) {
-                
-
+                console.log(data);
+                // return
                 $("#btn_login").html(
                     '<i class="fa fa-check-circle"></i> &nbsp; Connexion'
                 );
                 $("#btn_login").attr("disabled", false);
 
-                if (data.code === 200) {
+                if (data.success) {
                     // setAcademicYear();
-                    localStorage.setItem('data-year',data.activityYear);
+                    // localStorage.setItem('data-year',data.activityYear);
 
 
-                    swal("Notification", data.msg,"success").then(() => {
+                    swal("Notification", data.message,"success").then(() => {
                         window.location.href = URL_HOME;
                     });
 
                 } else {
-                    $.notify(data.msg, "error",);
+                    console.log(data);
+                    
+                    $.notify(data.message, "error",);
                 }
             }
         });

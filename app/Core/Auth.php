@@ -54,12 +54,10 @@ class Auth
 
         Session::set($authKey, [
             'id'    => $user['code_user'],
-            'nom'  => $user['nom_user'] . '' . $user['prenom_user'],
+            'enseignant'    =>  $user['enseignant'],
+            'nom'  => $user['nom_user'] . ' ' . $user['prenom_user'],
             'fonction' => $user['libelle_fonction'],
-            "boutique_code" => $user['boutique_code'],
-            "compte_code" => $user['compte_code'],
-            "etat_compte" => $user['etat_compte'],
-            "caisse" => $etatCaisse,
+            "etablisement_code" => $user['etablissement_code'],
             "is_logged" => true,
             'groupes' => $groupes,
             'roles' => $roles
