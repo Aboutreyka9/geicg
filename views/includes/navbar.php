@@ -46,43 +46,113 @@
 
             <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
 
-                <li class="nav-item toggle-nav-search hidden-caret">
+                <!-- <li class="nav-item toggle-nav-search hidden-caret">
                     <a class="nav-link" data-toggle="collapse" href="#search-nav" role="button"
                         aria-expanded="false" aria-controls="search-nav">
                         <i class="fa fa-search"></i>
                     </a>
-                </li>
+                </li> -->
 
                 <?php //if(auth()->hasGroupe(Groupes::RECEPTION)) : 
                 ?>
-                <li class="nav-item dropdown hidden-caret">
-                    <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-bell"></i>
-                        <span class="notification"></span>
-                    </a>
-                    <ul class="dropdown-menu notif-box animated fadeIn" aria-labelledby="notifDropdown">
-                        <li>
-                            <div class="dropdown-title">Notifications</div>
-                        </li>
-                        <li>
-                            <div class="notif-center">
-                                <a href="<?= route('facture.attente') ?>">
-                                    <div class="notif-icon notif-primary"> <i class="fa fa-user-plus"></i>
-                                    </div>
-                                    <div class="notif-content">
-                                        <span class="block">
-                                            Factures non reglées
-                                        </span>
-                                    </div>
-                                </a>
-                            </div>
-                        </li>
+               <?php $limit = ['tetet']; ?>
 
-                    </ul>
-                </li>
+               <?php if (count($limit) > 0): ?>
+
+              <li class="nav-item dropdown hidden-caret">
+                <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fa fa-bell"></i>
+                  <span class="notification bg-danger pulse"> <?= count($limit); ?></span>
+                </a>
+                <ul class="dropdown-menu notif-box animated fadeIn" aria-labelledby="notifDropdown">
+                  <li>
+                    <div class="dropdown-title">Messages Alert</div>
+                  </li>
+
+                  <li>
+                    <div class="notif-center">
+                      <?php foreach ($limit as $key => $value) {
+                      ?>
+                        <a href="approvision>">
+                          <div class="notif-icon notif-warning"> <i class="fas fa-exclamation-triangle"></i> </div>
+                          <div class="notif-content">
+                            <span class="block">test
+                            </span>
+                          </div>
+                        </a>
+                      <?php } ?>
+
+
+                    </div>
+                  </li>
+
+                </ul>
+              </li>
+            <?php endif; ?>
                 <?php //endif; 
                 ?>
+
+                <?php $nbNotif =0;?>
+
+                <li class="nav-item dropdown hidden-caret">
+              <a class="nav-link dropdown-toggle" href="#" id="messageDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-envelope"></i>
+
+                <?php if ($nbNotif > 0): ?>
+                  <span class="notification bg-warning pulse"><?= $nbNotif ?></span>
+                <?php endif; ?>
+
+              </a>
+
+              <ul class="dropdown-menu messages-notif-box animated fadeIn" aria-labelledby="messageDropdown">
+                <li>
+                  <div class="message-notif-scroll scrollbar-outer">
+                    <div class="notif-center">
+
+                      <?php
+                      $hasNotif = false;
+                      $notifications = [];
+                      foreach ($notifications as $key => $config):
+                        if (!empty($etat[$key]) && $config['is_vide'] === true):
+                          $hasNotif = true;
+                      ?>
+                          <a href="">
+                            <div class="notif-img">
+                              <div class="<?= $config['color'] ?> text-white d-flex align-items-center justify-content-center"
+                                style="width:40px;height:40px;border-radius:50%;font-weight:bold;">
+                                <?= $config['letter'] ?>
+                              </div>
+                            </div>
+                            <div class="notif-content">
+                              <span class="subject"><?= $config['label'] ?></span>
+                              <span class="block">
+                                <?= $config['message'] ?>
+                              </span>
+                              <span class="time">Action requise</span>
+                            </div>
+                          </a>
+                      <?php
+                        endif;
+                      endforeach;
+                      ?>
+
+                      <?php if (!$hasNotif): ?>
+                        <div class="text-center p-3">
+                          <small>Aucune notification</small>
+                        </div>
+                      <?php endif; ?>
+
+                    </div>
+                  </div>
+                </li>
+
+                <li>
+                  <a class="btn btn-primary btn-sm col-md-12" href="">
+                    Voir plus &nbsp; <i class="fa fa-angle-right"></i>
+                  </a>
+                </li>
+              </ul>
+            </li>
 
                 <?php //if(auth()->hasGroupe(Groupes::ADMIN) || auth()->hasGroupe(Groupes::COMPTABLE)) : 
                 ?>

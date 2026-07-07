@@ -63,10 +63,34 @@ function btnRes(selector, message = 'Ajouter', icon = "fa-plus-circle") {
     $(selector).attr("disabled", false);
 }
 
+   // RESET FORM
+    function resetForm() {
+        // $(".reset").click(function(){
+        $("form").trigger("reset");
+        // $("form")[0].reset()
+        $("input[type='text']").val('');
+        $("input[type='number']").val('');
+        // $("form").remove();
+        // $(selector)[0].reset()
+        //   });
+    }
+
+    // CLOSE MODAL
+    closeModal();
+
+    function closeModal() {
+        $('body').delegate('.dismiss_modal', 'click', function (e) {
+            e.preventDefault();
+            resetForm();
+            $(".modal").modal('hide');
+
+        })
+    }
+
 
 // searchUser();
 function searchTestInput() {
-    $("body").delegate($('#data-table-utilisateur').DataTable().search(), "keyup", function(e) {
+    $("body").on( "keyup",$('#data-table-utilisateur').DataTable().search(), function(e) {
         e.preventDefault();
         var search = $('input[type="search"]').val();
        
@@ -155,11 +179,17 @@ function synchronisation(params) {
 }
 
 function money(val) {
-    return val.toLocaleString('fr-FR', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    })
-}
+    if (isNaN(val) || val <= 0) return val;
+    val = Number(val);
+        return val.toLocaleString('fr-FR', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        })
+    }
+    
+    function formatMontant(montant) {
+        return new Intl.NumberFormat('fr-FR').format(montant) + ' FCFA';
+    }
 
 formatPhoneNumber();
 

@@ -101,7 +101,7 @@ body::-webkit-scrollbar {
 
 .image-wrapper {
     /* background-image: url('../images/shop/product10.jpg'); */
-    background-image: linear-gradient(rgba(122, 122, 122, 0.2), rgba(155, 88, 88, 0.3), rgba(2, 1, 1, 0.2)), url(http://localhost/hotel/assets/guest/images/h3.jpg);
+    background-image: linear-gradient(rgba(122, 122, 122, 0.2), rgba(155, 88, 88, 0.3), rgba(2, 1, 1, 0.2)), url(http://localhost/geicg/assets/user/images/cover.png);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;

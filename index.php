@@ -124,7 +124,7 @@ $router->group(['before' => '', 'prefix' => 'geicg'], function ($router) {
  * ************************************************
  */
 
-    $router->get('/', [AuthController::class, 'login'], ['before' => 'auth']);
+    $router->get('/', [HomeController::class, 'acueil'], ['before' => 'auth']);
     $router->get('login', [AuthController::class, 'login'], ['before' => 'guest']);
     $router->get('dashboard', [HomeController::class, 'acueil']);
     $router->get('utilisateurs/liste-employes',[UserController::class, 'liste']);
