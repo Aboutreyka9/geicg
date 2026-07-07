@@ -213,6 +213,7 @@ var qrcode = new QRCode(document.getElementById("qrcode"), {
 </html>
 
 <?php 
+
 // cmpt a: 5sYep
 //cmpt t: ta29z
 // auth()->logout();

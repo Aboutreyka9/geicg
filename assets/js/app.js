@@ -3,7 +3,7 @@ const ORIGIN = window.location.origin;
 // const ORIGIN = (window.location.protocol + '//' + window.location.host);
 const URL_HOME =ORIGIN +"/geicg/";
 const URL_AJAX = URL_HOME + "app/controllers/ajx.php";
-
+let tables = {};
 let formChanged = false;
 const $form = $('form');
 let initialData = $form.serialize(); // capture les valeurs initiales
@@ -66,11 +66,11 @@ function btnRes(selector, message = 'Ajouter', icon = "fa-plus-circle") {
 
 // searchUser();
 function searchTestInput() {
-    $("body").delegate($('#data-table-produit').DataTable().search(), "keyup", function(e) {
+    $("body").delegate($('#data-table-utilisateur').DataTable().search(), "keyup", function(e) {
         e.preventDefault();
         var search = $('input[type="search"]').val();
        
-        testDatable('aCharger_data_produits','#data-table-produit',search)
+        testDatable('bcharger_data_utilisateurs','#data-table-utilisateur',search)
         // loadDataTable('data-table-user', '#data-table-user', 'bcharger_data_users');
     });
 }
@@ -110,9 +110,9 @@ function loadDataTable(tableId,selector,action) {
     if ($(selector + ':visible').length) {
         console.log(selector,tableId,action);
 
-        testDatable(action, selector);
+        // testDatable(action, selector);
 
-        return;
+        // return;
         
         tables[tableId] = $(selector).DataTable({
             "processing": true,
@@ -301,9 +301,9 @@ function activeTabsMenu() {
 
 loadDataTable('data-table-utilisateur', '#data-table-utilisateur', 'bcharger_data_utilisateurs');
 
-bopenModalAddUtilisateur();
-function bopenModalAddUtilisateur() {
-    $('#UtilisateurAddModal').click(function (e) {
+openModalAddUtilisateur();
+function openModalAddUtilisateur() {
+    $('.btn_utilisateur_addModal').click(function (e) {
         e.preventDefault();
 
         $.ajax({
@@ -322,13 +322,17 @@ function bopenModalAddUtilisateur() {
                 // btnRes("#ClientAddModal", 'Ajouter un client', 'fa-plus');
                 // ;
                 console.log(data);
-                
+               
 
-                if (data.code == 200) {
-                    $(".data-modal").html(data.data);
-                    $("#fournisseur-modal").modal("show");
-                    $(".loader_backdrop2").css('display', "none");
+                $(".loader_backdrop2").css('display', "none");
+                if (data.success) {
+                    var output = data.data;
+                    $(".data-modal").html(output.data);
+                    $("#user-modal").modal("show");
 
+
+                }else{
+                    $.notify(data.message);
 
                 }
 
@@ -337,9 +341,9 @@ function bopenModalAddUtilisateur() {
     });
 }
 
-bAjouterFournisseur();
-function bAjouterFournisseur() {
-    $("body").delegate("#frmAddFournisseurData", "submit", function(e) {
+ajouterUtilisateur();
+function ajouterUtilisateur() {
+    $("body").delegate("#frmAddUser", "submit", function(e) {
         e.preventDefault();
         var data = $(this).serialize();
 
@@ -347,7 +351,7 @@ function bAjouterFournisseur() {
             method: "POST",
             url: URL_AJAX,
             data: data,
-            dataType: "json",
+            dataType: "JSON",
             beforeSend: function () {
                 $(".loader_backdrop2").css('display', "block");
                 
@@ -357,11 +361,11 @@ function bAjouterFournisseur() {
                 console.log(data);
                     $(".loader_backdrop2").css('display', "none");
 
-                btnRes(".modal_footer", "Ajouter le fournisseur", "fa-save");
-                if (data.code == 200) {
-                    tables['data-table-fournisseur'].ajax.reload(null, false);
+                btnRes(".modal_footer", "Enregistrer", "fa-save");
+                if (data.success) {
+                    tables['data-table-utilisateur'].ajax.reload(null, false);
                     $.notify(data.message, "success");
-                    $("#fournisseur-modal").modal("hide");
+                    $("#user-modal").modal("hide");
                 } else {
                     $.notify(data.message);
                 }

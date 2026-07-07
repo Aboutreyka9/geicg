@@ -67,7 +67,7 @@ class AuthService
 
         return [
             'success' => true,
-            'message' => 'Connexion réussie.',
+            'message' => 'Connexion réussie.'
         ];
     }
 

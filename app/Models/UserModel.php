@@ -39,13 +39,13 @@ class UserModel extends Model
     }
 
     // get all fonction
-    public function getAllFonctions(): array
+    public function getAllFonctions($etablissement_code): array
     {
         $data = [];
         try {
-            $sql = "SELECT * FROM " . TABLES::FONCTIONS . " AS fn WHERE fn.boutique_code = :boutique_code AND etat_fonction = 1 ORDER BY libelle_fonction";
+            $sql = "SELECT * FROM " . TABLES::FONCTIONS . " AS fn WHERE fn.etablissement_code = :etablissement_code AND statut_fonction = :statut ORDER BY libelle_fonction";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['boutique_code' => Auth::user('boutique_code')]);
+            $stmt->execute(['etablissement_code' => $etablissement_code,'statut' => STATUT_ACTIF]);
             $data = $stmt->fetchAll();
         } catch (Exception $e) {
             die($e->getMessage());
@@ -53,7 +53,20 @@ class UserModel extends Model
         return $data;
     }
 
-
+    // get all Services
+    public function getAllServices($etablissement_code): array
+    {
+        $data = [];
+        try {
+            $sql = "SELECT * FROM " . TABLES::SERVICES . " AS se WHERE se.etablissement_code = :etablissement_code AND statut_service = :statut ORDER BY libelle_service";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['etablissement_code' => $etablissement_code,'statut' => STATUT_ACTIF]);
+            $data = $stmt->fetchAll();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
 
     public function getUserGroups(string $userCode): array
     {
@@ -119,10 +132,10 @@ class UserModel extends Model
     {
         $data = [];
         try {
-            $sql = "SELECT bt.etat_boutique, code_user,password_user,nom_user,prenom_user ,f.libelle_fonction, f.code_fonction, u.boutique_code, u.compte_code  FROM " . TABLES::USERS . " AS u
+            $sql = "SELECT bt.etat_boutique, code_user,password_user,nom_user,prenom_user ,f.libelle_fonction, f.code_fonction, u.etablissement_code, u.compte_code  FROM " . TABLES::USERS . " AS u
             JOIN " . TABLES::FONCTIONS . " AS f ON f.code_fonction = u.fonction_code
-            JOIN " . TABLES::BOUTIQUES . " AS bt ON bt.code_boutique = u.boutique_code 
-        WHERE {$login} = :login AND etat_user = 1  LIMIT 1";
+            JOIN " . TABLES::BOUTIQUES . " AS bt ON bt.code_boutique = u.etablissement_code 
+        WHERE {$login} = :login AND statut_user = 1  LIMIT 1";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['login' => $value]);
@@ -156,12 +169,12 @@ class UserModel extends Model
     {
         $data = [];
         try {
-            $sql = "SELECT us.*, fn.libelle_fonction FROM " . TABLES::USERS . " AS us JOIN " . TABLES::FONCTIONS . " fn ON fn.code_fonction = us.fonction_code AND fn.etat_fonction = :etat 
-            WHERE us.boutique_code = :boutique_code  ORDER BY us.etat_user DESC, us.nom_user";
+            $sql = "SELECT us.*, fn.libelle_fonction FROM " . TABLES::USERS . " AS us JOIN " . TABLES::FONCTIONS . " fn ON fn.code_fonction = us.fonction_code AND fn.statut_fonction = :etat 
+            WHERE us.etablissement_code = :etablissement_code  ORDER BY us.statut_user DESC, us.nom_user";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 'etat' => $etat,
-                'boutique_code' => Auth::user('boutique_code')
+                'etablissement_code' => Auth::user('etablissement_code')
             ]);
             $data = $stmt->fetchAll();
         } catch (Exception $e) {
@@ -183,11 +196,11 @@ class UserModel extends Model
         //     );
         // }
 
-        $where = "WHERE us.boutique_code = :boutique_code AND us.etat_user = :etat_user";
+        $where = "WHERE us.etablissement_code = :etablissement_code";
         if (!empty($likeParams)) {
             $likes = [];
             foreach ($likeParams as $field => $search) {
-                $likes[] = "us.$field LIKE :$field";
+                $likes[] = "$field LIKE :$field";
                 $likeParams[$field] = "%$search%";
             }
             $where .= " AND (" . implode(' OR ', $likes) . ")";
@@ -205,12 +218,12 @@ class UserModel extends Model
         //     $where .= '(' . implode(' OR ', $likes) . ')';
         // }
 
-        $sql = "SELECT us.*, fn.* 
-            FROM " . TABLES::USERS . " us JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code AND fn.etat_fonction = :etat_fonction $where";
+        $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
+            JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code  $where";
         $stmt = $this->db->prepare($sql);
 
         // return $sql;
-        $stmt->execute(array_merge($whereParams, $likeParams, ['etat_fonction' => ETAT_ACTIF]));
+        $stmt->execute(array_merge($whereParams, $likeParams));
         return (int) $stmt->fetchColumn();
     }
 
@@ -219,26 +232,24 @@ class UserModel extends Model
     {
 
 
-        $where = "WHERE us.boutique_code = :boutique_code AND us.etat_user = :etat_user";
+        $where = "WHERE us.etablissement_code = :etablissement_code";
 
         if (!empty($likeParams)) {
             $likes = [];
             foreach ($likeParams as $field => $search) {
-                $likes[] = "us.$field LIKE :$field";
+                $likes[] = "$field LIKE :$field";
                 $likeParams[$field] = "%$search%";
             }
             $where .= " AND (" . implode(' OR ', $likes) . ")";
         }
 
 
-        $sql = "SELECT us.*, fn.* 
-            FROM " . TABLES::USERS . " us JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code AND fn.etat_fonction = :etat_fonction $where ORDER BY nom_user ASC, prenom_user ASC LIMIT :start, :limit";
+        $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
+        LEFT JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code $where ORDER BY nom_user ASC, prenom_user ASC LIMIT :start, :limit";
 
         $stmt = $this->db->prepare($sql);
 
-        $stmt->bindValue(":etat_fonction", ETAT_ACTIF);
-        $stmt->bindValue(":boutique_code", Auth::user('boutique_code'));
-        $stmt->bindValue(":etat_user", ETAT_ACTIF);
+        $stmt->bindValue(":etablissement_code", Auth::user('etablissement_code'));
 
         // Bind les parametreslike
         $like = [];
@@ -264,9 +275,9 @@ class UserModel extends Model
         try {
             $sql = "SELECT us.*, fn.libelle_fonction FROM " . TABLES::USERS . " AS us 
             JOIN " . TABLES::FONCTIONS . " fn ON fn.code_fonction = us.fonction_code
-            WHERE us.boutique_code = :boutique_code ORDER BY us.nom_user";
+            WHERE us.etablissement_code = :etablissement_code ORDER BY us.nom_user";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['boutique_code' => Auth::user('boutique_code')]);
+            $stmt->execute(['etablissement_code' => Auth::user('etablissement_code')]);
             $data = $stmt->fetchAll();
         } catch (Exception $e) {
             die($e->getMessage());

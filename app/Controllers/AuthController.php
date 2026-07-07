@@ -69,13 +69,14 @@ class AuthController extends MainController
         $password = $_POST['password'];
 
         $v = new Validator();
-        $v->required('email', $email, 'Email')->email('email', $email, 'Email invalide')
+        $v->required('email', $email, 'Email')->email('email', $email, 'Email')
           ->required('password', $password, 'Mot de passe');
     
 
         if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
 
          $result = $this->authService->login($email, $password);
+         
 
         if (!$result['success']) {
             Response::error($result['message'], 401);

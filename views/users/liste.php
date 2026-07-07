@@ -6,24 +6,24 @@
             </div>
             <div class="table_row_header_right">
                 <button class="btn btn-primary "> <i class="fa fa-print"></i> &nbsp; <span class="text_button text-uppercase">Imprimer</span></button>
-                <button class="btn btn-info  btn_modal_user"> <i class="fa fa-plus-circle fa-2"></i> &nbsp; <span class="text_button text-uppercase">Enregistrer utilisateur</span></button>
+                <button class="btn btn-info  btn_utilisateur_addModal"> <i class="fa fa-plus-circle fa-2"></i> &nbsp; <span class="text_button text-uppercase">Enregistrer utilisateur</span></button>
 
             </div>
 
         </div>
     </div>
     <div class="card-body">
-        <div class="table-responsive table-responsive-md " id="sexion_user">
+        <div class="table-responsive " id="sexion_user">
 
-            <table id="data-table-utilisateur" class="table table-striped table-bordered  table-hover table-sm table-data">
+            <table id="data-table-utilisateur" class="table table-striped table-bordered  table-hover ">
                 <thead class="">
                     <tr>
                         <th>#</th>
                         <th>EMAIL</th>
                         <th>NOM</th>
                         <th>PRENOMS</th>
-                        <th>Contact</th>
-                        <th>Fonction</th>
+                        <th>CONTACT</th>
+                        <th>FONCTION</th>
                         <th>STATUT</th>
                         <th>OPTION</th>
                     </tr>

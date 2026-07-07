@@ -26,6 +26,38 @@ class Validator
         return $this;
     }
 
+        public function digit(string $field, mixed $value, string $label): self
+    {
+        $value = removeSpace($value);
+        if ($value !== null && !ctype_digit($value)) {
+                $this->errors[$field] = "Le champ « {$label} » doit être valeur(s) numériques.";
+        }
+        return $this;
+    }
+
+    public function phoneNumber(string $field, mixed $value, int $length, string $label): self
+    {
+        
+        if ($value !== null) {
+            $old = $value;
+            $value = removeSpace($value);
+            $value = str_replace('(+225)', '', $value);
+            if (!ctype_digit($value) || mb_strlen($value) !== $length) {
+
+                $this->errors[$field] = "Le champ « {$label} » doit ètre egal à {$length} caractère(s) numeriques.";
+            }
+        }
+        return $this;
+    }
+
+     public function length(string $field, mixed $value, int $length, string $label): self
+    {
+        if ($value !== null && mb_strlen((string) $value) != $length) {
+            $this->errors[$field] = "Le champ « {$label} » doit contenir au moins {$length} caractères.";
+        }
+        return $this;
+    }
+
     public function minLength(string $field, mixed $value, int $min, string $label): self
     {
         if ($value !== null && mb_strlen((string) $value) < $min) {

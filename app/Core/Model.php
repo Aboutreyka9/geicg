@@ -418,13 +418,13 @@ abstract class Model
         return $data;
     }
 
-    public function getInfoBoutique($boutiqueCode)
+    public function getInfoEtablissement($etablissement_code)
     {
         $data = [];
         try {
-            $sql = "SELECT * FROM " . TABLES::BOUTIQUES . " bt WHERE bt.code_boutique = :boutique_code LIMIT 1";
+            $sql = "SELECT * FROM " . TABLES::ETABLISSEMENTS . " e WHERE e.code_etablissement = :etablissement_code LIMIT 1";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['boutique_code' => $boutiqueCode]);
+            $stmt->execute(['etablissement_code' => $etablissement_code]);
             if ($stmt->rowCount() > 0) {
                 $data = $stmt->fetch();
             }

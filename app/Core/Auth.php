@@ -57,7 +57,7 @@ class Auth
             'enseignant'    =>  $user['enseignant'],
             'nom'  => $user['nom_user'] . ' ' . $user['prenom_user'],
             'fonction' => $user['libelle_fonction'],
-            "etablisement_code" => $user['etablissement_code'],
+            "etablissement_code" => $user['etablissement_code'],
             "is_logged" => true,
             'groupes' => $groupes,
             'roles' => $roles

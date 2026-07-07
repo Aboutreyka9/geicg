@@ -24,7 +24,7 @@ $action = $_POST['action'] ?? null;
 
 switch ($action) {
 
-        // Debut Actions pour les utilisateurs
+        // Debut Actions authentification
     case 'btnLogin':
         $ajx = new AuthController();
         $ajx->authenticate();
@@ -34,6 +34,14 @@ switch ($action) {
     case 'bcharger_data_utilisateurs':
         $ajx = new UserController();
         $ajx->bGetListeUser();
+    break;
+    case 'btn_showmodal_utilisateur_add':
+        $ajx = new UserController();
+        $ajx->modalAddUser();
+    break;
+     case 'btn_add_user':
+        $ajx = new UserController();
+        $ajx->addUser();
     break;
 
     //end Actions pour les utilisateurs

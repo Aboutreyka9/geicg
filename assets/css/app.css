@@ -70,7 +70,9 @@
 }
 
 
-
+.modal-content{
+border: solid 1px #0550b1ff !important;
+}
 
 .bg-grad-dark {
 

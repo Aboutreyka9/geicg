@@ -47,6 +47,7 @@ class TABLES
     public const SALLES = 'salles';
     public const SCOLARITES = 'scolarites';
     public const SEMESTRES = 'semestres';
+    public const SERVICES = 'services';
     public const USERS = 'users';
     public const USER_ROLES = 'user_roles';
 }
@@ -89,7 +90,7 @@ class Groupesss
 const STATUT_CHAMBRE = ['Libre', 'Occupee', 'En nettoyage', 'Maintenance'];
 const STATUT_RESERVATION = ['En cour', 'Confirmee', 'Annulee', 'Checkout'];
 const PAIEMENT = ['Especes', 'Carte', 'Mobile money'];
-const SEXEP = ['Entreprise', 'Mr', 'Mlle', 'Mme', 'Autre'];
+const SEXEP = ['Mr', 'Mlle', 'Mme'];
 const PIECES_DATA = ["CNI" => "CNI", "PASSEPORT" => "PASSEPORT", "CMU" => "CMU", "PERMIS" => "PERMIS", "CARTE CONSLAIRE" => "CARTE CONSLAIRE", "AUTRES" => "AUTRES"];
 
 const EXTENSION = ["jpg", "png", "jpeg", "jfif", "webp", "svg", "gif", "bmp", "ico", "heic", "heif"];
