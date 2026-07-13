@@ -2,7 +2,7 @@
     <!-- Logo Header -->
     <div class="logo-header" data-background-color="dark">
 
-        <a href="<?= url('home') ?>" class="logo">
+        <a href="<?= url('') ?>" class="logo">
 
 
             <span style="color: #fff; font-size:18px" class="navbar-brand"><?= getDataEnv('APP_NAME') ?></span>

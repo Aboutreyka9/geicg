@@ -73,17 +73,26 @@ class AuthController extends MainController
           ->required('password', $password, 'Mot de passe');
     
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::BAD_REQUEST, $v->errors());
 
          $result = $this->authService->login($email, $password);
          
 
         if (!$result['success']) {
-            Response::error($result['message'], 401);
+            Response::error($result['message'], HttpStatusCode::UNAUTHORIZED, []);
         }
 
         Response::success($result['message'], []);
       
+    }
+
+    public function deconnexion()
+    {
+        if (Auth::check()) {
+            Auth::disconect();
+            Response::success("Déconnexion réussie",[],HttpStatusCode::OK);
+        }
+        Response::error("Vous n'êtes pas connecté", HttpStatusCode::UNAUTHORIZED, []);
     }
 
 }

@@ -85,9 +85,19 @@ class UserController extends MainController
         return $this->view('welcome', ["result" => $result, "title", 'title' => "Mon espace"]);
     }
 
-    public function liste()
+    public function recrutement()
     {
-        $this->view('users/liste', ['title' => "Liste des utilisateurs"]);
+        $this->view('personnels/recrutement', ['title' => "Liste du personnel"]);
+    }
+
+    public function enseignants()
+    {
+        $this->view('personnels/enseignant', ['title' => "Liste des Enseignants"]);
+    }
+
+    public function administratif()
+    {
+        $this->view('personnels/liste', ['title' => "Liste des utilisateurs"]);
     }
 
     public function profileEmploye($code)

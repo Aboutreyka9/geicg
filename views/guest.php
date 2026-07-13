@@ -14,6 +14,7 @@
 
   <!-- CSS only -->
   <link rel="stylesheet" href="<?= ASSETS ?>user/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link rel="stylesheet" href="<?= ASSETS ?>user/style.css">
 
 </head>

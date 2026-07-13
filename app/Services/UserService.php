@@ -167,6 +167,8 @@ class UserService
                 <div class="row mb-3">
                     <div class="col-md-12">
                         <button type="submit" class="btn btn-primary w-50 modal_footer" id="btnSubmitForm"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
+                        <button type="button" class="btn btn-light dismiss_modal">Close</button>
+
                     </div>
                 </div>
 

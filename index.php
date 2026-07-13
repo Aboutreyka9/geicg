@@ -29,8 +29,6 @@ use App\Middlewares\RouteMiddleWare;
 use Phroute\Phroute\Dispatcher;
 
 
-
-
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $title = "";
@@ -124,12 +122,21 @@ $router->group(['before' => '', 'prefix' => 'geicg'], function ($router) {
  * ************************************************
  */
 
-    $router->get('/', [HomeController::class, 'acueil'], ['before' => 'auth']);
-    $router->get('login', [AuthController::class, 'login'], ['before' => 'guest']);
+$router->get('login', [AuthController::class, 'login'], ['before' => 'guest']);
+// <!-- sexion utilisateur  -->
+$router->group(['before' => 'auth', 'prefix' => '/'], function ($router) {
+    
     $router->get('dashboard', [HomeController::class, 'acueil']);
-    $router->get('utilisateurs/liste-employes',[UserController::class, 'liste']);
+    $router->get('/', [HomeController::class, 'acueil'], ['before' => 'auth']);
 
+    $router->get('personnel/recrutements',[UserController::class, 'recrutement']);
+    $router->get('personnel-enseignants',[UserController::class, 'enseignants']);
+    $router->get('personnel-administratifs',[UserController::class, 'administratif']);
 
+    // <!-- parametrage -->
+    $router->get('fonctions',[SettingController::class, 'fonction']);
+
+});
 
 
 /**

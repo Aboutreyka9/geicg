@@ -7,7 +7,7 @@ const URL_AJAX = URL_HOME + "app/controllers/ajx.php";
 let rolesPermissions = [];
 let dataCheck = [];
 let charts = {}; // stocker les graphiques par ID
-
+// alert('ghdfhdf');
 
 // ## SEXION CONNEXION
 btnLoginUser();
@@ -31,8 +31,6 @@ function btnLoginUser() {
                 $("#btn_login").attr("disabled", "disabled");
             },
             success: function (data) {
-                console.log(data);
-                // return
                 $("#btn_login").html(
                     '<i class="fa fa-check-circle"></i> &nbsp; Connexion'
                 );
@@ -48,7 +46,6 @@ function btnLoginUser() {
                     });
 
                 } else {
-                    console.log(data);
                     
                     $.notify(data.message, "error",);
                 }

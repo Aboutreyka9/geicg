@@ -286,7 +286,7 @@ $(document).ready(function(){
 	// addClass if nav-item click and has subnav
 
 	$(".nav-item a").on('click', (function(){
-		if ( $(this).parent().find('.collapse').hasClass("show") ) {
+		if ($(this).parent().find('.collapse').hasClass("show") ) {
 			$(this).parent().removeClass('submenu');
 		} else {
 			$(this).parent().addClass('submenu');

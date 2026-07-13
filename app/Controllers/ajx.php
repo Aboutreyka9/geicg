@@ -7,6 +7,7 @@ session_start();
 include __DIR__ . '/../../app/Core/security.php';
 
 use App\Controllers\AuthController;
+use App\Controllers\SettingController;
 use App\Controllers\UserController;
 
 require __DIR__ . '/../../vendor/autoload.php';
@@ -29,6 +30,10 @@ switch ($action) {
         $ajx = new AuthController();
         $ajx->authenticate();
     break;
+    case 'btn_user_deconnect':
+        $ajx = new AuthController();
+        $ajx->deconnexion();
+    break;
 
     // Debut Actions pour les utilisateurs
     case 'bcharger_data_utilisateurs':
@@ -45,6 +50,18 @@ switch ($action) {
     break;
 
     //end Actions pour les utilisateurs
+
+        // Debut Actions pour les fonctions
+    case 'bcharger_data_fonctions':
+        $ajx = new SettingController();
+        $ajx->bGetListeFonction();
+    break;
+     case 'btn_add_fonction':
+        $ajx = new SettingController();
+        $ajx->addFonction();
+    break;
+
+    //end Actions pour les fonctions
 
 
 

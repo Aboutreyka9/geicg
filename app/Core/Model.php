@@ -322,6 +322,174 @@ abstract class Model
         return $result;
     }
 
+       public static function upsertMultipleAchat(array $rows)
+    {
+        if (empty($rows))
+            return false;
+
+        $columns = ['achat_id', 'article_id', 'prix_achat', 'qte', 'etat', 'created_at'];
+
+        $placeholders = [];
+        $values = [];
+
+        foreach ($rows as $row) {
+            $placeholders[] = '(' . implode(',', array_fill(0, count($columns), '?')) . ')';
+            foreach ($columns as $col) {
+                $values[] = $row[$col];
+            }
+        }
+
+        // $sql = 'INSERT INTO entree (' . implode(',', $columns) . ')
+            // VALUES ' . implode(',', $placeholders) . '
+            // ON DUPLICATE KEY UPDATE
+            //     prix_achat = VALUES(prix_achat),
+            //     qte = VALUES(qte),
+            //     etat = VALUES(etat)';
+
+        $stmt = self::getConnexion()->prepare($sql);
+        return $stmt->execute($values);
+    }
+
+    public static function updateOrInsertAchat(array $data)
+    {
+        // Sécurité minimale
+        // if (empty($data['achat_id']) || empty($data['article_id'])) {
+        //     throw new Exception("achat_id et article_id sont obligatoires");
+        // }
+
+        $sql = 'INSERT INTO entree 
+                (achat_id, article_id, prix_achat, qte, etat_entree, updated_at)
+            VALUES 
+                (:achat_id, :article_id, :prix_achat, :qte, :etat_entree, :updated_at)
+            ON DUPLICATE KEY UPDATE
+                prix_achat = VALUES(prix_achat),
+                qte = VALUES(qte)';
+
+        $stmt = self::getConnexion()->prepare($sql);
+
+        return $stmt->execute([
+            ':achat_id' => $data['achat_id'],
+            ':article_id' => $data['article_id'],
+            ':prix_achat' => $data['prix_achat'],
+            ':qte' => $data['qte'],
+            ':etat_entree' => $data['etat'],
+            ':updated_at' => $data['updated_at'],
+        ]);
+    }
+
+    public static function updateOrInsertVente(array $data)
+    {
+        // Sécurité minimale
+        // if (empty($data['vente_id']) || empty($data['article_id'])) {
+        //     throw new Exception("vente_id et article_id sont obligatoires");
+        // }
+
+        $sql = 'INSERT INTO sortie 
+            (vente_id, article_id, prix_vente, qte, etat_sortie)
+        VALUES 
+            (:vente_id, :article_id, :prix_vente, :qte, :etat_sortie)
+        ON DUPLICATE KEY UPDATE
+            prix_vente = VALUES(prix_vente),
+            qte = VALUES(qte),
+            etat_sortie = VALUES(etat_sortie)';
+
+        $stmt = self::getConnexion()->prepare($sql);
+
+        return $stmt->execute([
+            ':vente_id' => $data['vente_id'],
+            ':article_id' => $data['article_id'],
+            ':prix_vente' => $data['prix_vente'],
+            ':qte' => $data['qte'],
+            ':etat_sortie' => $data['etat'],  // ou corriger ici
+        ]);
+    }
+
+     public static function inserted($table, array $data)
+    {
+        if (empty($data)) {
+            throw new Exception('Aucune donnée à insérer');
+        }
+
+        // Colonnes
+        $columns = implode(', ', array_keys($data));
+
+        // Placeholders (?, ?, ?)
+        $placeholders = implode(', ', array_fill(0, count($data), '?'));
+
+        $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
+
+        $query = self::getConnexion()->prepare($sql);
+
+        $query->execute(array_values($data));
+
+        return self::getConnexion()->lastInsertId();
+    }
+
+    public static function insertMultiple($table, array $rows)
+    {
+        if (empty($rows)) {
+            throw new Exception('Aucune donnée à insérer');
+        }
+
+        // Colonnes (on prend celles de la première ligne)
+        $columns = array_keys($rows[0]);
+        $columnsList = implode(', ', $columns);
+
+        // (?, ?, ?)
+        $placeholders = '(' . implode(', ', array_fill(0, count($columns), '?')) . ')';
+
+        // Générer (?, ?), (?, ?), (?, ?)
+        $allPlaceholders = implode(', ', array_fill(0, count($rows), $placeholders));
+
+        $sql = "INSERT INTO $table ($columnsList) VALUES $allPlaceholders";
+
+        // Aplatir les valeurs
+        $values = array_merge(...array_map(fn($row) => array_values($row), $rows));
+
+        $query = self::getConnexion()->prepare($sql);
+
+        return $query->execute($values);
+    }
+
+    public static function upsert($table, $data, $uniqueKeys)
+    {
+        $columns = array_keys($data);
+
+        $placeholders = ':' . implode(', :', $columns);
+
+        $updates = [];
+        foreach ($columns as $col) {
+            if (!in_array($col, $uniqueKeys)) {
+                $updates[] = "$col = VALUES($col)";
+            }
+        }
+
+        $sql = "INSERT INTO $table (" . implode(',', $columns) . ")
+            VALUES ($placeholders)
+            ON DUPLICATE KEY UPDATE " . implode(', ', $updates);
+
+        $stmt = self::getConnexion()->prepare($sql);
+        return $stmt->execute($data);
+    }
+
+    public static function updated($table, array $data, array $where)
+    {
+        // SET part
+        $set = implode(', ', array_map(fn($col) => "$col = ?", array_keys($data)));
+
+        // WHERE part
+        $conditions = implode(' AND ', array_map(fn($col) => "$col = ?", array_keys($where)));
+
+        $sql = "UPDATE $table SET $set WHERE $conditions";
+
+        // Fusion des valeurs
+        $values = array_merge(array_values($data), array_values($where));
+
+        $query = self::getConnexion()->prepare($sql);
+
+        return $query->execute($values);
+    }
+
     public function update(string $table, string $key, string $id, array $data)
     {
         $result = false;
@@ -443,6 +611,26 @@ abstract class Model
         } catch (Exception $e) {
             $this->db->rollBack();
             echo "Échec de la transaction : " . $e->getMessage();
+        }
+    }
+
+        /**
+     * @param callable $callback
+     * @return boolean
+     */
+    public function transactionData($callback)
+    {
+        $this->db->beginTransaction();
+        try {
+            $callback();
+            $callback($this);
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            return "Échec de la transaction : " . $e->getMessage();
+
+            // throw $e;
         }
     }
 
