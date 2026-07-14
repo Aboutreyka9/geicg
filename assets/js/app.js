@@ -130,6 +130,7 @@ function testDatable(action, selector,search = "") {
 
 
 function loadDataTable(tableId,selector,action) {
+console.log("teeeeee");
 
 
     if ($(selector + ':visible').length) {
@@ -137,7 +138,7 @@ function loadDataTable(tableId,selector,action) {
 
         // testDatable(action, selector);
 
-        // return;
+        // // return;
         
         tables[tableId] = $(selector).DataTable({
             "processing": true,

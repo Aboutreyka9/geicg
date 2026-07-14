@@ -196,7 +196,6 @@ class UserController extends MainController
         // 📄 Données
 
         $userList = $user->DataTableFetchUsersListe($likeParams, $start, $limit);
-
         $data = [];
 
 

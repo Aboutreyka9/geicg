@@ -435,29 +435,6 @@ input::-o-outer-spin-button {
     line-height: 28px !important;
 }
 
-.table-nowrap td,
-.table-nowrap th {
-  overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-table{
-  width: 100%;
-  /* font-family: 'Inter', sans-serif; */
-  table-layout: fixed;
-}
-
-.table_active {
-    background-color: #d0ebff !important;
-}
-#table_selected tbody tr {
-    cursor: pointer;
-}
-.label-price{
-  border-bottom:2px solid #222222ff;
-  background:rgb(179, 213, 230); 
-  color:#000
-}
 
 .modal-footer{
     height: 60px!important;
@@ -465,12 +442,21 @@ table{
 .modal_footer{
     position: fixed;
     right: 20px;
-    bottom: 1px;
+    bottom: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    /* grid-area: footer; */
+}
+.modal_footer >.dismiss_modal{
+    background-color: #858a92 !important;
+    color: #ffffff !important;
 }
 
 .modal-content{
     /* min-height: 600px;  */
     position: relative;
+    border: #06b6d4 2px solid !important;
 }
 
 .action-statut {

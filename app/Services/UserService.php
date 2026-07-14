@@ -37,11 +37,11 @@ class UserService
             $token = generetor(random_int(50, 70));
 
             $data_user = [
-                'nom_user' => strtoupper($nom_user),
-                'prenom_user' => strtoupper($prenom_user),
+                'nom_user' => ucfirst($nom_user),
+                'prenom_user' => ucfirst($prenom_user),
                 'telephone_user' => $telephone_user,
                 'code_user' => $code,
-                'email_user' => $email_user,
+                'email_user' => strtolower($email_user),
                 'matricule_user' => strtoupper($matricule_user),
                 'sexe_user' => $sexe_user,
                 'fonction_code' => $fonction_user,
@@ -165,9 +165,9 @@ class UserService
                 </div>
                
                 <div class="row mb-3">
-                    <div class="col-md-12">
-                        <button type="submit" class="btn btn-primary w-50 modal_footer" id="btnSubmitForm"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
-                        <button type="button" class="btn btn-light dismiss_modal">Close</button>
+                    <div class="col-md-12 modal_footer">
+                        <button type="submit" class="btn btn-primary" id="btnSubmitForm"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
+                        <button type="button" class="btn btn-light dismiss_modal">Fermer</button>
 
                     </div>
                 </div>
@@ -261,11 +261,11 @@ class UserService
 
             $data[] = [
                 $i,
-                $user['email_user'],
-                $user['nom_user'],
-                $user['prenom_user'],
+                strtolower($user['email_user']),
+                ucfirst($user['nom_user']),
+                ucfirst($user['prenom_user']),
                 $user['telephone_user'],
-                $user['libelle_fonction'],
+                ucfirst($user['libelle_fonction']),
                 $etat,
                 $actions
             ];

@@ -197,6 +197,7 @@ class UserModel extends Model
         // }
 
         $where = "WHERE us.etablissement_code = :etablissement_code";
+
         if (!empty($likeParams)) {
             $likes = [];
             foreach ($likeParams as $field => $search) {
@@ -218,13 +219,18 @@ class UserModel extends Model
         //     $where .= '(' . implode(' OR ', $likes) . ')';
         // }
 
-        $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
+            
+        $sql = "SELECT COUNT(*) AS nb FROM " . TABLES::USERS . " us 
             JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code  $where";
+
         $stmt = $this->db->prepare($sql);
 
         // return $sql;
         $stmt->execute(array_merge($whereParams, $likeParams));
-        return (int) $stmt->fetchColumn();
+        $data = $stmt->fetch();
+        return $data['nb'] ?? 0 ;
+
+
     }
 
 
@@ -244,7 +250,8 @@ class UserModel extends Model
         }
 
 
-        $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
+       
+         $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
         LEFT JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code $where ORDER BY nom_user ASC, prenom_user ASC LIMIT :start, :limit";
 
         $stmt = $this->db->prepare($sql);
