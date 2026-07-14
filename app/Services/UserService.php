@@ -223,50 +223,45 @@ class UserService
         foreach ($users as $user) {
             $i++;
 
-            $etat = $user['statut_user'] == STATUT_ACTIF ? '<span class="badge badge-success"> ✅ Actif</span>' : '<span class="badge badge-danger"> ❌ Desactivé</span>';
+            $etat = checkEtatData($user['statut_user']);
 
-            $actions = '<div class="dropdown">
-        <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown">
-            Action
-        </button>
-        <div class="dropdown-menu">';
+            $actions = '
+            <button class="btn btn-light btn-link " type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h"></i>
+            </button>
+            <div class="dropdown-menu">
 
-            if (!empty($user['token']) && $user['statut_user'] == STATUT_ACTIF) {
-                $actions .= '
-            <button class="dropdown-item btn_send_mail" data-user="' . $user['code_user'] . '">
-                📧 Renvoyer mail
-            </button>';
-            }
-
-            $actions .= '
-        <a href="#" class="dropdown-item" data-user="' . $user['code_user'] . '">
-            <i class="fa fa-print"></i> Imprimer
+        <a class="dropdown-item" href="" data-toggle="tooltip" title="" data-original-title="Voir les détails de la commande">
+            <i class="fa fa-eye text-icon-primary"></i> &nbsp; &nbsp; Voir details
         </a>
 
-        <a href="' . url('', ['code' => $user['code_user']]) . '" class="dropdown-item">
-            👁‍🗨 Voir
-        </a>';
+        <button class="dropdown-item " data-toggle="tooltip" title="" data-original-title="Modifier utilisateur" 
+                onclick="modalUpdatedUtilisateurr(' . $user['code_user'] . ')"
+                title="" >
+            <i class="fa fa-edit text-icon-primary "></i> &nbsp; &nbsp; Modifier utilisateur 
+        </button>
 
-            if (empty($user['token'])) {
-                $actions .= $user['statut_user']
-                    ? '<button class="dropdown-item btn_disable_user" data-user="' . $user['code_user'] . '">
-                   ❌ Désactiver compte
-               </button>'
-                    : '<button class="dropdown-item btn_enable_user" data-user="' . $user['code_user'] . '">
-                   ✅ Activer compte
-               </button>';
-            }
+                <button class="dropdown-item " data-toggle="tooltip" 
+            id="btn_validation_achat"
+                onclick="updateELement()"
+                title="Valider la commande" >
+            <i class="fa fa-save text-icon-success "></i> &nbsp; &nbsp; Valider commande 
+        </button>
+    
+        <div role="separator" class="dropdown-divider"></div>
 
-            $actions .= '</div></div>';
+        <a class="dropdown-item " href="" target="_blank" data-toggle="tooltip" title="" data-original-title="Imprimer la facture de la commande">
+            <i class="fas fa fa-print text-icon-dark"></i> &nbsp; &nbsp; Imprimer la commande commande </a>
+    </div>
+            ';
 
             $data[] = [
                 $i,
-                strtolower($user['email_user']),
+                $etat,
                 ucfirst($user['nom_user']),
                 ucfirst($user['prenom_user']),
                 $user['telephone_user'],
                 ucfirst($user['libelle_fonction']),
-                $etat,
                 $actions
             ];
         }

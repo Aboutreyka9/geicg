@@ -365,6 +365,7 @@ function deconnecter() {
 
 loadDataTable('data-table-utilisateur', '#data-table-utilisateur', 'bcharger_data_utilisateurs');
 
+
 openModalAddUtilisateur();
 function openModalAddUtilisateur() {
     $('.btn_utilisateur_addModal').click(function (e) {
@@ -417,15 +418,15 @@ function ajouterUtilisateur() {
             data: data,
             dataType: "JSON",
             beforeSend: function () {
-                $(".loader_backdrop2").css('display', "block");
+                // $(".loader_backdrop2").css('display', "block");
                 
-                btnReq(".modal_footer", "Enregistrement...");
+                btnReq("#btnSubmitForm", "Enregistrement...");
             },
             success: function(data) {
                 console.log(data);
-                    $(".loader_backdrop2").css('display', "none");
+                    // $(".loader_backdrop2").css('display', "none");
 
-                btnRes(".modal_footer", "Enregistrer", "fa-save");
+                btnRes("#btnSubmitForm", "Enregistrer", "fa-save");
                 if (data.success) {
                     tables['data-table-utilisateur'].ajax.reload(null, false);
                     $.notify(data.message, "success");
@@ -473,6 +474,36 @@ function bOpenModalUpdatedUtilisateurr() {
     );
 }
 
+function modalUpdatedUtilisateurr(code) {
+    // let btn = btn_action.id;
+    
+
+    $.ajax({
+        method: "POST",
+        url: URL_AJAX,
+        data: {
+        action: 'btn_showmodal_utilisateur_update',
+        codeUtilisateur: code
+        },
+        dataType: 'JSON',
+        beforeSend: function () {
+            $(".loader_backdrop2").css('display', "block");
+            // btnReq(".modal_footer", "Traitement...");
+        },
+        success: function (data) {
+
+            $(".loader_backdrop2").css('display', "none");
+            if (data.success) {
+                $(".data-modal").html(data.data);
+                $("#user-modal").modal("show");
+                
+            } else {
+                showNotify(data.message, "error");
+            }
+        }
+    });
+}
+
 bUpdatedUtilisateur();
 function bUpdatedUtilisateur() {
     $("body").delegate("#frmUpdateFournisseurData", "submit", function(e) {
@@ -507,6 +538,46 @@ function bUpdatedUtilisateur() {
         })
     });
 }
+
+    function updateELementDepegggnse(btn_action, code) {
+        let btn = btn_action.id;
+        swal({
+            title: "Etes vous sure",
+            text: "de vouloir effectuer cette opération?",
+            icon: "warning",
+            buttons: ['Non', 'Oui'],
+            dangerMode: true,
+        }).then((a) => {
+
+            if (a) {
+                $.ajax({
+                    url: "../partials/rooter.php",
+                    method: "POST",
+                    data: {
+                        id: code,
+                        btn_action: btn
+                    },
+                    dataType: 'JSON',
+                    success: function (data) {
+
+                        if (data.success) {
+                            swal({
+                            title: "Notification",
+                            text: data.msg,
+                            icon: "success",
+                            }).then((a) => { window.location.reload(); });
+                            
+                          
+                        } else {
+                            showNotify(data.msg, "error");
+                        }
+
+
+                    }
+                });
+            }
+        });
+    }
 
 /** FIN SECTION UTILISATEUR */
 

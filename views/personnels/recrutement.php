@@ -1,41 +1,40 @@
-<div class="card mt-2 bg_light">
-    <div class="card-header">
-        <div class="table_row_header">
-            <div class="table_row_header_left">
-                <h4 class=" text-upper"> <i class="fa fa-list"></i> &nbsp; Liste des utilisateurs</h4>
-            </div>
-            <div class="table_row_header_right">
-                <button class="btn btn-primary "> <i class="fa fa-print"></i> &nbsp; <span class="text_button text-uppercase">Imprimer</span></button>
-                <button class="btn btn-info  btn_utilisateur_addModal"> <i class="fa fa-plus-circle fa-2"></i> &nbsp; <span class="text_button text-uppercase">Enregistrer utilisateur</span></button>
 
-            </div>
+ <div class="card mb-3">
+   <div class="card-body">
+     <div class="row">
+       <div class="col-md-4">
+         <button style="border: none;" type="button" class="btn btn-outline-dark w-50 btn_reload"><i class="fas fa-sync"></i> &nbsp; Mettre à jour</button>
+       </div>
+       <div class="col-md-8 d-flex justify-content-end ">
+        <button class="btn btn-dark mr-3"> <i class="fa fa-print"></i> &nbsp; <span class="text_button text-uppercase">Imprimer</span></button>
+                <button class="btn btn-info  btn_utilisateur_addModal"> <i class="fa fa-plus-circle fa-2"></i> &nbsp; <span class="text_button text-uppercase">Ajouter</span>
+            </button>
 
-        </div>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <div class="card">
+   <div class="card-body">
+
+    <div class="table-responsive " id="sexion_user">
+        <table id="data-table-utilisateur" class="table table-striped table-bordered  table-hover ">
+            <thead class="">
+                <tr>
+                    <th>#</th>
+                    <th>STATUT</th>
+                    <th>NOM</th>
+                    <th>PRENOMS</th>
+                    <th>CONTACT</th>
+                    <th>FONCTION</th>
+                    <th>OPTIONS</th>
+                </tr>
+            </thead>
+        </table>
     </div>
-    <div class="card-body">
-        <div class="table-responsive " id="sexion_user">
-
-            <table id="data-table-utilisateur" class="table table-striped table-bordered  table-hover ">
-                <thead class="">
-                    <tr>
-                        <th>#</th>
-                        <th>EMAIL</th>
-                        <th>NOM</th>
-                        <th>PRENOMS</th>
-                        <th>CONTACT</th>
-                        <th>FONCTION</th>
-                        <th>STATUT</th>
-                        <th>OPTION</th>
-                    </tr>
-                </thead>
-
-            </table>
-        </div>
-    </div>
-</div>
-
-
-
+   </div>
+ </div>
 
 
 

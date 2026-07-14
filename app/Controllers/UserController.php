@@ -164,6 +164,7 @@ class UserController extends MainController
     public function bGetListeUser()
     {
 
+        $_POST = sanitizePostData($_POST);
         extract($_POST);
         $output = "";
         $user = new UserModel();
@@ -217,6 +218,24 @@ class UserController extends MainController
 
         // $users = getAllusers();
         $u = new UserModel();
+        $fonctions = $u->getAllFonctions(Auth::user('etablissement_code'));
+        $services = $u->getAllServices(Auth::user('etablissement_code'));
+        // $services = getAllServices();
+        if (empty($fonctions) || empty($services)) Response::error('Aucune fonction ou service trouvé');
+            
+
+        $output = UserService::userAddModalService($fonctions, $services);
+        Response::success('', ['data' => $output]);
+    }
+
+       public function modalUpdatedUtilisateurr()
+    {
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+        
+        // $users = getAllusers();
+        $u = new UserModel();
+        $user = $u->getUserByCodeWithFoction(decrypter($codeUtilisateur));
         $fonctions = $u->getAllFonctions(Auth::user('etablissement_code'));
         $services = $u->getAllServices(Auth::user('etablissement_code'));
         // $services = getAllServices();

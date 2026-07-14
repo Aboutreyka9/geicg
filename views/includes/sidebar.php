@@ -333,7 +333,7 @@
                             <?php //if(auth()->hasRole(Roles::ADMIN_H)): 
                             ?>
                             <li>
-                                <a class="item-link" href="<?= url('personnel/recrutements') ?>">
+                                <a class="item-link" href="<?= url('recrutements/personnel') ?>">
                                     <span class="sub-item"> Recrutement</span>
                                 </a>
                             </li>

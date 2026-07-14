@@ -150,7 +150,7 @@ class UserModel extends Model
     {
         $data = [];
         try {
-            $sql = "SELECT us.*, fn.libelle_fonction FROM users AS us JOIN fonctions fn ON fn.code_fonction = us.fonction_id 
+            $sql = "SELECT us.*, fn.libelle_fonction FROM " . TABLES::USERS . " AS us JOIN " . TABLES::FONCTIONS . " fn ON fn.code_fonction = us.fonction_id 
             WHERE us.hotel_id = :hotel_id AND us.code_user = :code LIMIT 1";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([

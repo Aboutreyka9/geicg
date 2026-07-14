@@ -44,6 +44,10 @@ switch ($action) {
         $ajx = new UserController();
         $ajx->modalAddUser();
     break;
+    case 'btn_showmodal_utilisateur_update':
+        $ajx = new UserController();
+        $ajx->modalUpdatedUtilisateurr();
+    break;
      case 'btn_add_user':
         $ajx = new UserController();
         $ajx->addUser();

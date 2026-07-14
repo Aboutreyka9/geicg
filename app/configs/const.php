@@ -87,7 +87,7 @@ class Groupesss
 //                 'test' =>[]
 //             ];
 
-const STATUT_CHAMBRE = ['Libre', 'Occupee', 'En nettoyage', 'Maintenance'];
+const STATUT_DATA = ['actif', 'inactif', ''];
 const STATUT_RESERVATION = ['En cour', 'Confirmee', 'Annulee', 'Checkout'];
 const PAIEMENT = ['Especes', 'Carte', 'Mobile money'];
 const SEXEP = ['Mr', 'Mlle', 'Mme'];

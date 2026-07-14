@@ -129,7 +129,7 @@ $router->group(['before' => 'auth', 'prefix' => '/'], function ($router) {
     $router->get('dashboard', [HomeController::class, 'acueil']);
     $router->get('/', [HomeController::class, 'acueil'], ['before' => 'auth']);
 
-    $router->get('personnel/recrutements',[UserController::class, 'recrutement']);
+    $router->get('recrutements/personnel',[UserController::class, 'recrutement']);
     $router->get('personnel-enseignants',[UserController::class, 'enseignants']);
     $router->get('personnel-administratifs',[UserController::class, 'administratif']);
 
