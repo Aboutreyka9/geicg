@@ -77,6 +77,49 @@ class UserService
 
     }
 
+       function updateUserData($post)  {
+        extract($post);
+        $user = new UserModel();
+
+
+         $userphone = $user->find(TABLES::USERS, "telephone_user", $telephone_user);
+        if (!empty($userphone) && $userphone['code_user'] != $code_user) 
+            {
+            return ['success' => false, 'message' => 'Desolé! Ce numero de telephone existe déjà.'];
+            }
+
+             $userEmail = $user->find(TABLES::USERS, "email_user", $email_user);
+             if (!empty($userEmail) && $userEmail['code_user'] != $code_user) 
+            {
+            return ['success' => false, 'message' => 'Desolé! Cette adresse email existe déjà.'];
+            }
+
+
+            $data_user = [
+                'nom_user' => ucfirst($nom_user),
+                'prenom_user' => ucfirst($prenom_user),
+                'telephone_user' => $telephone_user,
+                'email_user' => strtolower($email_user),
+                'matricule_user' => strtoupper($matricule_user),
+                'sexe_user' => $sexe_user,
+                'fonction_code' => $fonction_user,
+                'created_at_user' => date('Y-m-d :H:i:s'),
+            ];
+
+            if (!$user->update(TABLES::USERS, 'code_user', $code_user, $data_user))
+            {
+                return ['success' => false, 'message' => "Desolé! echec d'operation."];
+            }
+
+            return [
+                    'success' => true,
+                    'message' => 'Modification effectuée avec succès.',
+                ];
+
+
+    }
+
+
 
     public static function userAddModalService(array $fonctions,array $services)
     {
@@ -177,6 +220,106 @@ class UserService
         return $output;
     }
 
+      public static function userUpdateModalService(array $user, array $fonctions, array $services)
+    {
+        $output = "";
+        $output .= '
+            <form action="#" method="post" id="frmUpdateUser">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <input type="hidden" value="btn_update_user" name="action">
+                        <input type="hidden" value="' . $user['code_user'] . '" name="code_user">
+                        <input type="hidden" value="' . csrfToken()::token() . '" name="csrf_token">
+                        <label for="nom" class="form-label">Nom <strong class="text-danger">*</strong></label>
+                        <input type="text" class="form-control" id="nom" value="' . $user['nom_user'] . '" name="nom_user" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nom" class="form-label">Prénoms <strong class="text-danger">*</strong></label>
+                        <input type="text" class="form-control" id="nom" value="' . $user['prenom_user'] . '" name="prenom_user" required>
+                    </div>
+
+                </div>
+
+                <hr>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="telephone" class="form-label">Téléphone <strong class="text-danger">*</strong></label>
+                        <input type="text" class="form-control telephone" name="telephone_user" id="telephone" value="' . $user['telephone_user'] . '" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="email" class="form-label">Adresse email <strong class="text-danger">*</strong></label>
+                        <input type="email" class="form-control" id="email" name="email_user" value="' . $user['email_user'] . '" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="matricule" class="form-label">Matricule <strong class="text-danger">*</strong></label>
+                        <input type="text" class="form-control" name="matricule_user" id="matricule" value="' . $user['matricule_user'] . '" required>
+
+                    </div>
+                
+                </div>
+
+                <hr>
+                <div class="row mb-3">
+
+                    <div class="col-md-4">
+                        <label for="sexe" class="form-label">Civilé <strong class="text-danger">*</strong></label>
+                        <select name="sexe_user" class="form-control" id="sexe" required>
+                            <option value="">--- CHOISIR ---</option>
+                            ';
+
+                            foreach (SEXEP as $sx) {
+                                $output .= '<option '.selected($user['sexe_user'] ?? null, $sx).' value="' . $sx . '">' . $sx . '</option>';
+                            }
+
+                            $output .= '
+                                            </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="service" class="form-label">Service <strong class="text-danger">*</strong></label>
+                        <select name="service_user" class="form-control" id="service" required>
+                            <option value="">--- CHOISIR ---</option>
+                            ';
+
+                        foreach ($services as $se) {
+                            $output .= '<option '.selected($user['service_code'] ?? null, $se['code_service']).' value="' . $se['code_service'] . '">' .strtoupper($se['libelle_service']) . '</option>';
+                        }
+
+                        $output .= '
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="fonction" class="form-label">Fonction <strong class="text-danger">*</strong></label>
+                        <select name="fonction_user" class="form-control" id="fonction" required>
+                            <option value="">--- CHOISIR ---</option>
+                            ';
+
+                        foreach ($fonctions as $fn) {
+                            $output .= '<option '.selected($user['fonction_code'] ?? null, $fn['code_fonction']).' value="' . $fn['code_fonction'] . '">' .strtoupper( $fn['libelle_fonction']) . '</option>';
+                        }
+
+                        $output .= '
+                        </select>
+                    </div>
+
+                </div>
+               
+                <div class="row mb-3">
+                    <div class="col-md-12 modal_footer">
+                        <button type="submit" class="btn btn-primary" id="btnSubmitForm"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
+                        <button type="button" class="btn btn-light dismiss_modal">Fermer</button>
+
+                    </div>
+                </div>
+
+
+            </form> ';
+        return $output;
+    }
+
     public static function rolesDataGroupes($groupes, $code)
     {
         $output = '';
@@ -232,21 +375,26 @@ class UserService
             <div class="dropdown-menu">
 
         <a class="dropdown-item" href="" data-toggle="tooltip" title="" data-original-title="Voir les détails de la commande">
-            <i class="fa fa-eye text-icon-primary"></i> &nbsp; &nbsp; Voir details
+            <i class="fa fa-eye text-icon-info"></i> &nbsp; &nbsp; Voir details
         </a>
-
-        <button class="dropdown-item " data-toggle="tooltip" title="" data-original-title="Modifier utilisateur" 
-                onclick="modalUpdatedUtilisateurr(' . $user['code_user'] . ')"
-                title="" >
-            <i class="fa fa-edit text-icon-primary "></i> &nbsp; &nbsp; Modifier utilisateur 
-        </button>
-
-                <button class="dropdown-item " data-toggle="tooltip" 
-            id="btn_validation_achat"
-                onclick="updateELement()"
-                title="Valider la commande" >
-            <i class="fa fa-save text-icon-success "></i> &nbsp; &nbsp; Valider commande 
-        </button>
+        <button class="dropdown-item " id="Modifier" onclick="modalUpdatedUtilisateurr(\'' . $user['code_user'] . '\')" 
+            data-toggle="tooltip" title="" data-original-title="Modifier utilisateur">
+        <i class="fa fa-edit text-icon-primary"></i> &nbsp; &nbsp; Modifier utilisateur </button>
+        ';
+        if ($user['statut_user'] == STATUT_ACTIF) {
+            $actions .= '
+        <button class="dropdown-item " id="" onclick="changeStatutUser(\'' . $user['code_user'] . '\',\'' . STATUT_INACTIF . '\')" 
+            data-toggle="tooltip" title="" data-original-title="Désactiver compte ">
+            <i class="fa fa-times text-icon-danger"></i> &nbsp; &nbsp; Désactiver compte </button>
+        ';
+        } else {
+            $actions .= '
+        <button class="dropdown-item " id="" onclick="changeStatutUser(\'' . $user['code_user'] . '\',\'' . STATUT_ACTIF . '\')" 
+            data-toggle="tooltip" title="" data-original-title="Activer compte ">
+            <i class="fa fa-check text-icon-success"></i> &nbsp; &nbsp; Activer compte </button>
+        ';
+        }
+        $actions .= '
     
         <div role="separator" class="dropdown-divider"></div>
 

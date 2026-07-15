@@ -150,12 +150,12 @@ class UserModel extends Model
     {
         $data = [];
         try {
-            $sql = "SELECT us.*, fn.libelle_fonction FROM " . TABLES::USERS . " AS us JOIN " . TABLES::FONCTIONS . " fn ON fn.code_fonction = us.fonction_id 
-            WHERE us.hotel_id = :hotel_id AND us.code_user = :code LIMIT 1";
+            $sql = "SELECT us.*, fn.libelle_fonction FROM " . TABLES::USERS . " AS us JOIN " . TABLES::FONCTIONS . " fn ON fn.code_fonction = us.fonction_code 
+            WHERE us.etablissement_code = :etablissement_code AND us.code_user = :code LIMIT 1";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 'code' => $codeUser,
-                'hotel_id' => Auth::user('hotel_id')
+                'etablissement_code' => Auth::user('etablissement_code')
             ]);
             if ($stmt->rowCount() > 0)
                 $data = $stmt->fetch();

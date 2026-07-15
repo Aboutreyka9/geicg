@@ -166,7 +166,6 @@ class UserController extends MainController
 
         $_POST = sanitizePostData($_POST);
         extract($_POST);
-        $output = "";
         $user = new UserModel();
 
 
@@ -235,15 +234,15 @@ class UserController extends MainController
         
         // $users = getAllusers();
         $u = new UserModel();
-        $user = $u->getUserByCodeWithFoction(decrypter($codeUtilisateur));
+        $user = $u->getUserByCodeWithFoction($codeUtilisateur);
         $fonctions = $u->getAllFonctions(Auth::user('etablissement_code'));
         $services = $u->getAllServices(Auth::user('etablissement_code'));
         // $services = getAllServices();
         if (empty($fonctions) || empty($services)) Response::error('Aucune fonction ou service trouvé');
             
 
-        $output = UserService::userAddModalService($fonctions, $services);
-        Response::success('', ['data' => $output]);
+        $output = UserService::userUpdateModalService($user, $fonctions, $services);
+        echo json_encode(['data' => $output, 'code' => 200, 'message' => 'operation reussie','success' => true]);
     }
 
 
@@ -281,27 +280,48 @@ class UserController extends MainController
 
     }
 
-    public function enableUser()
-    {
 
-        $msg['code'] = 400;
+    public function updateUser()
+    {
+         $_POST = sanitizePostData($_POST);
         extract($_POST);
 
-        $code = decrypter($id_user);
+        $v = new Validator();
 
-        $fn = new Factory();
-        $res = $fn->update('users', 'code_user', $code, ['etat_user' => 1]);
-        if ($res || $res == 0) {
-            $msg['code'] = 200;
-            $msg['type'] = "success";
-            $msg['message'] = "Compte activé avec succes";
-        } else {
-            $msg['type'] = "warning";
-            $msg['message'] = "Echec de 'opération!";
+        $v->required('nom_user', $nom_user, 'Nom')
+        ->required('prenom_user', $prenom_user, 'Prenoms')
+        ->required('telephone_user', $telephone_user, 'Telephone')->phoneNumber('telephone_user', $telephone_user,10 ,'Telephone')
+        ->required('email_user', $email_user, 'Email')->email('email_user', $email_user, 'Email')->required('sexe_user', $sexe_user, 'Civilité')->required('fonction_user', $fonction_user, 'Fonction')->required('service_user', $service_user, 'Service')->required('matricule_user', $matricule_user, 'Matricule');
+    
+        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+
+        $result = $this->userService->updateUserData($_POST);
+
+
+        if (!$result['success']) {
+            Response::error($result['message'], HttpStatusCode::UNAUTHORIZED);
         }
 
-        echo json_encode($msg);
-        return;
+        Response::success($result['message'], []);
+
+    }
+
+    public function changeStatutUser()
+    {
+
+       $_POST = sanitizePostData($_POST);
+        extract($_POST);
+
+        // $statut_user = (isset($statut_utilisateur) && $statut_utilisateur != STATUT_INACTIF) ? STATUT_ACTIF : STATUT_INACTIF;
+        
+
+        $fn = new Factory();
+      
+
+        if($fn->update(TABLES::USERS, 'code_user', $code_utilisateur, ['statut_user' => $statut_utilisateur])) Response::success('Statut modifié avec succès', []);
+
+        Response::error("Echec de l'opération", HttpStatusCode::INTERNAL_SERVER_ERROR);
+     
     }
 
 
@@ -313,7 +333,7 @@ class UserController extends MainController
 
         $code = decrypter($id_user);
         $fn = new Factory();
-        $res = $fn->update('users', 'code_user', $code, ['etat_user' => 0]);
+        $res = $fn->update(TABLES::USERS, 'code_user', $code, ['etat_user' => 0]);
         if ($res || $res == 0) {
             $msg['code'] = 200;
             $msg['type'] = "success";
@@ -814,72 +834,6 @@ class UserController extends MainController
         }
     }
 
-    public function updateUser()
-    {
-        $msg['code'] = 400;
-        $msg['type'] = "warning";
-        $_POST = sanitizePostData($_POST);
-        if ($_POST['code']) {
-
-            if (!empty($_POST['nom']) && !empty($_POST['prenom']) && !empty($_POST['telephone']) && !empty($_POST['email']) && !empty($_POST['fonction']) && !empty($_POST['genre'])) {
-                extract($_POST);
-                $telephone = removeSpace($telephone);
-                $telephone = str_replace('(+225)', '', $telephone);
-
-                // if (isValidPhoneNumber($telephone)) {
-                if (ctype_digit($telephone) && mb_strlen($telephone) == 10) {
-
-                    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        $user = new Factory();
-                        $userphone = $user->find("users", "telephone", $telephone);
-
-                        if (empty($userphone) || $userphone['code_user'] == $code) {
-
-                            $userEmail = $user->find("users", "email", $email);
-
-                            if (empty($userEmail) || $userEmail['code_user'] == $code) {
-
-                                $data_user = [
-                                    'nom' => strtoupper($nom),
-                                    'prenom' => strtoupper($prenom),
-                                    'telephone' => $telephone,
-                                    'email' => $email,
-                                    'sexe' => $genre,
-                                    'fonction_id' => $fonction,
-                                ];
-
-                                $res = $user->update('users', 'code_user', $code, $data_user);
-
-                                if ($res || $res == 0) {
-
-                                    $msg['code'] = 200;
-                                    $msg['type'] = "success";
-                                    $msg['message'] = "Modification effectuée avec succès!";
-                                } else {
-                                    $msg['message'] = "Echec d'operation!";
-                                }
-                            } else {
-                                $msg['message'] = "Desolé! Cette adresse email existe déjà. ";
-                            }
-                        } else {
-                            $msg['message'] = "Desolé! Ce numero de telephone existe déjà. ";
-                        }
-                    } else {
-                        $msg['message'] = "Adresse email invalide. ";
-                    }
-                } else {
-
-                    $msg['message'] = "Numero de telephone invalide. ";
-                }
-            } else {
-                $msg['message'] = "Veuillez remplire tous les champs. ";
-            }
-        } else {
-            $msg['message'] = "Echec de verification des données ";
-        }
-        echo json_encode($msg);
-        return;
-    }
 
     public function resetPasswordUser()
     {

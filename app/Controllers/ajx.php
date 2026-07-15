@@ -36,9 +36,13 @@ switch ($action) {
     break;
 
     // Debut Actions pour les utilisateurs
-    case 'bcharger_data_utilisateurs':
+    case 'charger_data_utilisateurs':
         $ajx = new UserController();
         $ajx->bGetListeUser();
+    break;
+    case 'change_statut_utilisateurs':
+        $ajx = new UserController();
+        $ajx->changeStatutUser();
     break;
     case 'btn_showmodal_utilisateur_add':
         $ajx = new UserController();
@@ -51,6 +55,10 @@ switch ($action) {
      case 'btn_add_user':
         $ajx = new UserController();
         $ajx->addUser();
+    break;
+     case 'btn_update_user':
+        $ajx = new UserController();
+        $ajx->updateUser();
     break;
 
     //end Actions pour les utilisateurs

@@ -507,7 +507,9 @@ abstract class Model
         return $result;
     }
 
-    public function update2(string $table, array $keys, array $data)
+
+    // Comment: updateAnyKeks updates rows matching multiple key conditions
+    public function updateAnyKeks(string $table, array $keys, array $data)
     {
         $result = false;
         $key = implode(' AND ', array_map(fn($k) => "$k = :$k", array_keys($keys)));

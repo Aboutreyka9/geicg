@@ -28,7 +28,7 @@ use App\Core\Router;
 use App\Middlewares\RouteMiddleWare;
 use Phroute\Phroute\Dispatcher;
 
-
+        
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $title = "";
@@ -162,4 +162,3 @@ echo $response;
 
 // session_destroy();
 // var_dump($_SESSION);
-
