@@ -136,11 +136,11 @@ function loadDataTable(tableId, selector, action) {
         return;
     }
 
-    testDatable(action, selector);
+    // testDatable(action, selector);
 
-    // return;
+    // // return;
 
-    console.log(selector, tableId, action);
+    // console.log(selector, tableId, action);
 
     tables[tableId] = $(selector).DataTable({
         processing: true,
@@ -575,7 +575,7 @@ function openModalAddFonction() {
                 $(".loader_backdrop2").css('display', "none");
                 if (data.success) {
                     var output = data.data;
-                    $(".data-modal").html(output.data);
+                    $(".data-fonction-modal").html(output.data);
                     $("#fonction-modal").modal("show");
 
 
@@ -643,7 +643,7 @@ function modalUpdatedFonction(code) {
             $(".loader_backdrop2").css('display', "none");
 
             if (data.success) {
-                $(".data-modal").html(data.data);
+                $(".data-fonction-modal").html(data.data);
                 $("#fonction-modal").modal("show");
 
             } else {
