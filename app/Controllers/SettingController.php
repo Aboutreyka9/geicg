@@ -70,11 +70,22 @@ class SettingController extends MainController
         $whereParams = ['etablissement_code' => Auth::user('etablissement_code')];
 
 
-        $limit  = $_POST['length'];
-        $start  = $_POST['start'];
+        $limit  = (int) ($_POST['length'] ?? 10);
+        $start  = (int) ($_POST['start'] ?? 0);
+        $orderColumn = (int) ($_POST['order'][0]['column'] ?? 0);
+        $orderDir    = strtolower($_POST['order'][0]['dir'] ?? 'asc');
+        $search = trim($_POST['search']['value'] ?? '');
         // $search = $_POST['search'] ?? '';
-        $search = $_POST['search']['value'] ?? '';
+        $columns = [
+            0 => 'created_at_fonction',
+            1 => 'statut_fonction',
+            2 => 'libelle_fonction',
+            3 => 'description_fonction',
+            4 => 'created_at_fonction',
+        ];
 
+        $orderBy = $columns[$orderColumn] ?? 'libelle_fonction';
+        $orderDir = $orderDir === 'desc' ? 'DESC' : 'ASC';
 
 
 
@@ -92,7 +103,7 @@ class SettingController extends MainController
         $totalFiltered = $f->dataTbleCountTotalFonctionsRow($whereParams, $likeParams);
         // 📄 Données
 
-        $fonctionList = $f->DataTableFetchFonctionsListe($likeParams, $start, $limit);
+        $fonctionList = $f->DataTableFetchFonctionsListe($likeParams, $orderBy, $orderDir,$start, $limit);
         $data = [];
 
 

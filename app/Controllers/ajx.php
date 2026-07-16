@@ -37,7 +37,7 @@ switch ($action) {
     // Debut Actions pour les utilisateurs
     case 'charger_data_utilisateurs':
         $ajx = new UserController();
-        $ajx->bGetListeUser();
+        $ajx->GetListeUser();
     break;
     case 'change_statut_utilisateurs':
         $ajx = new UserController();

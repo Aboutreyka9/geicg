@@ -71,7 +71,7 @@ class SettingModel extends Model
         return $data;
     }
     
-    function dataTbleCountTotalFonctionsRow(array $whereParams, $likeParams = [])
+    public function dataTbleCountTotalFonctionsRow(array $whereParams, $likeParams = [])
     {
         // if (!empty($whereParams)) {
         //     $where = 'WHERE ';
@@ -118,7 +118,7 @@ class SettingModel extends Model
     }
 
 
-    function DataTableFetchFonctionsListe($likeParams = [], int $start = 0, int $limit = 10)
+    public function DataTableFetchFonctionsListe(array $likeParams, string $orderBy, string $orderDir, int $start = 0, int $limit = 10)
     {
 
 
@@ -135,7 +135,7 @@ class SettingModel extends Model
 
 
        
-         $sql = "SELECT fn.* FROM " . TABLES::FONCTIONS . " fn $where ORDER BY fn.libelle_fonction ASC LIMIT :start, :limit";
+         $sql = "SELECT fn.* FROM " . TABLES::FONCTIONS . " fn $where ORDER BY $orderBy $orderDir LIMIT :start, :limit";
 
         $stmt = $this->db->prepare($sql);
 

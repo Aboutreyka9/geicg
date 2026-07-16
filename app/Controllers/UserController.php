@@ -87,7 +87,7 @@ class UserController extends MainController
 
       
 
-    public function bGetListeUser()
+    public function GetListeUser()
     {
 
         $_POST = sanitizePostData($_POST);
@@ -102,6 +102,24 @@ class UserController extends MainController
         $start  = $_POST['start'];
         // $search = $_POST['search'] ?? '';
         $search = $_POST['search']['value'] ?? '';
+
+        $limit  = (int) ($_POST['length'] ?? 10);
+        $start  = (int) ($_POST['start'] ?? 0);
+        $orderColumn = (int) ($_POST['order'][0]['column'] ?? 0);
+        $orderDir    = strtolower($_POST['order'][0]['dir'] ?? 'asc');
+        $search = trim($_POST['search']['value'] ?? '');
+        // $search = $_POST['search'] ?? '';
+        $columns = [
+            0 => 'nom_user',
+            1 => 'statut_user',
+            2 => 'nom_user',
+            3 => 'prenom_user',
+            4 => 'telephone_user',
+            5 => 'libelle_fonction',
+        ];
+
+        $orderBy = $columns[$orderColumn] ?? 'libelle_fonction';
+        $orderDir = $orderDir === 'desc' ? 'DESC' : 'ASC';
 
 
 
@@ -120,7 +138,7 @@ class UserController extends MainController
         $totalFiltered = $this->userModel->dataTbleCountTotalUsersRow($whereParams, $likeParams);
         // 📄 Données
 
-        $userList = $this->userModel->DataTableFetchUsersListe($likeParams, $start, $limit);
+        $userList = $this->userModel->DataTableFetchUsersListe($likeParams, $orderBy, $orderDir, $start, $limit);
         $data = [];
 
 

@@ -53,7 +53,7 @@ class UserModel extends Model
 
 
     
-    function dataTbleCountTotalUsersRow(array $whereParams, $likeParams = [])
+    public function dataTbleCountTotalUsersRow(array $whereParams, array $likeParams = [])
     {
 
 
@@ -104,7 +104,7 @@ class UserModel extends Model
     }
 
 
-    function DataTableFetchUsersListe($likeParams = [], int $start = 0, int $limit = 10)
+    public function DataTableFetchUsersListe(array $likeParams, string $orderBy , string $orderDir, int $start = 0, int $limit = 10)
     {
 
 
@@ -122,7 +122,7 @@ class UserModel extends Model
 
        
          $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
-        LEFT JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code $where ORDER BY nom_user ASC, prenom_user ASC LIMIT :start, :limit";
+        LEFT JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code $where ORDER BY $orderBy $orderDir LIMIT :start, :limit";
 
         $stmt = $this->db->prepare($sql);
 

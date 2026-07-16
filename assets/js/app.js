@@ -105,6 +105,7 @@ function searchTestInput() {
 
 function testDatable(action, selector, search = "") {
     // var se = $(selector).DataTable().search().value;
+    alert('test')
     $.ajax({
         method: "POST",
         url: URL_AJAX,
@@ -131,50 +132,29 @@ function testDatable(action, selector, search = "") {
 
 function loadDataTable(tableId, selector, action) {
 
-
-    if ($(selector + ':visible').length) {
-        console.log(selector, tableId, action);
-
-        // testDatable(action, selector);
-
-        // return;
-
-        tables[tableId] = $(selector).DataTable({
-            "processing": true,
-            "serverSide": function loadDataTable(tableId, selector, action) {
-
-
-                if ($(selector + ':visible').length) {
-                    console.log(selector, tableId, action);
-
-                    // testDatable(action, selector);
-
-                    // return;
-
-                    tables[tableId] = $(selector).DataTable({
-                        "processing": true,
-                        "serverSide": true,
-                        "ajax": {
-                            "url": URL_AJAX,
-                            "type": "POST",
-                            "data": {
-                                action: action
-                            }
-                        }
-                    });
-                }
-            },
-            "ajax": {
-                "url": URL_AJAX,
-                "type": "POST",
-                "data": {
-                    action: action
-                }
-            }
-        });
+    if (!$(selector + ':visible').length) {
+        return;
     }
-}
 
+    testDatable(action, selector);
+
+    // return;
+
+    console.log(selector, tableId, action);
+
+    tables[tableId] = $(selector).DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: URL_AJAX,
+            type: "POST",
+            data: {
+                action: action
+            }
+        }
+    });
+
+}
 
 menuNav();
 function menuNav() {
