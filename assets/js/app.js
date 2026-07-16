@@ -141,7 +141,29 @@ function loadDataTable(tableId, selector, action) {
 
         tables[tableId] = $(selector).DataTable({
             "processing": true,
-            "serverSide": true,
+            "serverSide": function loadDataTable(tableId, selector, action) {
+
+
+                if ($(selector + ':visible').length) {
+                    console.log(selector, tableId, action);
+
+                    // testDatable(action, selector);
+
+                    // return;
+
+                    tables[tableId] = $(selector).DataTable({
+                        "processing": true,
+                        "serverSide": true,
+                        "ajax": {
+                            "url": URL_AJAX,
+                            "type": "POST",
+                            "data": {
+                                action: action
+                            }
+                        }
+                    });
+                }
+            },
             "ajax": {
                 "url": URL_AJAX,
                 "type": "POST",
@@ -335,7 +357,6 @@ deconnecter();
 function deconnecter() {
     $('.btn_deconnect').click(function (e) {
         e.preventDefault();
-        alert("deconnecter");
         $.ajax({
             url: URL_AJAX,
             method: 'POST',
@@ -406,7 +427,7 @@ function openModalAddUtilisateur() {
 
 ajouterUtilisateur();
 function ajouterUtilisateur() {
-    $("body").delegate("#frmAddUser", "submit", function (e) {
+    $("body").on("submit", "#frmAddUser", function (e) {
         e.preventDefault();
         var data = $(this).serialize();
 
@@ -470,7 +491,7 @@ function modalUpdatedUtilisateurr(code) {
 
 updatedUtilisateur();
 function updatedUtilisateur() {
-    $("body").delegate("#frmUpdateUser", "submit", function (e) {
+    $("body").on("submit", "#frmUpdateUser", function (e) {
         e.preventDefault();
         var data = $(this).serialize();
 
@@ -598,7 +619,7 @@ function ajouterFonction() {
             method: "POST",
             url: URL_AJAX,
             data: data,
-            // dataType: "JSON",
+            dataType: "JSON",
             beforeSend: function () {
                 // $(".loader_backdrop2").css('display', "block");
 
@@ -609,7 +630,6 @@ function ajouterFonction() {
                 // $(".loader_backdrop2").css('display', "none");
 
                 btnRes("#btnSubmitFormFonction", "Enregistrer", "fa-save");
-                return;
                 if (data.success) {
                     tables['data-table-fonction'].ajax.reload(null, false);
                     $.notify(data.message, "success");
@@ -622,44 +642,41 @@ function ajouterFonction() {
     });
 }
 
-bOpenModalUpdatedFonction();
-function bOpenModalUpdatedFonction() {
-    $("body").on("click", ".frmModifierFonctionData", function (e) {
-        var code_fonction = $(this).data("fonction");
-        console.log(code_fonction);
 
-        $.ajax({
-            method: "POST",
-            url: URL_AJAX,
-            data: {
-                action: 'frm_modal_modifier_fonction',
-                codeFonction: code_fonction
-            },
-            dataType: "JSON",
-            beforeSend: function () {
-                $(".loader_backdrop2").css('display', "block");
-                // btnReq(".modal_footer", "Traitement...");
+function modalUpdatedFonction(code) {
+    // let btn = btn_action.id;
 
-            },
-            success: function (data) {
-                // btnRes(".modal_footer", 'Enregistrer le fournisseur', 'fa-save');
-                $(".loader_backdrop2").css('display', "none");
-                if (data.code == 200) {
-                    $(".data-modal").html(data.data);
-                    $("#fonction-modal").modal("show");
-                } else {
-                    $.notify("Erreur lors du traitement", "error");
-                }
+    $.ajax({
+        method: "POST",
+        url: URL_AJAX,
+        data: {
+            action: 'btn_showmodal_fonction_update',
+            codeFonction: code
+        },
+        dataType: 'JSON',
+        beforeSend: function () {
+            $(".loader_backdrop2").css('display', "block");
+            // btnReq(".modal_footer", "Traitement...");
+        },
+        success: function (data) {
+
+            $(".loader_backdrop2").css('display', "none");
+
+            if (data.success) {
+                $(".data-modal").html(data.data);
+                $("#fonction-modal").modal("show");
+
+            } else {
+                $.notify(data.message);
 
             }
-        })
-    }
-    );
+        }
+    });
 }
 
-bUpdatedFonction();
-function bUpdatedFonction() {
-    $("body").delegate("#frmUpdateFonctionData", "submit", function (e) {
+updatedFonction();
+function updatedFonction() {
+    $("body").on("submit", "#frmUpdateFonction", function (e) {
         e.preventDefault();
         var data = $(this).serialize();
 
@@ -668,18 +685,19 @@ function bUpdatedFonction() {
             method: "POST",
             url: URL_AJAX,
             data: data,
-            dataType: "json",
+            dataType: "JSON",
             beforeSend: function () {
-                $(".loader_backdrop2").css('display', "block");
+                // $(".loader_backdrop2").css('display', "block");
 
-                btnReq(".modal_footer", "Mise à jour en cours...");
+                btnReq("#btnSubmitFormFonction", "Mise à jour en cours...");
             },
             success: function (data) {
+                // $(".loader_backdrop2").css('display', "none");
                 console.log(data);
-                $(".loader_backdrop2").css('display', "none");
 
-                btnRes(".modal_footer", "Mettre à jour le fournisseur", "fa-edit");
-                if (data.code == 200) {
+                btnRes("#btnSubmitFormFonction", "Enregistrer", "fa-save");
+
+                if (data.success) {
                     tables['data-table-fonction'].ajax.reload(null, false);
                     $.notify(data.message, "success");
                     $("#fonction-modal").modal("hide");
@@ -692,5 +710,47 @@ function bUpdatedFonction() {
     });
 }
 
+function changeStatutFonction(code, statut) {
+    swal({
+        title: "Notification",
+        text: "Voulez-vous vraiment modifier le statut de cette fonction?",
+        icon: "warning",
+        dangerMode: true,
+        closeOnClickOutside: false,
+        buttons: {
+            cancel: true,
+            confirm: "Confirmer",
+        },
+    })
+        .then(willDelete => {
+            if (willDelete) {
+
+
+                $.ajax({
+                    url: URL_AJAX,
+                    method: 'POST',
+                    data: {
+                        action: 'change_statut_fonctions',
+                        code_fonction: code,
+                        statut_fonction: statut
+                    },
+                    dataType: 'JSON',
+                    beforeSend: function () {
+                        $(".loader_backdrop2").css('display', "block");
+                    },
+                    success: function (data) {
+                        $(".loader_backdrop2").css('display', "none");
+
+                        if (data.success) {
+                            $.notify(data.message, "success");
+                            tables['data-table-fonction'].ajax.reload(null, false);
+                        } else {
+                            $.notify(data.message);
+                        }
+                    }
+                });;
+            }
+        });
+}
 /** FIN SECTION FONCTION */
 

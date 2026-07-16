@@ -9,11 +9,11 @@ use TABLES;
 class UserService
 {
 
-  public static UserModel $userModel;
+  public  UserModel $userModel;
 
     public function __construct()
     {
-        self::$userModel = new UserModel();
+        $this->userModel = new UserModel();
     }
 
     /**
@@ -24,22 +24,22 @@ class UserService
      * --------------------------------------------------------------------------
      */
 
-    public static function saveUserData($post)  {
+    public  function saveUserData($post)  {
         extract($post);
 
 
-        if (!empty(self::$userModel->find(TABLES::USERS, 'telephone_user', $telephone_user))) 
+        if (!empty($this->userModel->find(TABLES::USERS, 'telephone_user', $telephone_user))) 
             {
             return ['success' => false, 'message' => 'Desolé! Ce numero de telephone existe déjà.'];
             }
 
-             if (!empty(self::$userModel->find(TABLES::USERS, 'email_user', $email_user))) 
+             if (!empty($this->userModel->find(TABLES::USERS, 'email_user', $email_user))) 
             {
             return ['success' => false, 'message' => 'Desolé! Cette adresse email existe déjà.'];
             }
 
             $passwrod = generetor(5);
-            $code = self::$userModel->generatorCode(TABLES::USERS, 'code_user');
+            $code = $this->userModel->generatorCode(TABLES::USERS, 'code_user');
             $token = generetor(random_int(50, 70));
 
             $data_user = [
@@ -58,13 +58,13 @@ class UserService
                 'created_at_user' => date('Y-m-d :H:i:s'),
             ];
 
-            if (!self::$userModel->create(TABLES::USERS, $data_user))
+            if (!$this->userModel->create(TABLES::USERS, $data_user))
             {
                 return ['success' => false, 'message' => "Desolé! echec d'operation."];
             }
 
 
-                $etablissement =   self::$userModel->getInfoEtablissement(Auth::user('etablissement_code'));
+                $etablissement =   $this->userModel->getInfoEtablissement(Auth::user('etablissement_code'));
 
                 $data_mail = [
                     "appName" => $_ENV["APP_NAME"],
@@ -83,17 +83,17 @@ class UserService
 
     }
 
-          public static function updateUserData($post)  {
+          public  function updateUserData($post)  {
         extract($post);
 
 
-         $userphone = self::$userModel->find(TABLES::USERS, "telephone_user", $telephone_user);
+         $userphone = $this->userModel->find(TABLES::USERS, "telephone_user", $telephone_user);
         if (!empty($userphone) && $userphone['code_user'] != $code_user) 
             {
             return ['success' => false, 'message' => 'Desolé! Ce numero de telephone existe déjà.'];
             }
 
-             $userEmail = self::$userModel->find(TABLES::USERS, "email_user", $email_user);
+             $userEmail = $this->userModel->find(TABLES::USERS, "email_user", $email_user);
              if (!empty($userEmail) && $userEmail['code_user'] != $code_user) 
             {
             return ['success' => false, 'message' => 'Desolé! Cette adresse email existe déjà.'];
@@ -111,7 +111,7 @@ class UserService
                 'created_at_user' => date('Y-m-d :H:i:s'),
             ];
 
-            if (!self::$userModel->update(TABLES::USERS, 'code_user', $code_user, $data_user))
+            if (!$this->userModel->update(TABLES::USERS, 'code_user', $code_user, $data_user))
             {
                 return ['success' => false, 'message' => "Desolé! echec d'operation."];
             }
@@ -138,7 +138,7 @@ class UserService
 
 
 
-    public static function userAddModalService(array $fonctions,array $services)
+    public  function userAddModalService(array $fonctions,array $services)
     {
         $output = "";
         $output .= '
@@ -237,7 +237,7 @@ class UserService
         return $output;
     }
 
-    public static function userUpdateModalService(array $user, array $fonctions, array $services)
+    public  function userUpdateModalService(array $user, array $fonctions, array $services)
     {
         $output = "";
         $output .= '
@@ -337,7 +337,7 @@ class UserService
         return $output;
     }
 
-        public static function userDataService($users)
+        public  function userDataService($users)
     {
 
         $i = 0;

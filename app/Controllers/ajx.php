@@ -67,13 +67,25 @@ switch ($action) {
         $ajx = new SettingController();
         $ajx->GetListeFonction();
     break;
+        case 'change_statut_fonctions':
+        $ajx = new SettingController();
+        $ajx->changeStatutFonction();
+    break;
      case 'btn_showmodal_fonction_add':
         $ajx = new SettingController();
         $ajx->modalAddFonction();
     break;
+     case 'btn_showmodal_fonction_update':
+        $ajx = new SettingController();
+        $ajx->modalUpdatedFonction();
+    break;
      case 'btn_add_fonction':
         $ajx = new SettingController();
         $ajx->addFonction();
+    break;
+         case 'btn_update_fonction':
+        $ajx = new SettingController();
+        $ajx->updateFonction();
     break;
 
     //end Actions pour les fonctions

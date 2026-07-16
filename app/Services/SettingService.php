@@ -30,19 +30,21 @@ class SettingService
         extract($post);
 
 
-        if (!empty(self::$settingModel->find(TABLES::FONCTIONS, 'libelle_fonction', $libelle_fonction))) 
+        if (!empty(self::$settingModel->getFieldsForParams(TABLES::FONCTIONS, [ 'libelle_fonction' => $libelle_fonction, 'etablissement_code' => Auth::user('etablissement_code') ]))) 
             {
             return ['success' => false, 'message' => 'Desolé! Ce libelle de fonction existe déjà.'];
             }
 
-            $passwrod = generetor(5);
             $code = self::$settingModel->generatorCode(TABLES::FONCTIONS, 'code_fonction');
-            $token = generetor(random_int(50, 70));
 
             $data_fonction = [
                 'libelle_fonction' => strtoupper($libelle_fonction),
                 'description_fonction' => $description_fonction,
-                'created_at_fonction' => date('Y-m-d :H:i:s'),
+                'code_fonction' => $code,
+                'statut_fonction' => STATUT_ACTIF,
+                'etablissement_code' => Auth::user('etablissement_code'),
+                'user_code' => Auth::user('id'),
+                'created_at_fonction' => date('Y-m-d H:i:s'),
             ];
 
             if (!self::$settingModel->create(TABLES::FONCTIONS, $data_fonction))
@@ -58,6 +60,35 @@ class SettingService
     }
 
 
+    public static function updateFonctionData($post)  {
+        extract($post);
+ 
+
+         $libelle = self::$settingModel->getFieldsForParams(TABLES::FONCTIONS, [ 'libelle_fonction' => $libelle_fonction, 'etablissement_code' => Auth::user('etablissement_code') ]);
+        if (!empty($libelle) && $libelle['code_fonction'] != $code_fonction) 
+            {
+            return ['success' => false, 'message' => 'Desolé! Ce libellé de fonction existe déjà.'];
+            }
+
+       
+            $data_fonction = [
+                'libelle_fonction' => strtoupper($libelle_fonction),
+                'description_fonction' => $description_fonction,
+                'updated_at_fonction' => date('Y-m-d H:i:s'),
+            ];
+
+            if (!self::$settingModel->update(TABLES::FONCTIONS, 'code_fonction', $code_fonction, $data_fonction))
+            {
+                return ['success' => false, 'message' => "Desolé! echec d'operation."];
+            }
+                
+
+            return [
+                    'success' => true,
+                    'message' => 'Modification effectuée avec succès.',
+                ];
+
+    }
 
 
       /**
@@ -75,15 +106,48 @@ class SettingService
         $output .= '
             <form action="#" method="post" id="frmAddFonction">
                 <div class="row mb-3">
-                    <div class="col-md-12">
+                    <div class="col-md-12 mb-3">
                         <input type="hidden" value="btn_add_fonction" name="action">
                         <input type="hidden" value="' . csrfToken()::token() . '" name="csrf_token">
                         <label for="libelle_fonction" class="form-label">Libelle fonction <strong class="text-danger">*</strong></label>
                         <input type="text" class="form-control" id="libelle_fonction" name="libelle_fonction" required>
                     </div>
-                    <div class="col-md-12">
-                        <label for="description_fonction" class="form-label">Description <strong class="text-danger">*</strong></label>
+                    <div class="col-md-12 mb-3">
+                        <label for="description_fonction" class="form-label">Description </label>
                         <textarea rows="3" class="form-control" name="description_fonction" id="description_fonction"></textarea>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12 modal_footer">
+                        <button type="submit" class="btn btn-primary" id="btnSubmitFormFonction"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
+                        <button type="button" class="btn btn-light dismiss_modal">Close</button>
+
+                    </div>
+                </div>
+
+
+            </form> ';
+        return $output;
+    }
+
+
+    public static function fonctionUpdateModalService( array $fonction)
+    {
+        $output = "";
+            $output .= '
+            <form action="#" method="post" id="frmUpdateFonction">
+                <div class="row mb-3">
+                    <div class="col-md-12 mb-3">
+                        <input type="hidden" value="btn_update_fonction" name="action">
+                        <input type="hidden" value="' . $fonction['code_fonction'] . '" name="code_fonction">
+                        <input type="hidden" value="' . csrfToken()::token() . '" name="csrf_token">
+                        <label for="libelle_fonction" class="form-label">Libelle fonction <strong class="text-danger">*</strong></label>
+                        <input type="text" class="form-control" id="libelle_fonction" name="libelle_fonction" value="' . $fonction['libelle_fonction'] . '" required>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="description_fonction" class="form-label">Description </label>
+                        <textarea rows="3" class="form-control" name="description_fonction" id="description_fonction">' . $fonction['description_fonction'] . '</textarea>
                     </div>
                 </div>
 

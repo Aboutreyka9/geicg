@@ -25,11 +25,19 @@ class UserController extends MainController
     private SettingModel $settingModel;
     private UserModel $userModel;
 
+    // SERVICES
+    private SettingService $settingService;
+    private UserService $userService;
+
     public function __construct()
     {
         parent::__construct();
         $this->settingModel = new SettingModel();
         $this->userModel = new UserModel();
+
+        // SERVICES
+        $this->settingService = new SettingService();
+        $this->userService = new UserService();
     }
 
     /**
@@ -116,7 +124,7 @@ class UserController extends MainController
         $data = [];
 
 
-        $data = UserService::userDataService($userList);
+        $data = $this->userService->userDataService($userList);
         // Response::success('operation reussie',);
         echo json_encode([
             "draw"            => intval($_POST['draw']),
@@ -139,7 +147,7 @@ class UserController extends MainController
         if (empty($fonctions) || empty($services)) Response::error('Aucune fonction ou service trouvé');
             
 
-        $output = UserService::userAddModalService($fonctions, $services);
+        $output = $this->userService->userAddModalService($fonctions, $services);
         Response::success('', ['data' => $output]);
     }
 
@@ -156,7 +164,7 @@ class UserController extends MainController
         if (empty($fonctions) || empty($services)) Response::error('Aucune fonction ou service trouvé');
             
 
-        $output = UserService::userUpdateModalService($user, $fonctions, $services);
+        $output = $this->userService->userUpdateModalService($user, $fonctions, $services);
         echo json_encode(['data' => $output, 'code' => 200, 'message' => 'operation reussie','success' => true]);
     }
 
@@ -176,7 +184,7 @@ class UserController extends MainController
     
         if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
 
-        $result = UserService::saveUserData($_POST);
+        $result = $this->userService->saveUserData($_POST);
 
 
         if (!$result['success']) {
@@ -210,7 +218,7 @@ class UserController extends MainController
     
         if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
 
-        $result = UserService::updateUserData($_POST);
+        $result = $this->userService->updateUserData($_POST);
 
 
         if (!$result['success']) {
@@ -233,7 +241,7 @@ class UserController extends MainController
         if($this->userModel->update(TABLES::USERS, 'code_user', $code_utilisateur, ['statut_user' => $statut_utilisateur])) Response::success('Statut modifié avec succès', []);
 
         Response::error("Echec de l'opération", HttpStatusCode::INTERNAL_SERVER_ERROR);
-     
+
     }
 
 

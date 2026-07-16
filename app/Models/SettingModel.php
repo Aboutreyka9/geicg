@@ -13,6 +13,34 @@ class SettingModel extends Model
     protected string $table = "fonctions";
     public string $id = 'code_fonction';
 
+        public function getSingleFonctionByCode(string $code): array
+    {
+        $data = [];
+        try {
+            $sql = "SELECT * FROM " . TABLES::FONCTIONS . " AS fn WHERE fn.code_fonction = :code LIMIT 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['code' => $code]);
+            $data = $stmt->fetch();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
+            public function getSingleServiceByCode(string $code): array
+    {
+        $data = [];
+        try {
+            $sql = "SELECT * FROM " . TABLES::SERVICES . " AS se WHERE se.code_service = :code LIMIT 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['code' => $code]);
+            $data = $stmt->fetch();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
     // get all fonction
     public function getAllFonctions($etablissement_code): array
     {
