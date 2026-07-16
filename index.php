@@ -28,7 +28,7 @@ use App\Core\Router;
 use App\Middlewares\RouteMiddleWare;
 use Phroute\Phroute\Dispatcher;
 
-
+        
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $title = "";
@@ -129,12 +129,12 @@ $router->group(['before' => 'auth', 'prefix' => '/'], function ($router) {
     $router->get('dashboard', [HomeController::class, 'acueil']);
     $router->get('/', [HomeController::class, 'acueil'], ['before' => 'auth']);
 
-    $router->get('personnel/recrutements',[UserController::class, 'recrutement']);
+    $router->get('recrutements/personnel',[UserController::class, 'recrutement']);
     $router->get('personnel-enseignants',[UserController::class, 'enseignants']);
     $router->get('personnel-administratifs',[UserController::class, 'administratif']);
 
     // <!-- parametrage -->
-    $router->get('fonctions',[SettingController::class, 'fonction']);
+    $router->get('services-fonctions',[SettingController::class, 'fonction']);
 
 });
 
@@ -162,4 +162,3 @@ echo $response;
 
 // session_destroy();
 // var_dump($_SESSION);
-

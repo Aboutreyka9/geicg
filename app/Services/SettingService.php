@@ -4,22 +4,71 @@ namespace App\Services;
 
 use App\Core\Auth;
 use App\Models\Factory;
+use App\Models\SettingModel;
 use App\Models\UserModel;
 use TABLES;
 
 class SettingService
 {
 
+  public static SettingModel $settingModel;
+
+    public function __construct()
+    {
+        self::$settingModel = new SettingModel();
+    }
+
     /**
      * ------------------------------------------------------------------------
      * **********************************************************************
-     * * DEBUT SEXION SETTING 
+     * * DEBUT SEXION SETTING REQUETES
      * **********************************************************************
      * --------------------------------------------------------------------------
      */
 
+      public static function saveFonctionData(array $post)  {
+        extract($post);
 
 
+        if (!empty(self::$settingModel->find(TABLES::FONCTIONS, 'libelle_fonction', $libelle_fonction))) 
+            {
+            return ['success' => false, 'message' => 'Desolé! Ce libelle de fonction existe déjà.'];
+            }
+
+            $passwrod = generetor(5);
+            $code = self::$settingModel->generatorCode(TABLES::FONCTIONS, 'code_fonction');
+            $token = generetor(random_int(50, 70));
+
+            $data_fonction = [
+                'libelle_fonction' => strtoupper($libelle_fonction),
+                'description_fonction' => $description_fonction,
+                'created_at_fonction' => date('Y-m-d :H:i:s'),
+            ];
+
+            if (!self::$settingModel->create(TABLES::FONCTIONS, $data_fonction))
+            {
+                return ['success' => false, 'message' => "Desolé! echec d'operation."];
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Fonction enregistrée avec succès.',
+            ];
+
+    }
+
+
+
+
+      /**
+     * ------------------------------------------------------------------------
+     * **********************************************************************
+     * * DEBUT SEXION SETTING TEMPLATES 
+     * **********************************************************************
+     * --------------------------------------------------------------------------
+     */
+
+  
     public static function fonctionAddModalService()
     {
         $output = "";
@@ -34,13 +83,13 @@ class SettingService
                     </div>
                     <div class="col-md-12">
                         <label for="description_fonction" class="form-label">Description <strong class="text-danger">*</strong></label>
-                        <textarea rows="3" name="description_fonction" id="description_fonction"></textarea>
+                        <textarea rows="3" class="form-control" name="description_fonction" id="description_fonction"></textarea>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-12 modal_footer">
-                        <button type="submit" class="btn btn-primary w-50 " id="btnSubmitForm"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
+                        <button type="submit" class="btn btn-primary" id="btnSubmitFormFonction"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
                         <button type="button" class="btn btn-light dismiss_modal">Close</button>
 
                     </div>
@@ -51,66 +100,54 @@ class SettingService
         return $output;
     }
 
-     function saveFonctionData(array $post)  {
-        extract($post);
-        $fac = new Factory();
+    public static function fonctionDataService($fonctions)
+    {
 
+        $i = 0;
+        $data = [];
 
-        if (!empty($fac->where(TABLES::FONCTIONS, '', $telephone_user))) 
-            {
-            return ['success' => false, 'message' => 'Desolé! Ce numero de telephone existe déjà.'];
-            }
+        foreach ($fonctions as $fonction) {
+            $i++;
 
-             if (!empty($user->find(TABLES::USERS, 'email_user', $email_user))) 
-            {
-            return ['success' => false, 'message' => 'Desolé! Cette adresse email existe déjà.'];
-            }
+            $etat = checkEtatData($fonction['statut_fonction']);
 
-            $passwrod = generetor(5);
-            $code = $user->generatorCode(TABLES::USERS, 'code_user');
-            $token = generetor(random_int(50, 70));
+            $actions = '
+            <button class="btn btn-light btn-link " type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h"></i>
+            </button>
+            <div class="dropdown-menu">
 
-            $data_user = [
-                'nom_user' => strtoupper($nom_user),
-                'prenom_user' => strtoupper($prenom_user),
-                'telephone_user' => $telephone_user,
-                'code_user' => $code,
-                'email_user' => $email_user,
-                'matricule_user' => strtoupper($matricule_user),
-                'sexe_user' => $sexe_user,
-                'fonction_code' => $fonction_user,
-                'etablissement_code' => Auth::user('etablissement_code'),
-                'statut_user' => ETAT_INACTIF,
-                'password_user' => password_hash($passwrod, PASSWORD_BCRYPT),
-                'token_user' => $token,
-                'created_at_user' => date('Y-m-d :H:i:s'),
+        <button class="dropdown-item " id="Modifier" onclick="modalUpdatedFonction(\'' . $fonction['code_fonction'] . '\')" 
+            data-toggle="tooltip" title="" data-original-title="Modifier fonction">
+        <i class="fa fa-edit text-icon-primary"></i> &nbsp; &nbsp; Modifier fonction </button>
+        ';
+        if ($fonction['statut_fonction'] == STATUT_ACTIF) {
+            $actions .= '
+        <button class="dropdown-item " id="" onclick="changeStatutFonction(\'' . $fonction['code_fonction'] . '\',\'' . STATUT_INACTIF . '\')" 
+            data-toggle="tooltip" title="" data-original-title="Désactiver fonction ">
+            <i class="fa fa-times text-icon-danger"></i> &nbsp; &nbsp; Désactiver fonction </button>
+        ';
+        } else {
+            $actions .= '
+        <button class="dropdown-item " id="" onclick="changeStatutFonction(\'' . $fonction['code_fonction'] . '\',\'' . STATUT_ACTIF . '\')" 
+            data-toggle="tooltip" title="" data-original-title="Activer fonction ">
+            <i class="fa fa-check text-icon-success"></i> &nbsp; &nbsp; Activer fonction </button>
+        ';
+        }
+        $actions .= ' </div>
+            ';
+
+            $data[] = [
+                $i,
+                $etat,
+                strtoupper($fonction['libelle_fonction']),
+                textLimit($fonction['description_fonction']),
+                date_formater($fonction['created_at_fonction']),
+                $actions
             ];
+        }
 
-            if (!$user->create(TABLES::USERS, $data_user))
-            {
-                return ['success' => false, 'message' => "Desolé! echec d'operation."];
-            }
-
-
-                $etablissement =   $user->getInfoEtablissement(Auth::user('etablissement_code'));
-
-                $data_mail = [
-                    "appName" => $_ENV["APP_NAME"],
-                    "libelle_structure" => $etablissement['libelle_etablissement'],
-                    "email" => $email_user,
-                    "password" => $passwrod,
-                    "nom" => strtoupper($nom_user . " " . $prenom_user),
-                    "lienActivation" => HOME . "/activation/{$token}"
-                ];
-
-                return [
-                    'success' => true,
-                    'message' => 'Utilisateur enregistré avec succès.',
-                    'data' => $data_mail
-                ];
-
+        return $data;
     }
-
-
 
 }

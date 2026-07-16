@@ -406,90 +406,173 @@ function money($montant)
     return number_format($montant, 0, ',', ' ') . " FCFA";
 }
 
-function checkState($etat, $data = STATUT_RESERVATION)
+function checkModePaiement(string $mode)
 {
-    $result = "";
-    switch ($etat) {
-        case $data[0]:
-            $result = '⏳ ';
-            break;
-        case $data[1]:
-            $result = '✅ ';
-            break;
-        case $data[2]:
-            $result = '❌ ';
-            break;
-        case $data[3]:
-            $result = '✔ ';
-            break;
-        default:
-            $result = '✅ Libre ';
-            break;
-    }
+  $modes = PAYMENT_MODE_SHOW;
 
+  if (!isset($modes[$mode])) {
+    return '';
+  }
 
-    return $result;
+  return '<span class="text-light badge bg-' . $modes[$mode]['class'] . '">
+                ' . $modes[$mode]['label'] . '
+            </span>';
 }
 
-function checkEtatCh($etat)
+
+function checkStatusCommande(string $etat, array $data = STATUT_COMMANDE)
 {
-    $result = "";
-    switch ($etat) {
-        case 0:
-            $result = '⏳ Non soldé';
-            break;
-        case 1:
-            $result = '✅ Soldé';
-            break;
-        default:
-            $result = '❌ en attente';
-            break;
-    }
+  $result = "";
+  switch ($etat) {
+    case $data[0]:
+      $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> ' . $data[0] . '</span>';
+      break;
+    case $data[1]:
+      $result = '<span class="badge badge-statut statut-info"><span class="dot"></span> ' . $data[1] . '</span>';
+      break;
+    case $data[2]:
+      $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> ' . $data[2] . '</span>';
+      break;
+    case $data[3]:
+      $result = '<span class="badge badge-statut statut-default"><span class="dot"></span> ' . $data[3] . '</span>';
+      break;
+    case $data[4]:
+      $result = '<span class="badge badge-statut statut-danger"><span class="dot"></span> ' . $data[4] . '</span>';
+      break;
+    default:
+      $result = '';
+      break;
+  }
+  return $result;
+}
+function checkEtat(string $status, array $data = ETATS)
+{
+  $result = "";
+  switch ($status) {
+    case $data[0]:
+      $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> ' . 'En attente' . '</span>';
+      break;
+    case $data[1]:
+      $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> ' . 'confirmé' . '</span>';
+      break;
+    default:
+      $result = 1;
+      break;
+  }
 
 
-    return $result;
+  return $result;
 }
 
-function recaptCheckState($etat, $data = STATUT_RESERVATION)
+
+function checkEtatData(string $status, array $data = STATUT_DATA)
 {
-    $result = "";
-    switch ($etat) {
-        case $data[0]:
-            $result = '⏳ en attente';
-            break;
-        case $data[1]:
-            $result = '✅ confirmée';
-            break;
-        case $data[2]:
-            $result = '❌ ennulée';
-            break;
-        default:
-            $result = '⏳ en attente';
-            break;
-    }
+  $result = "";
+  switch ($status) {
+    case $data[0]:
+      $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> actif </span>';
+      break;
+    default:
+     $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> inactif </span>';
+      break;
+  }
 
 
-    return $result;
+  return $result;
 }
 
-function checkStateDepense($etat)
+function checkEtatDispo(string $status, array $data = ETATS)
 {
-    $result = "";
-    switch ($etat) {
-        case 1:
-            $result = '✅ Confirmée';
-            break;
-        case 2:
-            $result = '❌ Annulée';
-            break;
+  $result = "";
+  switch ($status) {
+    case $data[0]:
+      $result = '<span class="badge badge-statut statut-warning"> NON </span>';
+      break;
+    case $data[1]:
+      $result = '<span class="badge badge-statut statut-success"> OUI </span>';
+      break;
+    default:
+      $result = 1;
+      break;
+  }
 
-        default:
-            $result = '⏳ En attente';
-            break;
-    }
+
+  return $result;
+}
+
+function checkEtatStock(string $stock, $stockAlerte)
+{
+  $result = "";
+
+  if ($stock >= ($stockAlerte + 20)) {
+    $result = ' <i class="fas fa-arrow-up text-icon-success"></i> ' . $stock;
+  } elseif ($stock < ($stockAlerte + 20) && $stock > $stockAlerte) {
+    $result = ' <i class="fas fa-arrow-down text-icon-warning"></i> ' . $stock;
+  } else {
+    $result = ' <i class="fas fa-arrow-down text-icon-danger"></i> ' . $stock;
+  }
 
 
-    return $result;
+
+  return $result;
+}
+function checkEtatEcart($ecart)
+{
+  $result = "";
+
+  if ($ecart > 0) {
+    $result = ' <i class="fas fa-arrow-circle-up text-icon-primary"></i> ' . $ecart;
+  } elseif ($ecart < 0) {
+    $result = ' <i class="fas fa-arrow-circle-down text-icon-danger"></i> ' . $ecart;
+  } else {
+    $result = ' <i class="fas fa-check-circle text-icon-success"></i> ' . $ecart;
+  }
+
+
+
+  return $result;
+}
+
+function checkEtatPaiement(string $status)
+{
+  $result = "";
+  switch ($status) {
+    case 'Non payé':
+      $result = '<span class="badge badge-statut statut-danger"> ' . $status . ' </span>';
+      break;
+    case 'Payé':
+      $result = '<span class="badge badge-statut statut-success"> ' . $status . ' </span>';
+      break;
+    default:
+      $result = '<span class="badge badge-statut statut-warning"> En cour... </span>';
+      break;
+  }
+
+
+  return $result;
+}
+
+
+function checkStatusDepense(string $etat, array $data = STATUT_DEPENSE)
+{
+  $result = "";
+  switch ($etat) {
+    case $data[0]:
+      $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> ' . $data[0] . '</span>';
+      break;
+    case $data[1]:
+      $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> ' . $data[1] . '</span>';
+      break;
+    case $data[2]:
+      $result = '<span class="badge badge-statut statut-danger"><span class="dot"></span> ' . $data[2] . '</span>';
+      break;
+    default:
+      $result = '';
+      break;
+  }
+
+
+  return $result;
 }
 
 function showHtmlElement($item = 1, $equal = 2, $return = 'active show')
@@ -498,6 +581,26 @@ function showHtmlElement($item = 1, $equal = 2, $return = 'active show')
 }
 
 
+
+function textLimit(string | null $text, int $limit = 30, string $suffix = '...'): string
+{
+    if (empty($text)) {
+        return '...';
+    }
+    if (mb_strlen($text) <= $limit) {
+        return $text;
+    }
+
+    $truncated = mb_substr($text, 0, $limit);
+    $result = preg_replace('/\s+\S*$/u', '', $truncated);
+
+    // Si aucun espace n'a été trouvé (mot très long)
+    if ($result === '') {
+        return $truncated . $suffix;
+    }
+
+    return rtrim($result) . $suffix;
+}
 
 
 /**

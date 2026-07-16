@@ -2,15 +2,25 @@
 
 namespace App\Controllers;
 
+use App\Core\Auth;
 use App\Models\Factory;
 use App\Core\MainController;
 use App\Helpers\HttpStatusCode;
 use App\Helpers\Response;
 use App\Helpers\Validator;
+use App\Models\SettingModel;
 use App\Services\SettingService;
 
 class SettingController extends MainController
 {
+
+  private SettingService $settingService;
+
+    public function __construct()
+    {
+         parent::__construct();
+        $this->settingService = new SettingService();
+    }
 
     /**
      * ------------------------------------------------------------------------
@@ -40,13 +50,12 @@ class SettingController extends MainController
 
 
 
-    public function bGetListeFonction()
+    public function GetListeFonction()
     {
 
+        $_POST = sanitizePostData($_POST);
         extract($_POST);
-        $output = "";
-        $user = new Factory();
-
+        $f = new SettingModel();
 
         $likeParams = [];
         $whereParams = ['etablissement_code' => Auth::user('etablissement_code')];
@@ -64,32 +73,38 @@ class SettingController extends MainController
         if (!empty($search)) {
             // $likeParams = ['nom_user' => $search,'prenom_user' => $search,'email_user' => $search,'telephone_user' => $search,'matricule_user' => $search,'sexe_user' => $search];
 
-             $likeParams = ['nom_user' => $search, 'prenom_user' => $search, 'email_user' => $search, 'telephone_user' => $search, 'matricule_user' => $search, 'sexe_user' => $search, 'libelle_fonction' => $search, 'created_at_user' => $search];
+             $likeParams = ['libelle_fonction' => $search, 'created_at_fonction' => $search, 'statut_fonction' => $search];
         }
 
         // 🔢 Total
-        $total = $user->dataTbleCountTotalUsersRow($whereParams);
+        $total = $f->dataTbleCountTotalFonctionsRow($whereParams);
         // 🔢 Total filtré
 
-        $totalFiltered = $user->dataTbleCountTotalUsersRow($whereParams, $likeParams);
+        $totalFiltered = $f->dataTbleCountTotalFonctionsRow($whereParams, $likeParams);
         // 📄 Données
 
-        $userList = $user->DataTableFetchUsersListe($likeParams, $start, $limit);
-
+        $fonctionList = $f->DataTableFetchFonctionsListe($likeParams, $start, $limit);
         $data = [];
 
 
-        $data = UserService::userDataService($userList);
+        $data = SettingService::fonctionDataService($fonctionList);
         // Response::success('operation reussie',);
         echo json_encode([
             "draw"            => intval($_POST['draw']),
             "recordsTotal"    => $total,
             "recordsFiltered" => $totalFiltered,
             "data"            => $data
-            // "data"            => $userList
+            // "data"            => $fonctionList
         ]);
         // // echo json_encode(['data' => $total, 'code' => 200]);
         return;
+    }
+
+    public function modalAddFonction()
+    {
+
+        $output = SettingService::fonctionAddModalService();
+        Response::success('', ['data' => $output]);
     }
 
         public function addFonction()
@@ -104,21 +119,11 @@ class SettingController extends MainController
     
         if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
 
-        $result = $this->userService->saveUserData($_POST);
+        $result = $this->settingService->saveFonctionData($_POST);
 
 
         if (!$result['success']) {
             Response::error($result['message'], HttpStatusCode::UNAUTHORIZED);
-        }
-
-        try {
-            //code...
-            $this->SendMail($email_user, "Création de compte", "activation", $result['data']);
-            Response::success($result['message'], []);
-        } catch (\Throwable $th) {
-            //throw $th;
-            Response::error("Desole verifier l'adresse du destinataire.", HttpStatusCode::NOT_FOUND);
-
         }
 
     }

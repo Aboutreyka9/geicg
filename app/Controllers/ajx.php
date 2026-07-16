@@ -1,4 +1,3 @@
-
 <?php
 session_name("APP675444554_SESSION");
 
@@ -36,25 +35,41 @@ switch ($action) {
     break;
 
     // Debut Actions pour les utilisateurs
-    case 'bcharger_data_utilisateurs':
+    case 'charger_data_utilisateurs':
         $ajx = new UserController();
         $ajx->bGetListeUser();
+    break;
+    case 'change_statut_utilisateurs':
+        $ajx = new UserController();
+        $ajx->changeStatutUser();
     break;
     case 'btn_showmodal_utilisateur_add':
         $ajx = new UserController();
         $ajx->modalAddUser();
     break;
+    case 'btn_showmodal_utilisateur_update':
+        $ajx = new UserController();
+        $ajx->modalUpdatedUtilisateurr();
+    break;
      case 'btn_add_user':
         $ajx = new UserController();
         $ajx->addUser();
     break;
+     case 'btn_update_user':
+        $ajx = new UserController();
+        $ajx->updateUser();
+    break;
 
     //end Actions pour les utilisateurs
 
-        // Debut Actions pour les fonctions
-    case 'bcharger_data_fonctions':
+        // Debut Actions pour les fonctions et services
+    case 'charger_data_fonctions':
         $ajx = new SettingController();
-        $ajx->bGetListeFonction();
+        $ajx->GetListeFonction();
+    break;
+     case 'btn_showmodal_fonction_add':
+        $ajx = new SettingController();
+        $ajx->modalAddFonction();
     break;
      case 'btn_add_fonction':
         $ajx = new SettingController();
@@ -62,8 +77,6 @@ switch ($action) {
     break;
 
     //end Actions pour les fonctions
-
-
 
     // Autres cas...
     default:

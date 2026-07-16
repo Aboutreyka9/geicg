@@ -464,6 +464,31 @@ input::-o-outer-spin-button {
 }
 
 
+.table-nowrap td,
+.table-nowrap th {
+  overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+table{
+  width: 100%;
+  /* font-family: 'Inter', sans-serif; */
+  table-layout: fixed;
+}
+
+.table_active {
+    background-color: #d0ebff !important;
+}
+#table_selected tbody tr {
+    cursor: pointer;
+}
+.label-price{
+  border-bottom:2px solid #222222ff;
+  background:rgb(179, 213, 230); 
+  color:#000
+}
+
+
 /* si ecran taille < 600 ajouter la classe none */
 @media (max-width: 600px) {
     .text_button {
