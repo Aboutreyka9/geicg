@@ -130,7 +130,6 @@ function testDatable(action, selector, search = "") {
 
 
 function loadDataTable(tableId, selector, action) {
-    console.log("teeeeee");
 
 
     if ($(selector + ':visible').length) {
@@ -138,7 +137,7 @@ function loadDataTable(tableId, selector, action) {
 
         // testDatable(action, selector);
 
-        // // return;
+        // return;
 
         tables[tableId] = $(selector).DataTable({
             "processing": true,
@@ -386,8 +385,6 @@ function openModalAddUtilisateur() {
             success: function (data) {
                 // btnRes("#ClientAddModal", 'Ajouter un client', 'fa-plus');
                 // ;
-                console.log(data);
-
 
                 $(".loader_backdrop2").css('display', "none");
                 if (data.success) {
@@ -424,7 +421,6 @@ function ajouterUtilisateur() {
                 btnReq("#btnSubmitForm", "Enregistrement...");
             },
             success: function (data) {
-                console.log(data);
                 // $(".loader_backdrop2").css('display', "none");
 
                 btnRes("#btnSubmitForm", "Enregistrer", "fa-save");
@@ -459,7 +455,6 @@ function modalUpdatedUtilisateurr(code) {
         success: function (data) {
 
             $(".loader_backdrop2").css('display', "none");
-            console.log(data.data);
 
             if (data.success) {
                 $(".data-modal").html(data.data);
@@ -491,7 +486,6 @@ function updatedUtilisateur() {
                 btnReq("#btnSubmitForm", "Mise à jour en cours...");
             },
             success: function (data) {
-                console.log(data);
                 // $(".loader_backdrop2").css('display', "none");
 
                 btnRes("#btnSubmitForm", "Enregistrer", "fa-save");
@@ -538,7 +532,6 @@ function changeStatutUser(code, statut) {
                     },
                     success: function (data) {
                         $(".loader_backdrop2").css('display', "none");
-                        console.log(data);
 
                         if (data.success) {
                             $.notify(data.message, "success");
@@ -552,53 +545,52 @@ function changeStatutUser(code, statut) {
         });
 }
 
+/** FIN SECTION UTILISATEUR */
 
-// bOpenModalUpdatedUtilisateurr();
-function bOpenModalUpdatedUtilisateurr() {
-    $("body").on("click", ".frmModifierUData", function (e) {
-        var code_utilisateur = $(this).data("utilisateur");
-        console.log(code_utilisateur);
+/** DEBUT SECTION FONCTION */
+loadDataTable('data-table-fonction', '#data-table-fonction', 'charger_data_fonctions');
+
+openModalAddFonction();
+function openModalAddFonction() {
+    $('#btn_fonction_addModal').click(function (e) {
+        e.preventDefault();
 
         $.ajax({
             method: "POST",
             url: URL_AJAX,
             data: {
-                action: 'frm_modal_modifier_utilisateur',
-                codeUtilisateur: code_utilisateur
+                action: 'btn_showmodal_fonction_add'
             },
             dataType: "JSON",
             beforeSend: function () {
                 $(".loader_backdrop2").css('display', "block");
-                // btnReq(".modal_footer", "Traitement...");
+                // btnReq("#ClientAddModal", "Traitement...");
 
             },
             success: function (data) {
-                // btnRes(".modal_footer", 'Enregistrer le fournisseur', 'fa-save');
+                // btnRes("#ClientAddModal", 'Ajouter un client', 'fa-plus');
+                // ;
+
                 $(".loader_backdrop2").css('display', "none");
                 if (data.success) {
-                    $(".data-modal").html(data.data);
-                    $("#user-modal").modal("show");
+                    var output = data.data;
+                    $(".data-modal").html(output.data);
+                    $("#fonction-modal").modal("show");
+
+
                 } else {
-                    $.notify("Erreur lors du traitement", "error");
+                    $.notify(data.message);
+
                 }
 
             }
         })
-    }
-    );
+    });
 }
-
-
-/** FIN SECTION UTILISATEUR */
-
-/** DEBUT SECTION FONCTION */
-
-loadDataTable('data-table-fonction', '#data-table-fonction', 'bcharger_data_fonctions');
-
 
 ajouterFonction();
 function ajouterFonction() {
-    $("body").delegate("#frmAddFonction", "submit", function (e) {
+    $("body").on("submit", "#frmAddFonction", function (e) {
         e.preventDefault();
         var data = $(this).serialize();
 
@@ -608,20 +600,20 @@ function ajouterFonction() {
             data: data,
             // dataType: "JSON",
             beforeSend: function () {
-                $(".loader_backdrop2").css('display', "block");
+                // $(".loader_backdrop2").css('display', "block");
 
                 btnReq("#btnSubmitFormFonction", "Enregistrement...");
             },
             success: function (data) {
                 console.log(data);
-                $(".loader_backdrop2").css('display', "none");
+                // $(".loader_backdrop2").css('display', "none");
 
-                btnRes(".modal_footer", "Enregistrer", "fa-save");
+                btnRes("#btnSubmitFormFonction", "Enregistrer", "fa-save");
                 return;
                 if (data.success) {
-                    tables['data-table-utilisateur'].ajax.reload(null, false);
+                    tables['data-table-fonction'].ajax.reload(null, false);
                     $.notify(data.message, "success");
-                    $("#user-modal").modal("hide");
+                    $("#fonction-modal").modal("hide");
                 } else {
                     $.notify(data.message);
                 }
@@ -633,15 +625,15 @@ function ajouterFonction() {
 bOpenModalUpdatedFonction();
 function bOpenModalUpdatedFonction() {
     $("body").on("click", ".frmModifierFonctionData", function (e) {
-        var code_fournisseur = $(this).data("fournisseur");
-        console.log(code_fournisseur);
+        var code_fonction = $(this).data("fonction");
+        console.log(code_fonction);
 
         $.ajax({
             method: "POST",
             url: URL_AJAX,
             data: {
-                action: 'frm_modal_modifier_fournisseur',
-                codeFournisseur: code_fournisseur
+                action: 'frm_modal_modifier_fonction',
+                codeFonction: code_fonction
             },
             dataType: "JSON",
             beforeSend: function () {
@@ -654,7 +646,7 @@ function bOpenModalUpdatedFonction() {
                 $(".loader_backdrop2").css('display', "none");
                 if (data.code == 200) {
                     $(".data-modal").html(data.data);
-                    $("#fournisseur-modal").modal("show");
+                    $("#fonction-modal").modal("show");
                 } else {
                     $.notify("Erreur lors du traitement", "error");
                 }
@@ -688,9 +680,9 @@ function bUpdatedFonction() {
 
                 btnRes(".modal_footer", "Mettre à jour le fournisseur", "fa-edit");
                 if (data.code == 200) {
-                    tables['data-table-fournisseur'].ajax.reload(null, false);
+                    tables['data-table-fonction'].ajax.reload(null, false);
                     $.notify(data.message, "success");
-                    $("#fournisseur-modal").modal("hide");
+                    $("#fonction-modal").modal("hide");
 
                 } else {
                     $.notify(data.message);

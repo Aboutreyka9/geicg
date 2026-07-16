@@ -8,42 +8,19 @@ use Exception;
 use PDO;
 use TABLES;
 
-class UserModel extends Model
+class SettingModel extends Model
 {
-    protected string $table = "users";
-    public string $id = 'code_user';
+    protected string $table = "fonctions";
+    public string $id = 'code_fonction';
 
-    
-        public function getUserByCodeWithFoction($codeUser): ?array
+    // get all fonction
+    public function getAllFonctions($etablissement_code): array
     {
         $data = [];
         try {
-            $sql = "SELECT us.*, fn.libelle_fonction FROM " . TABLES::USERS . " AS us JOIN " . TABLES::FONCTIONS . " fn ON fn.code_fonction = us.fonction_code 
-            WHERE us.etablissement_code = :etablissement_code AND us.code_user = :code LIMIT 1";
+            $sql = "SELECT * FROM " . TABLES::FONCTIONS . " AS fn WHERE fn.etablissement_code = :etablissement_code AND statut_fonction = :statut ORDER BY libelle_fonction";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([
-                'code' => $codeUser,
-                'etablissement_code' => Auth::user('etablissement_code')
-            ]);
-            if ($stmt->rowCount() > 0)
-                $data = $stmt->fetch();
-        } catch (Exception $e) {
-            die($e->getMessage());
-        }
-        return $data;
-    }
-
-    public function getUserWithFoction($etat = 1): ?array
-    {
-        $data = [];
-        try {
-            $sql = "SELECT us.*, fn.libelle_fonction FROM " . TABLES::USERS . " AS us JOIN " . TABLES::FONCTIONS . " fn ON fn.code_fonction = us.fonction_code AND fn.statut_fonction = :etat 
-            WHERE us.etablissement_code = :etablissement_code  ORDER BY us.statut_user DESC, us.nom_user";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([
-                'etat' => $etat,
-                'etablissement_code' => Auth::user('etablissement_code')
-            ]);
+            $stmt->execute(['etablissement_code' => $etablissement_code,'statut' => STATUT_ACTIF]);
             $data = $stmt->fetchAll();
         } catch (Exception $e) {
             die($e->getMessage());
@@ -51,13 +28,23 @@ class UserModel extends Model
         return $data;
     }
 
-
-    
-    function dataTbleCountTotalUsersRow(array $whereParams, $likeParams = [])
+    // get all Services
+    public function getAllServices($etablissement_code): array
     {
-
-
-
+        $data = [];
+        try {
+            $sql = "SELECT * FROM " . TABLES::SERVICES . " AS se WHERE se.etablissement_code = :etablissement_code AND statut_service = :statut ORDER BY libelle_service";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['etablissement_code' => $etablissement_code,'statut' => STATUT_ACTIF]);
+            $data = $stmt->fetchAll();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+    
+    function dataTbleCountTotalFonctionsRow(array $whereParams, $likeParams = [])
+    {
         // if (!empty($whereParams)) {
         //     $where = 'WHERE ';
         //     $where .=  implode(
@@ -66,7 +53,7 @@ class UserModel extends Model
         //     );
         // }
 
-        $where = "WHERE us.etablissement_code = :etablissement_code";
+        $where = "WHERE fn.etablissement_code = :etablissement_code";
 
         if (!empty($likeParams)) {
             $likes = [];
@@ -90,8 +77,7 @@ class UserModel extends Model
         // }
 
             
-        $sql = "SELECT COUNT(*) AS nb FROM " . TABLES::USERS . " us 
-            JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code  $where";
+        $sql = "SELECT COUNT(*) AS nb FROM " . TABLES::FONCTIONS . " fn $where";
 
         $stmt = $this->db->prepare($sql);
 
@@ -104,11 +90,11 @@ class UserModel extends Model
     }
 
 
-    function DataTableFetchUsersListe($likeParams = [], int $start = 0, int $limit = 10)
+    function DataTableFetchFonctionsListe($likeParams = [], int $start = 0, int $limit = 10)
     {
 
 
-        $where = "WHERE us.etablissement_code = :etablissement_code";
+        $where = "WHERE fn.etablissement_code = :etablissement_code";
 
         if (!empty($likeParams)) {
             $likes = [];
@@ -121,8 +107,7 @@ class UserModel extends Model
 
 
        
-         $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
-        LEFT JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code $where ORDER BY nom_user ASC, prenom_user ASC LIMIT :start, :limit";
+         $sql = "SELECT fn.* FROM " . TABLES::FONCTIONS . " fn $where ORDER BY fn.libelle_fonction ASC LIMIT :start, :limit";
 
         $stmt = $this->db->prepare($sql);
 

@@ -251,6 +251,14 @@ abstract class Model
         return $stmt->fetchAll();
     }
 
+    /**
+     * Summary of getFieldsForParams
+     * @param string $table
+     * @param array $params
+     * @param array $columns
+     * @param string $methodFetch
+     * @param array $order
+     */
     public function getFieldsForParams(string $table, array $params = [], array $columns = [], string $methodFetch = 'fetch', array $order = [])
     {
         $result = [];
@@ -322,7 +330,7 @@ abstract class Model
         return $result;
     }
 
-       public static function upsertMultipleAchat(array $rows)
+       public function upsertMultipleAchat(array $rows)
     {
         if (empty($rows))
             return false;
@@ -339,18 +347,18 @@ abstract class Model
             }
         }
 
-        // $sql = 'INSERT INTO entree (' . implode(',', $columns) . ')
-            // VALUES ' . implode(',', $placeholders) . '
-            // ON DUPLICATE KEY UPDATE
-            //     prix_achat = VALUES(prix_achat),
-            //     qte = VALUES(qte),
-            //     etat = VALUES(etat)';
+        $sql = 'INSERT INTO entree (' . implode(',', $columns) . ')
+            VALUES ' . implode(',', $placeholders) . '
+            ON DUPLICATE KEY UPDATE
+                prix_achat = VALUES(prix_achat),
+                qte = VALUES(qte),
+                etat = VALUES(etat)';
 
-        $stmt = self::getConnexion()->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         return $stmt->execute($values);
     }
 
-    public static function updateOrInsertAchat(array $data)
+    public function updateOrInsertAchat(array $data)
     {
         // Sécurité minimale
         // if (empty($data['achat_id']) || empty($data['article_id'])) {
@@ -365,7 +373,7 @@ abstract class Model
                 prix_achat = VALUES(prix_achat),
                 qte = VALUES(qte)';
 
-        $stmt = self::getConnexion()->prepare($sql);
+        $stmt = $this->db->prepare($sql);
 
         return $stmt->execute([
             ':achat_id' => $data['achat_id'],
@@ -377,7 +385,7 @@ abstract class Model
         ]);
     }
 
-    public static function updateOrInsertVente(array $data)
+    public function updateOrInsertVente(array $data)
     {
         // Sécurité minimale
         // if (empty($data['vente_id']) || empty($data['article_id'])) {
@@ -393,7 +401,7 @@ abstract class Model
             qte = VALUES(qte),
             etat_sortie = VALUES(etat_sortie)';
 
-        $stmt = self::getConnexion()->prepare($sql);
+        $stmt = $this->db->prepare($sql);
 
         return $stmt->execute([
             ':vente_id' => $data['vente_id'],
@@ -404,7 +412,7 @@ abstract class Model
         ]);
     }
 
-     public static function inserted($table, array $data)
+     public function inserted($table, array $data)
     {
         if (empty($data)) {
             throw new Exception('Aucune donnée à insérer');
@@ -418,14 +426,14 @@ abstract class Model
 
         $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
 
-        $query = self::getConnexion()->prepare($sql);
+        $query = $this->db->prepare($sql);
 
         $query->execute(array_values($data));
 
-        return self::getConnexion()->lastInsertId();
+        return $this->db->lastInsertId();
     }
 
-    public static function insertMultiple($table, array $rows)
+    public function insertMultiple($table, array $rows)
     {
         if (empty($rows)) {
             throw new Exception('Aucune donnée à insérer');
@@ -446,12 +454,12 @@ abstract class Model
         // Aplatir les valeurs
         $values = array_merge(...array_map(fn($row) => array_values($row), $rows));
 
-        $query = self::getConnexion()->prepare($sql);
+        $query = $this->db->prepare($sql);
 
         return $query->execute($values);
     }
 
-    public static function upsert($table, $data, $uniqueKeys)
+    public function upsert($table, $data, $uniqueKeys)
     {
         $columns = array_keys($data);
 
@@ -468,11 +476,11 @@ abstract class Model
             VALUES ($placeholders)
             ON DUPLICATE KEY UPDATE " . implode(', ', $updates);
 
-        $stmt = self::getConnexion()->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }
 
-    public static function updated($table, array $data, array $where)
+    public function updated($table, array $data, array $where)
     {
         // SET part
         $set = implode(', ', array_map(fn($col) => "$col = ?", array_keys($data)));
@@ -485,7 +493,7 @@ abstract class Model
         // Fusion des valeurs
         $values = array_merge(array_values($data), array_values($where));
 
-        $query = self::getConnexion()->prepare($sql);
+        $query = $this->db->prepare($sql);
 
         return $query->execute($values);
     }

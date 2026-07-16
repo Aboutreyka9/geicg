@@ -6,40 +6,34 @@ use App\Core\Auth;
 use App\Models\UserModel;
 use TABLES;
 
-class UserService
+class UserService43456
 {
-
-  public static UserModel $userModel;
-
-    public function __construct()
-    {
-        self::$userModel = new UserModel();
-    }
 
     /**
      * ------------------------------------------------------------------------
      * **********************************************************************
-     * * DEBUT SEXION REQUETE 
+     * * DEBUT SEXION USER 
      * **********************************************************************
      * --------------------------------------------------------------------------
      */
 
-    public static function saveUserData($post)  {
+    function saveUserData($post)  {
         extract($post);
+        $user = new UserModel();
 
 
-        if (!empty(self::$userModel->find(TABLES::USERS, 'telephone_user', $telephone_user))) 
+        if (!empty($user->find(TABLES::USERS, 'telephone_user', $telephone_user))) 
             {
             return ['success' => false, 'message' => 'Desolé! Ce numero de telephone existe déjà.'];
             }
 
-             if (!empty(self::$userModel->find(TABLES::USERS, 'email_user', $email_user))) 
+             if (!empty($user->find(TABLES::USERS, 'email_user', $email_user))) 
             {
             return ['success' => false, 'message' => 'Desolé! Cette adresse email existe déjà.'];
             }
 
             $passwrod = generetor(5);
-            $code = self::$userModel->generatorCode(TABLES::USERS, 'code_user');
+            $code = $user->generatorCode(TABLES::USERS, 'code_user');
             $token = generetor(random_int(50, 70));
 
             $data_user = [
@@ -58,13 +52,13 @@ class UserService
                 'created_at_user' => date('Y-m-d :H:i:s'),
             ];
 
-            if (!self::$userModel->create(TABLES::USERS, $data_user))
+            if (!$user->create(TABLES::USERS, $data_user))
             {
                 return ['success' => false, 'message' => "Desolé! echec d'operation."];
             }
 
 
-                $etablissement =   self::$userModel->getInfoEtablissement(Auth::user('etablissement_code'));
+                $etablissement =   $user->getInfoEtablissement(Auth::user('etablissement_code'));
 
                 $data_mail = [
                     "appName" => $_ENV["APP_NAME"],
@@ -83,17 +77,18 @@ class UserService
 
     }
 
-          public static function updateUserData($post)  {
+       function updateUserData($post)  {
         extract($post);
+        $user = new UserModel();
 
 
-         $userphone = self::$userModel->find(TABLES::USERS, "telephone_user", $telephone_user);
+         $userphone = $user->find(TABLES::USERS, "telephone_user", $telephone_user);
         if (!empty($userphone) && $userphone['code_user'] != $code_user) 
             {
             return ['success' => false, 'message' => 'Desolé! Ce numero de telephone existe déjà.'];
             }
 
-             $userEmail = self::$userModel->find(TABLES::USERS, "email_user", $email_user);
+             $userEmail = $user->find(TABLES::USERS, "email_user", $email_user);
              if (!empty($userEmail) && $userEmail['code_user'] != $code_user) 
             {
             return ['success' => false, 'message' => 'Desolé! Cette adresse email existe déjà.'];
@@ -111,7 +106,7 @@ class UserService
                 'created_at_user' => date('Y-m-d :H:i:s'),
             ];
 
-            if (!self::$userModel->update(TABLES::USERS, 'code_user', $code_user, $data_user))
+            if (!$user->update(TABLES::USERS, 'code_user', $code_user, $data_user))
             {
                 return ['success' => false, 'message' => "Desolé! echec d'operation."];
             }
@@ -123,18 +118,6 @@ class UserService
 
 
     }
-
-    /**
-     * ------------------------------------------------------------------------
-     * **********************************************************************
-     * * DEBUT SEXION TEMPLATE 
-     * **********************************************************************
-     * --------------------------------------------------------------------------
-     */
-
- 
-
- 
 
 
 
@@ -237,7 +220,7 @@ class UserService
         return $output;
     }
 
-    public static function userUpdateModalService(array $user, array $fonctions, array $services)
+      public static function userUpdateModalService(array $user, array $fonctions, array $services)
     {
         $output = "";
         $output .= '
@@ -337,7 +320,44 @@ class UserService
         return $output;
     }
 
-        public static function userDataService($users)
+    public static function rolesDataGroupes($groupes, $code)
+    {
+        $output = '';
+        foreach ($groupes as $data) {
+            $output .= ' 
+            <div class="role-container">
+                    <div class="d-flex">
+                    <div class="">
+                    <input data-user="' . $code . '" data-groupe="' . $data['groupe'] . '" data-role="' . $data['code_role'] . '" type="checkbox" class="form-check-input me-2 toggle-role" id="r' . $data['code_role'] . '"> &nbsp;
+                    <label for="r' . $data['code_role'] . '" class="role-title">' .  strtoupper($data['module']) . '</label>
+                    </div>
+                        <div class="">
+                        </div>
+
+                    </div>
+
+                    <div class="permissions mt-3" id="permissions-r' . $data['code_role'] . '">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th width="45%">MODULES</th>
+                                    <th>➕ AJOUTER</th>
+                                    <th>👁️ VOIR</th>
+                                    <th>✏️ MODIFIER</th>
+                                    <th>❌ SUPPRIMER</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sexion-r' . $data['code_role'] . '">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            ';
+        }
+        return $output;
+    }
+
+    public static function userDataService($users)
     {
 
         $i = 0;

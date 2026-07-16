@@ -1,4 +1,3 @@
-
 <?php
 session_name("APP675444554_SESSION");
 
@@ -63,10 +62,14 @@ switch ($action) {
 
     //end Actions pour les utilisateurs
 
-        // Debut Actions pour les fonctions
-    case 'bcharger_data_fonctions':
+        // Debut Actions pour les fonctions et services
+    case 'charger_data_fonctions':
         $ajx = new SettingController();
-        $ajx->bGetListeFonction();
+        $ajx->GetListeFonction();
+    break;
+     case 'btn_showmodal_fonction_add':
+        $ajx = new SettingController();
+        $ajx->modalAddFonction();
     break;
      case 'btn_add_fonction':
         $ajx = new SettingController();
@@ -74,8 +77,6 @@ switch ($action) {
     break;
 
     //end Actions pour les fonctions
-
-
 
     // Autres cas...
     default:

@@ -582,6 +582,26 @@ function showHtmlElement($item = 1, $equal = 2, $return = 'active show')
 
 
 
+function textLimit(string | null $text, int $limit = 30, string $suffix = '...'): string
+{
+    if (empty($text)) {
+        return '...';
+    }
+    if (mb_strlen($text) <= $limit) {
+        return $text;
+    }
+
+    $truncated = mb_substr($text, 0, $limit);
+    $result = preg_replace('/\s+\S*$/u', '', $truncated);
+
+    // Si aucun espace n'a été trouvé (mot très long)
+    if ($result === '') {
+        return $truncated . $suffix;
+    }
+
+    return rtrim($result) . $suffix;
+}
+
 
 /**
  * Returns the string "disabled" if the two provided values are equal.

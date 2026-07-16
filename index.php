@@ -134,7 +134,7 @@ $router->group(['before' => 'auth', 'prefix' => '/'], function ($router) {
     $router->get('personnel-administratifs',[UserController::class, 'administratif']);
 
     // <!-- parametrage -->
-    $router->get('fonctions',[SettingController::class, 'fonction']);
+    $router->get('services-fonctions',[SettingController::class, 'fonction']);
 
 });
 

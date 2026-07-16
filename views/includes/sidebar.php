@@ -6,7 +6,8 @@
             <div class="user">
                 <div class="avatar-sm float-left mr-2">
                     <div class="name-user">
-                        <span style="font-size: 16px; font-weight: bold;" class=""><?= shortName(auth()->user('nom')) ?></span>
+                        <span style="font-size: 16px; font-weight: bold;"
+                            class=""><?= shortName(auth()->user('nom')) ?></span>
                     </div>
                 </div>
 
@@ -24,7 +25,8 @@
                     <div class="collapse in" id="collapseExample">
                         <ul class="nav">
                             <li>
-                                <a class="item-link" href="<?= route('user.profile', ['code' => auth()->user('id')]) ?>">
+                                <a class="item-link"
+                                    href="<?= route('user.profile', ['code' => auth()->user('id')]) ?>">
                                     <span class="link-collapse">Profile</span>
                                 </a>
                             </li>
@@ -44,13 +46,13 @@
             <ul class="nav nav-primary">
                 <li class="nav-item">
                     <a style="background: #db241df1;" class="" href="<?= route('home') ?>">
-                        <i  style="color: #fff!important;" class="fas fa-home"></i>
+                        <i style="color: #fff!important;" class="fas fa-home"></i>
                         <p style="color: #fff!important;">TABLEAU DE BORD</p>
                     </a>
                 </li>
 
 
-                 <!-- Groupes::Gestion académique  => -->
+                <!-- Groupes::Gestion académique  => -->
 
                 <?php //if(auth()->hasGroupe(Groupes::ADMIN)): 
                 ?>
@@ -89,7 +91,7 @@
                             </li>
                             <?php //endif; 
                             ?>
-                               <?php //if(auth()->hasRole(Roles::ADMIN_H)): 
+                            <?php //if(auth()->hasRole(Roles::ADMIN_H)): 
                             ?>
                             <li>
                                 <a class="item-link" href="<?= url('emplois-du-temps') ?>">
@@ -101,9 +103,9 @@
                                     <span class="sub-item">Planification des cours</span>
                                 </a>
                             </li>
-                             <?php //endif; 
+                            <?php //endif; 
                             ?>
-                             <?php //if(auth()->hasRole(Roles::ADMIN_H)): 
+                            <?php //if(auth()->hasRole(Roles::ADMIN_H)): 
                             ?>
                             <li>
                                 <a class="item-link" href="<?= url('semestres') ?>">
@@ -115,7 +117,7 @@
                                     <span class="sub-item">Années</span>
                                 </a>
                             </li>
-                             <?php //endif; 
+                            <?php //endif; 
                             ?>
 
                         </ul>
@@ -123,8 +125,8 @@
                 </li>
                 <?php //endif; 
                 ?>
-                
-                
+
+
                 <!-- Groupes::Étudiants  => -->
 
                 <?php //if(auth()->hasGroupe(Groupes::ADMIN)): 
@@ -151,17 +153,17 @@
                                     <span class="sub-item">Réinscriptions</span>
                                 </a>
                             </li>
-                             <li>
+                            <li>
                                 <a class="item-link" href="<?= url('dossiers-etudiants') ?>">
                                     <span class="sub-item">Dossiers étudiants</span>
                                 </a>
                             </li>
-                             <li>
+                            <li>
                                 <a class="item-link" href="<?= url('cartes-etudiantes') ?>">
                                     <span class="sub-item">Cartes étudiantes</span>
                                 </a>
                             </li>
-                             <li>
+                            <li>
                                 <a class="item-link" href="<?= url('historique-scolaire') ?>">
                                     <span class="sub-item">Historique scolaire</span>
                                 </a>
@@ -174,7 +176,7 @@
                 </li>
                 <?php //endif; 
                 ?>
-                
+
                 <!-- Groupes::Examens  => -->
 
                 <?php //if(auth()->hasGroupe(Groupes::ADMIN)): 
@@ -196,7 +198,7 @@
                                     <span class="sub-item"> Programmation</span>
                                 </a>
                             </li>
-                             <li>
+                            <li>
                                 <a class="item-link" href="<?= url('Saisie-des-notes') ?>">
                                     <span class="sub-item"> Saisie des notes</span>
                                 </a>
@@ -206,12 +208,12 @@
                                     <span class="sub-item">Délibérations</span>
                                 </a>
                             </li>
-                             <li>
+                            <li>
                                 <a class="item-link" href="<?= url('bulletins') ?>">
                                     <span class="sub-item">Bulletins</span>
                                 </a>
                             </li>
-                             <li>
+                            <li>
                                 <a class="item-link" href="<?= url('releves-de-notes') ?>">
                                     <span class="sub-item">Relevés de notes</span>
                                 </a>
@@ -225,7 +227,7 @@
                 <?php //endif; 
                 ?>
 
-                 <!-- Groupes::Finance  => -->
+                <!-- Groupes::Finance  => -->
 
                 <?php //if(auth()->hasGroupe(Groupes::ADMIN)): 
                 ?>
@@ -246,7 +248,7 @@
                                     <span class="sub-item"> Frais de scolarité</span>
                                 </a>
                             </li>
-                            
+
                             <?php //endif; 
                             ?>
                             <!-- 👉 Caissier, Gérant, Admin -->
@@ -257,10 +259,10 @@
                                     <span class="sub-item"> Paiements</span>
                                 </a>
                             </li>
-                            
+
                             <?php //endif; 
                             ?>
-                              <!-- 👉 Caissier, Gérant, Admin -->
+                            <!-- 👉 Caissier, Gérant, Admin -->
                             <?php //if(auth()->hasRole(Roles::ADMIN_H)): 
                             ?>
                             <li>
@@ -268,7 +270,7 @@
                                     <span class="sub-item"> Caisse</span>
                                 </a>
                             </li>
-                            
+
                             <?php //endif; 
                             ?>
                             <!-- 👉 facturation, Gérant, Admin -->
@@ -279,10 +281,10 @@
                                     <span class="sub-item"> Facturation</span>
                                 </a>
                             </li>
-                            
+
                             <?php //endif; 
                             ?>
-                             <!-- 👉 facturation, Gérant, Admin -->
+                            <!-- 👉 facturation, Gérant, Admin -->
                             <?php //if(auth()->hasRole(Roles::ADMIN_H)): 
                             ?>
                             <li>
@@ -290,12 +292,12 @@
                                     <span class="sub-item"> Salaires</span>
                                 </a>
                             </li>
-                             <li>
+                            <li>
                                 <a class="item-link" href="<?= url('historique-salaires') ?>">
                                     <span class="sub-item"> Historique salaires</span>
                                 </a>
                             </li>
-                            
+
                             <?php //endif; 
                             ?>
 
@@ -305,7 +307,7 @@
                 <?php //endif; 
                 ?>
 
-                 <!-- Groupes::Ressources humaines  => -->
+                <!-- Groupes::Ressources humaines  => -->
 
                 <?php //if(auth()->hasGroupe(Groupes::ADMIN)): 
                 ?>
@@ -326,7 +328,7 @@
                                     <span class="sub-item"> Personnel Enseignants</span>
                                 </a>
                             </li>
-                            
+
                             <?php //endif; 
                             ?>
                             <!-- 👉 Caissier, Gérant, Admin -->
@@ -337,10 +339,10 @@
                                     <span class="sub-item"> Recrutement</span>
                                 </a>
                             </li>
-                            
+
                             <?php //endif; 
                             ?>
-                              <!-- 👉 Caissier, Gérant, Admin -->
+                            <!-- 👉 Caissier, Gérant, Admin -->
                             <?php //if(auth()->hasRole(Roles::ADMIN_H)): 
                             ?>
                             <!-- <li>
@@ -348,7 +350,7 @@
                                     <span class="sub-item"> Congés</span>
                                 </a>
                             </li> -->
-                            
+
                             <?php //endif; 
                             ?>
 
@@ -358,8 +360,8 @@
                 <?php //endif; 
                 ?>
 
-                
-                 <!-- Groupes::Administration  => -->
+
+                <!-- Groupes::Administration  => -->
 
                 <?php //if(auth()->hasGroupe(Groupes::ADMIN)): 
                 ?>
@@ -380,17 +382,17 @@
                                     <span class="sub-item"> personnel administratif</span>
                                 </a>
                             </li>
-                             <li>
-                                <a class="item-link" href="<?= url('fonctions') ?>">
+                            <li>
+                                <a class="item-link" href="<?= url('services-fonctions') ?>">
                                     <span class="sub-item"> Fonctions & services</span>
                                 </a>
                             </li>
-                             <li>
+                            <li>
                                 <a class="item-link" href="<?= url('services') ?>">
                                     <span class="sub-item"> Services</span>
                                 </a>
                             </li>
-                            
+
                             <?php //endif; 
                             ?>
                             <!-- 👉 Caissier, Gérant, Admin -->
@@ -401,7 +403,7 @@
                                     <span class="sub-item"> Rôles & permissions</span>
                                 </a>
                             </li>
-                            
+
                             <?php //endif; 
                             ?>
                             <!-- 👉 Caissier, Gérant, Admin -->
@@ -412,10 +414,10 @@
                                     <span class="sub-item"> Paramètres</span>
                                 </a>
                             </li>
-                            
+
                             <?php //endif; 
                             ?>
-                             <!-- 👉 Caissier, Gérant, Admin -->
+                            <!-- 👉 Caissier, Gérant, Admin -->
                             <?php //if(auth()->hasRole(Roles::ADMIN_H)): 
                             ?>
                             <li>
@@ -423,7 +425,7 @@
                                     <span class="sub-item"> Journaux d'activités</span>
                                 </a>
                             </li>
-                             <li>
+                            <li>
                                 <a class="item-link" href="<?= url("sauvegardes") ?>">
                                     <span class="sub-item"> Sauvegardes</span>
                                 </a>
