@@ -9,6 +9,30 @@ const $form = $('form');
 let initialData = $form.serialize(); // capture les valeurs initiales
 let formBtn = '';
 
+$.ajaxSetup({
+
+    beforeSend: function (xhr, settings) {
+
+        // console.log("Début de la requête :", settings.url);
+        $(".loader_backdrop2").css('display', "block");
+
+    },
+
+    complete: function () {
+
+        // Cacher le loader
+        $(".loader_backdrop2").css('display', "none");
+    },
+
+    error: function (xhr, status, error) {
+
+        $(".loader_backdrop2").css('display', "none");
+        console.error(error);
+        $.notify("Désolé une erreur est survenue", 'error');
+    }
+
+});
+
 
 detectChangeForms();
 
@@ -128,11 +152,11 @@ function testDatable(action, selector, search = "") {
     });
 }
 
+function loadDataTableMany(tableId, visibility, selector, action) {
 
+    if (!$(visibility + ':visible').length) {
+        console.log("Tableau non visible, donc pas de chargement pour " + tableId);
 
-function loadDataTable(tableId, selector, action) {
-
-    if (!$(selector + ':visible').length) {
         return;
     }
 
@@ -140,11 +164,42 @@ function loadDataTable(tableId, selector, action) {
 
     // // return;
 
-    // console.log(selector, tableId, action);
+    ajaxTable(tableId, selector, action);
+
+}
+
+
+function loadDataTable(tableId, selector, action) {
+
+    if (!$(selector + ':visible').length) {
+        console.log("Tableau non visible, donc pas de chargement pour " + tableId);
+
+        return;
+    }
+
+    // testDatable(action, selector);
+
+    // // return;
+
+    console.log(selector, tableId, action);
+
+    ajaxTable(tableId, selector, action);
+
+}
+
+function ajaxTable(tableId, selector, action) {
+
+    if ($.fn.DataTable.isDataTable(selector)) {
+        $(selector).DataTable().destroy();
+        $(selector).empty(); // vide le tbody généré
+    }
 
     tables[tableId] = $(selector).DataTable({
         processing: true,
         serverSide: true,
+        destroy: true,
+        autoWidth: false,
+
         ajax: {
             url: URL_AJAX,
             type: "POST",
@@ -154,16 +209,18 @@ function loadDataTable(tableId, selector, action) {
         }
     });
 
+    tables[tableId].columns.adjust();
 }
 
 menuNav();
+
+
 function menuNav() {
     const pages = window.location.pathname.split("/");
     var currentPage = pages[2];
     if (currentPage) {
         $(".current-page").text(currentPage.toUpperCase());
     }
-
 
 
     // var te = window.pathname.
@@ -549,7 +606,7 @@ function changeStatutUser(code, statut) {
 /** FIN SECTION UTILISATEUR */
 
 /** DEBUT SECTION FONCTION */
-loadDataTable('data-table-fonction', '#data-table-fonction', 'charger_data_fonctions');
+loadDataTableMany('data-table-fonction', '.service-fonction', '#data-table-fonction', 'charger_data_fonctions');
 
 openModalAddFonction();
 function openModalAddFonction() {
@@ -733,4 +790,191 @@ function changeStatutFonction(code, statut) {
         });
 }
 /** FIN SECTION FONCTION */
+// 123
+/** DEBUT SECTION SERVICE */
+loadDataTableMany('data-table-service', '.service-fonction', '#data-table-service', 'charger_data_services');
 
+
+openModalAddService();
+function openModalAddService() {
+    $('#btn_service_addModal').click(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: {
+                action: 'btn_showmodal_service_add'
+            },
+            dataType: "JSON",
+            beforeSend: function () {
+                $(".loader_backdrop2").css('display', "block");
+                // btnReq("#ClientAddModal", "Traitement...");
+
+            },
+            success: function (data) {
+                // btnRes("#ClientAddModal", 'Ajouter un client', 'fa-plus');
+                // ;
+
+                $(".loader_backdrop2").css('display', "none");
+                if (data.success) {
+                    var output = data.data;
+                    $(".data-service-modal").html(output.data);
+                    $("#service-modal").modal("show");
+
+
+                } else {
+                    $.notify(data.message);
+
+                }
+
+            }
+        })
+    });
+}
+
+ajouterService();
+function ajouterService() {
+    $("body").on("submit", "#frmAddService", function (e) {
+        e.preventDefault();
+        var data = $(this).serialize();
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: data,
+            dataType: "JSON",
+            beforeSend: function () {
+                // $(".loader_backdrop2").css('display', "block");
+
+                btnReq("#btnSubmitFormService", "Enregistrement...");
+            },
+            success: function (data) {
+                console.log(data);
+                // $(".loader_backdrop2").css('display', "none");
+
+                btnRes("#btnSubmitFormService", "Enregistrer", "fa-save");
+                if (data.success) {
+                    $.notify(data.message, "success");
+                    tables['data-table-service'].ajax.reload(null, false);
+
+                    $("#service-modal").modal("hide");
+                } else {
+                    $.notify(data.message);
+                }
+            }
+        })
+    });
+}
+
+
+function modalUpdatedService(code) {
+    // let btn = btn_action.id;
+
+    $.ajax({
+        method: "POST",
+        url: URL_AJAX,
+        data: {
+            action: 'btn_showmodal_service_update',
+            codeService: code
+        },
+        dataType: 'JSON',
+        beforeSend: function () {
+            $(".loader_backdrop2").css('display', "block");
+            // btnReq(".modal_footer", "Traitement...");
+        },
+        success: function (data) {
+
+            $(".loader_backdrop2").css('display', "none");
+
+            if (data.success) {
+                $(".data-service-modal").html(data.data);
+                $("#service-modal").modal("show");
+
+            } else {
+                $.notify(data.message);
+
+            }
+        }
+    });
+}
+
+updatedService();
+function updatedService() {
+    $("body").on("submit", "#frmUpdateService", function (e) {
+        e.preventDefault();
+        var data = $(this).serialize();
+
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: data,
+            dataType: "JSON",
+            beforeSend: function () {
+                // $(".loader_backdrop2").css('display', "block");
+
+                btnReq("#btnSubmitFormService", "Mise à jour en cours...");
+            },
+            success: function (data) {
+                // $(".loader_backdrop2").css('display', "none");
+                console.log(data);
+
+                btnRes("#btnSubmitFormService", "Enregistrer", "fa-save");
+
+                if (data.success) {
+                    tables['data-table-service'].ajax.reload(null, false);
+                    $.notify(data.message, "success");
+                    $("#service-modal").modal("hide");
+
+                } else {
+                    $.notify(data.message);
+                }
+            }
+        })
+    });
+}
+
+function changeStatutService(code, statut) {
+    swal({
+        title: "Notification",
+        text: "Voulez-vous vraiment modifier le statut de ce service?",
+        icon: "warning",
+        dangerMode: true,
+        closeOnClickOutside: false,
+        buttons: {
+            cancel: true,
+            confirm: "Confirmer",
+        },
+    })
+        .then(willDelete => {
+            if (willDelete) {
+
+
+                $.ajax({
+                    url: URL_AJAX,
+                    method: 'POST',
+                    data: {
+                        action: 'change_statut_services',
+                        code_service: code,
+                        statut_service: statut
+                    },
+                    dataType: 'JSON',
+                    beforeSend: function () {
+                        $(".loader_backdrop2").css('display', "block");
+                    },
+                    success: function (data) {
+                        $(".loader_backdrop2").css('display', "none");
+
+                        if (data.success) {
+                            $.notify(data.message, "success");
+                            tables['data-table-service'].ajax.reload(null, false);
+                        } else {
+                            $.notify(data.message);
+                        }
+                    }
+                });;
+            }
+        });
+}
+/** FIN SECTION SERVICE */

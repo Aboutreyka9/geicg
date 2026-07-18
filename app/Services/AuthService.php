@@ -18,7 +18,8 @@ class AuthService
 
     public function login(string $email, string $password)
     {
-        $user = $this->userModel->getUserDataForLogin('email_user',$email);
+
+        $user = $this->userModel->getUserDataForLogin('email_user', $email);
         $groupes = [];
         $roles = [];
 
@@ -32,11 +33,11 @@ class AuthService
 
         // Mise à jour de la dernière connexion
         $this->userModel->updateLastConnexion($user['code_user']);
-        
+
         // Récupérer les rôles de l'utilisateur
         $rolesuser = $this->userModel->getUserRoles($user['code_user']);
         $groupesuser = $this->userModel->getUserGroups($user['code_user']);
-        
+
         if (!empty($groupesuser)) {
             foreach ($groupesuser as $groupe) {
                 $groupes[] = $groupe['groupe'];
@@ -45,7 +46,7 @@ class AuthService
 
         if (!empty($rolesuser)) {
             foreach ($rolesuser as $role) {
-                
+
                 $roles[$role['code_role']] = [
                     'create' => (bool) $role['create_permission'],
                     'edit'   => (bool) $role['edit_permission'],
@@ -63,7 +64,7 @@ class AuthService
 
         // Régénérer l'ID de session pour éviter la fixation de session
         session_regenerate_id(true);
-        Auth::login($user,$groupes,$roles);
+        Auth::login($user, $groupes, $roles);
 
         return [
             'success' => true,
@@ -80,9 +81,13 @@ class AuthService
         if (ini_get('session.use_cookies')) {
             $params = session_get_cookie_params();
             setcookie(
-                session_name(), '', time() - 42000,
-                $params['path'], $params['domain'],
-                $params['secure'], $params['httponly']
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
             );
         }
         session_destroy();
@@ -96,7 +101,7 @@ class AuthService
         return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
     }
 
-      public static function check(): bool
+    public static function check(): bool
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();

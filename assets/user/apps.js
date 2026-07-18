@@ -1,15 +1,15 @@
 const ORIGIN = window.location.origin;
 /** obtenir cette structure http://localhost/hotel/ */
 // const ORIGIN = (window.location.protocol + '//' + window.location.host);
-const URL_HOME =ORIGIN +"/geicg/";
+const URL_HOME = ORIGIN + "/geicg/";
 const URL_AJAX = URL_HOME + "app/controllers/ajx.php";
 
 let rolesPermissions = [];
 let dataCheck = [];
 let charts = {}; // stocker les graphiques par ID
 // alert('ghdfhdf');
-
 // ## SEXION CONNEXION
+
 btnLoginUser();
 
 function btnLoginUser() {
@@ -22,7 +22,7 @@ function btnLoginUser() {
             method: 'POST',
             data: form,
             dataType: 'JSON',
-            
+
             beforeSend: function () {
 
                 $("#btn_login").html(
@@ -31,24 +31,33 @@ function btnLoginUser() {
                 $("#btn_login").attr("disabled", "disabled");
             },
             success: function (data) {
+                console.log(data);
                 $("#btn_login").html(
                     '<i class="fa fa-check-circle"></i> &nbsp; Connexion'
                 );
                 $("#btn_login").attr("disabled", false);
 
                 if (data.success) {
+
                     // setAcademicYear();
                     // localStorage.setItem('data-year',data.activityYear);
 
 
-                    swal("Notification", data.message,"success").then(() => {
+                    swal("Notification", data.message, "success").then(() => {
                         window.location.href = URL_HOME;
                     });
 
                 } else {
-                    
+
                     $.notify(data.message, "error",);
                 }
+            }, error: function (err) {
+                $.notify('Désolé une erreur est survenue', "error",);
+
+                $("#btn_login").html(
+                    '<i class="fa fa-check-circle"></i> &nbsp; Connexion'
+                );
+                $("#btn_login").attr("disabled", false);
             }
         });
     });
@@ -59,7 +68,7 @@ function btnRegisterUser() {
     $("body").delegate("#frmRegister", "submit", function (e) {
         e.preventDefault();
         var form = $(this).serialize();
-        
+
         $.ajax({
             url: URL_AJAX,
             method: 'POST',
@@ -75,8 +84,8 @@ function btnRegisterUser() {
             },
             success: function (data) {
                 console.log(data);
-                
-                
+
+
                 $("#btn_register").html(
                     '<i class="fa fa-check-circle"></i> &nbsp; Connexion'
                 );
@@ -84,9 +93,9 @@ function btnRegisterUser() {
 
                 if (data.code === 200) {
                     $("#frmRegister input").val("");
-                    swal("Notification", data.message,"success");
+                    swal("Notification", data.message, "success");
                     // reset form 
-                    
+
 
                 } else {
                     $.notify(data.message, "error",);
@@ -102,13 +111,13 @@ function btnResetPassword() {
     $("body").delegate("#frmResetPassword", "submit", function (e) {
         e.preventDefault();
         var form = $(this).serialize();
-        
+
         $.ajax({
             url: URL_AJAX,
             method: 'POST',
             data: form,
             dataType: 'JSON',
-            
+
             beforeSend: function () {
 
                 $("#btn_reset_password").html(
@@ -117,7 +126,7 @@ function btnResetPassword() {
                 $("#btn_reset_password").attr("disabled", "disabled");
             },
             success: function (data) {
-                
+
                 $("#btn_reset_password").html(
                     '<i class="fa fa-check-circle"></i> &nbsp; Connexion'
                 );
@@ -125,7 +134,7 @@ function btnResetPassword() {
 
                 if (data.code === 200) {
                     // setAcademicYear();
-                    swal("Notification", data.msg,"success")
+                    swal("Notification", data.msg, "success")
                     $("#frmResetPassword input").val("");
 
                 } else {
@@ -144,7 +153,7 @@ function showAndHidePassword() {
             $('.password').prop('type', 'text');
         } else {
             $('.password').prop('type', 'password');
-            
+
         }
 
     });
@@ -257,7 +266,7 @@ function menuRole() {
         const code = $(this).data("role");
         const groupe = $(this).data("groupe");
         const user = $(this).data("user");
-       
+
 
 
         if (this.checked) {
@@ -265,7 +274,7 @@ function menuRole() {
             if (!dataCheck.includes(groupe)) {
                 loadDataRole(user, groupe, code, permissionsDiv); // Rendre visible
             } else {
-             
+
                 permissionsDiv.style.maxHeight = permissionsDiv.scrollHeight + 'px'; // Permet de déployer
                 permissionsDiv.style.opacity = 1; // Rendre visible
             }
@@ -295,7 +304,7 @@ function loadDataRole(user, groupe, code, permissionsDiv) {
 
 
             if (data.code == 200) {
-               
+
                 $("#sexion-r" + code).html(data.data);
                 dataCheck.push(groupe);
                 permissionsDiv.style.maxHeight = permissionsDiv.scrollHeight + 'px'; // Permet de déployer
@@ -354,7 +363,7 @@ function checkPermission() {
             return role;
         });
 
- 
+
 
     });
 }
@@ -365,7 +374,7 @@ function modalRoleUser() {
     $("body").delegate(".modal_permission_user", "click", function (e) {
         e.preventDefault();
         var code = $(this).data("code");
-      
+
         userCode = code;
         $.ajax({
             url: URL_AJAX,
@@ -429,7 +438,7 @@ function savePermission() {
             },
             success: function (data) {
 
-        
+
                 // $("#spinner").removeClass("show");
 
                 // $("#btn_modifier_user").html(
@@ -442,11 +451,11 @@ function savePermission() {
                     rolesPermissions = [];
                     dataCheck = [];
 
-                    alert( data.message);
+                    alert(data.message);
                     $("#role-modal-permission").modal("hide");
 
                 } else {
-                    alert( data.message);
+                    alert(data.message);
 
                 }
             }
