@@ -13,6 +13,92 @@ class UserModel extends Model
     protected string $table = "users";
     public string $id = 'code_user';
 
+    public function getUser($field, $value)
+    {
+        $sql = "SELECT * FROM " . TABLES::USERS . " WHERE " . $field . " = :field LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(["field" => $value]);
+
+        return $stmt->fetch() ?: null;
+    }
+
+    public function groupes(): ?array
+    {
+        $data = [];
+        try {
+            $sql = "SELECT * FROM roles r WHERE r.statut_role = :statut GROUP BY r.groupe";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(["statut" => STATUT_ACTIF]);
+            $data = $stmt->fetchAll();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
+    public function createPermission(array $rolePermissions): ?String
+    {
+
+        $data = "";
+        try {
+            $sql = "INSERT INTO user_roles (user_code , role_code, create_permission, edit_permission, show_permission, delete_permission)
+                    VALUES (:user_code, :role_code, :create_permission, :edit_permission, :show_permission, :delete_permission)
+                    ON DUPLICATE KEY UPDATE 
+                    create_permission = VALUES(create_permission), 
+                    edit_permission = VALUES(edit_permission), 
+                    show_permission = VALUES(show_permission), 
+                    delete_permission = VALUES(delete_permission)";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($rolePermissions);
+            $data = $this->db->lastInsertId() ?: $stmt->rowCount();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+    public function deletePermission(string $userCode, string $roleCode): ?bool
+    {
+        $data = false;
+        try {
+            $sql = "DELETE FROM user_roles WHERE user_code = :user_code AND role_code = :role_code";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                'user_code' => $userCode,
+                'role_code' => $roleCode
+            ]);
+            $data = $stmt->rowCount() > 0;
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
+    public function getRolesByGroupe($groupe)
+    {
+        $result = [];
+        try {
+            $sql = "SELECT * FROM " . TABLES::ROLES . " WHERE groupe = :groupe";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(["groupe" => $groupe]);
+            if ($stmt->rowCount() > 0)
+                $result = $stmt->fetchAll();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $result;
+    }
+
+    public function getAllPermissionForUser(string $userCode)
+    {
+        $data = [];
+        $sql = "SELECT * FROM  " . TABLES::USER_ROLES . " ur WHERE ur.user_code =:user_code ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['user_code' => $userCode]);
+        $data =  $stmt->fetchAll();
+        return $data;
+    }
+
     public function getUserDataForLogin(string $email, string $value)
     {
         $data = [];

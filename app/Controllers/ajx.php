@@ -43,6 +43,18 @@ switch ($action) {
         $ajx = new UserController();
         $ajx->changeStatutUser();
         break;
+    case 'btn_showmodal_role_permission_utilisateur':
+        $ajx = new UserController();
+        $ajx->modalAddPermission();
+        break;
+    case 'btn_load_data_role':
+        $ajx = new UserController();
+        $ajx->loadDataRole();
+        break;
+    case 'btn_add_permission':
+        $ajx = new UserController();
+        $ajx->ajouterRolesPermissions();
+        break;
     case 'btn_showmodal_utilisateur_add':
         $ajx = new UserController();
         $ajx->modalAddUser();

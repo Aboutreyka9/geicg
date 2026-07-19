@@ -8,6 +8,8 @@ let formChanged = false;
 const $form = $('form');
 let initialData = $form.serialize(); // capture les valeurs initiales
 let formBtn = '';
+let rolesPermissions = [];
+let dataCheck = [];
 
 $.ajaxSetup({
 
@@ -494,7 +496,6 @@ function ajouterUtilisateur() {
     });
 }
 
-
 function modalUpdatedUtilisateurr(code) {
     // let btn = btn_action.id;
 
@@ -602,6 +603,221 @@ function changeStatutUser(code, statut) {
             }
         });
 }
+
+//SEXION ROLE PERMISSIONS AND ROLES
+function ModalAddrolePermissionUser(code) {
+    // let btn = btn_action.id;
+
+    $.ajax({
+        method: "POST",
+        url: URL_AJAX,
+        data: {
+            action: 'btn_showmodal_role_permission_utilisateur',
+            codeUtilisateur: code
+        },
+        dataType: 'JSON',
+        success: function (data) {
+
+            console.log(data);
+
+            // $(".loader_backdrop2").css('display', "none");
+
+            if (data.success) {
+
+                $('.role-permission-data-modal').html(data.data);
+                $('#user-info').text(data.user);
+                $("#role-permission-modal").modal("show");
+
+            } else {
+                $.notify(data.message);
+
+            }
+        }
+    });
+}
+
+
+btnCloseModalPermission();
+
+function btnCloseModalPermission() {
+    $("body").on("click", "#btn-close-modal", function (e) {
+        // e.preventDefault();  
+
+        dataCheck = [];
+
+    });
+}
+
+menuRole();
+
+function menuRole() {
+    $("body").on("change", ".toggle-role", function (e) {
+
+        const permissionsDiv = document.querySelector('#permissions-' + this.id);
+
+        const code = $(this).data("role");
+        const groupe = $(this).data("groupe");
+        const user = $(this).data("user");
+
+
+        if (this.checked) {
+
+            if (!dataCheck.includes(groupe)) {
+                loadDataRole(user, groupe, code, permissionsDiv); // Rendre visible
+            } else {
+
+                permissionsDiv.style.maxHeight = permissionsDiv.scrollHeight + 'px'; // Permet de déployer
+                permissionsDiv.style.opacity = 1; // Rendre visible
+            }
+
+        } else {
+            $("#btn-r" + code).prop("disabled", "true")
+            permissionsDiv.style.maxHeight = 0; // Réduire à 0 pour effacer
+            permissionsDiv.style.opacity = 0; // Rendre invisible
+        }
+
+    });
+}
+
+
+function loadDataRole(user, groupe, code, permissionsDiv) {
+
+    $.ajax({
+        url: URL_AJAX,
+        method: 'POST',
+        data: {
+            action: 'btn_load_data_role',
+            code_user: user,
+            code_role: groupe
+        },
+        dataType: 'JSON',
+        success: function (data) {
+            console.log(data);
+
+            if (data.success) {
+                $("#sexion-r" + code).html(data.data);
+                dataCheck.push(groupe);
+                permissionsDiv.style.maxHeight = permissionsDiv.scrollHeight + 'px'; // Permet de déployer
+                permissionsDiv.style.opacity = 1;
+
+
+            }
+        }
+    });
+
+
+
+
+}
+
+
+
+checkPermission();
+
+function checkPermission() {
+    $("body").on("change", ".perm", function (e) {
+        e.preventDefault();
+
+        let row = $(this).closest("tr");
+        let coderoleId = row.data("id");
+
+
+        let show = $("#show" + coderoleId).is(":checked") ? 1 : 0;
+        let edit = $("#edit" + coderoleId).is(":checked") ? 1 : 0;
+        let create = $("#create" + coderoleId).is(":checked") ? 1 : 0;
+        let deleted = $("#delete" + coderoleId).is(":checked") ? 1 : 0;
+
+
+        let existe = rolesPermissions.some(r => r.role === coderoleId);
+
+        if (!existe) {
+            let roleId = rolesPermissions.length + 1;
+
+            rolesPermissions.push({
+                id: roleId,
+                role: coderoleId,
+                create: create,
+                show: show,
+                edit: edit,
+                delete: deleted,
+            });
+        }
+
+
+        rolesPermissions = rolesPermissions.map(role => {
+
+            if (role.role === coderoleId) {
+                role["create"] = create;
+                role["show"] = show;
+                role["edit"] = edit;
+                role["delete"] = deleted;
+            }
+            return role;
+        });
+
+    });
+}
+
+
+savePermission();
+
+function savePermission() {
+    $("body").on("click", "#btnSavePermissions", function (e) {
+        e.preventDefault();
+        if (rolesPermissions.length === 0) {
+            $.notify('Aucune autoristion accordée')
+            return;
+        } else if (userCode == "") {
+            $.notify("Veuillez reprendre le processus")
+        }
+
+        $.ajax({
+            url: URL_AJAX,
+            method: 'POST',
+            dataType: 'JSON',
+            data: {
+                action: 'btn_add_permission',
+                codeUtilisateur: userCode,
+                roles: JSON.stringify(rolesPermissions)
+            },
+            beforeSend: function () {
+                // $("#spinner").addClass("show");
+                // $("#btn_modifier_user").html(
+                //   '<i class="fa fa-refresh fa-spin fa-2x"></i> &nbsp; Modification...'
+                // );
+                // $("#btn_modifier_user").attr("disabled", "disabled");
+            },
+            success: function (data) {
+
+
+                // $("#spinner").removeClass("show");
+
+                // $("#btn_modifier_user").html(
+                //     '<i class="fa fa-check-circle"></i> &nbsp; Modifier'
+                //   );
+                // $("#btn_modifier_user").attr("disabled", false);
+
+                if (data.code == 200) {
+                    userCode = "";
+                    rolesPermissions = [];
+                    dataCheck = [];
+
+                    $.notify(data.message, "success");
+                    $("#role-modal-permission").modal("hide");
+
+                } else {
+                    $.notify(data.message, "error");
+
+                }
+            }
+        });
+
+    });
+}
+
+
+// END SEXION ROLES PERMISSIONS
+
 
 /** FIN SECTION UTILISATEUR */
 

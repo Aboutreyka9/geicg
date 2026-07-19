@@ -45,7 +45,7 @@ class UserModeldd extends Model
         try {
             $sql = "SELECT * FROM " . TABLES::FONCTIONS . " AS fn WHERE fn.etablissement_code = :etablissement_code AND statut_fonction = :statut ORDER BY libelle_fonction";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['etablissement_code' => $etablissement_code,'statut' => STATUT_ACTIF]);
+            $stmt->execute(['etablissement_code' => $etablissement_code, 'statut' => STATUT_ACTIF]);
             $data = $stmt->fetchAll();
         } catch (Exception $e) {
             die($e->getMessage());
@@ -60,7 +60,7 @@ class UserModeldd extends Model
         try {
             $sql = "SELECT * FROM " . TABLES::SERVICES . " AS se WHERE se.etablissement_code = :etablissement_code AND statut_service = :statut ORDER BY libelle_service";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['etablissement_code' => $etablissement_code,'statut' => STATUT_ACTIF]);
+            $stmt->execute(['etablissement_code' => $etablissement_code, 'statut' => STATUT_ACTIF]);
             $data = $stmt->fetchAll();
         } catch (Exception $e) {
             die($e->getMessage());
@@ -98,7 +98,7 @@ class UserModeldd extends Model
         return $data;
     }
 
-     public function updateLastConnexion(string $code): void
+    public function updateLastConnexion(string $code): void
     {
         $sql = "UPDATE " . TABLES::USERS . " SET last_connexion = NOW() WHERE code_user = ?";
         $stmt = $this->db->prepare(
@@ -121,7 +121,6 @@ class UserModeldd extends Model
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['email' => $value, 'statut' => STATUT_ACTIF]);
             $data = $stmt->rowCount() > 0 ? $stmt->fetch() : [];
-            
         } catch (Exception $e) {
             die($e->getMessage());
         }
@@ -219,7 +218,7 @@ class UserModeldd extends Model
         //     $where .= '(' . implode(' OR ', $likes) . ')';
         // }
 
-            
+
         $sql = "SELECT COUNT(*) AS nb FROM " . TABLES::USERS . " us 
             JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code  $where";
 
@@ -228,9 +227,7 @@ class UserModeldd extends Model
         // return $sql;
         $stmt->execute(array_merge($whereParams, $likeParams));
         $data = $stmt->fetch();
-        return $data['nb'] ?? 0 ;
-
-
+        return $data['nb'] ?? 0;
     }
 
 
@@ -250,8 +247,8 @@ class UserModeldd extends Model
         }
 
 
-       
-         $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
+
+        $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
         LEFT JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code $where ORDER BY nom_user ASC, prenom_user ASC LIMIT :start, :limit";
 
         $stmt = $this->db->prepare($sql);
@@ -326,6 +323,7 @@ class UserModeldd extends Model
         }
         return $data;
     }
+
     public function createPermission(array $rolePermissions): ?String
     {
 
@@ -362,6 +360,7 @@ class UserModeldd extends Model
         }
         return $data;
     }
+
     public function getAllPermissionForUser(string $userCode)
     {
         $data = [];
