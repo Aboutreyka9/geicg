@@ -58,7 +58,7 @@ class AuthController extends MainController
      * --------------------------------------------------------------------------
      */
 
-       public  function authenticate()
+    public  function authenticate()
     {
 
         $result = [];
@@ -70,29 +70,27 @@ class AuthController extends MainController
 
         $v = new Validator();
         $v->required('email', $email, 'Email')->email('email', $email, 'Email')
-          ->required('password', $password, 'Mot de passe');
-    
+            ->required('password', $password, 'Mot de passe');
+
 
         if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::BAD_REQUEST, $v->errors());
 
-         $result = $this->authService->login($email, $password);
-         
+        $result = $this->authService->login($email, $password);
+
 
         if (!$result['success']) {
             Response::error($result['message'], HttpStatusCode::UNAUTHORIZED, []);
         }
 
         Response::success($result['message'], []);
-      
     }
 
     public function deconnexion()
     {
         if (Auth::check()) {
             Auth::disconect();
-            Response::success("Déconnexion réussie",[],HttpStatusCode::OK);
+            Response::success("Déconnexion réussie", [], HttpStatusCode::OK);
         }
         Response::error("Vous n'êtes pas connecté", HttpStatusCode::UNAUTHORIZED, []);
     }
-
 }

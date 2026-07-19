@@ -8,6 +8,32 @@ let formChanged = false;
 const $form = $('form');
 let initialData = $form.serialize(); // capture les valeurs initiales
 let formBtn = '';
+let rolesPermissions = [];
+let dataCheck = [];
+
+$.ajaxSetup({
+
+    beforeSend: function (xhr, settings) {
+
+        // console.log("Début de la requête :", settings.url);
+        $(".loader_backdrop2").css('display', "block");
+
+    },
+
+    complete: function () {
+
+        // Cacher le loader
+        $(".loader_backdrop2").css('display', "none");
+    },
+
+    error: function (xhr, status, error) {
+
+        $(".loader_backdrop2").css('display', "none");
+        console.error(error);
+        $.notify("Désolé une erreur est survenue", 'error');
+    }
+
+});
 
 
 detectChangeForms();
@@ -105,6 +131,7 @@ function searchTestInput() {
 
 function testDatable(action, selector, search = "") {
     // var se = $(selector).DataTable().search().value;
+    alert('test')
     $.ajax({
         method: "POST",
         url: URL_AJAX,
@@ -127,41 +154,75 @@ function testDatable(action, selector, search = "") {
     });
 }
 
+function loadDataTableMany(tableId, visibility, selector, action) {
+
+    if (!$(visibility + ':visible').length) {
+        console.log("Tableau non visible, donc pas de chargement pour " + tableId);
+
+        return;
+    }
+
+    // testDatable(action, selector);
+
+    // // return;
+
+    ajaxTable(tableId, selector, action);
+
+}
 
 
 function loadDataTable(tableId, selector, action) {
 
+    if (!$(selector + ':visible').length) {
+        console.log("Tableau non visible, donc pas de chargement pour " + tableId);
 
-    if ($(selector + ':visible').length) {
-        console.log(selector, tableId, action);
-
-        // testDatable(action, selector);
-
-        // return;
-
-        tables[tableId] = $(selector).DataTable({
-            "processing": true,
-            "serverSide": true,
-            "ajax": {
-                "url": URL_AJAX,
-                "type": "POST",
-                "data": {
-                    action: action
-                }
-            }
-        });
+        return;
     }
+
+    // testDatable(action, selector);
+
+    // // return;
+
+    console.log(selector, tableId, action);
+
+    ajaxTable(tableId, selector, action);
+
 }
 
+function ajaxTable(tableId, selector, action) {
+
+    if ($.fn.DataTable.isDataTable(selector)) {
+        $(selector).DataTable().destroy();
+        $(selector).empty(); // vide le tbody généré
+    }
+
+    tables[tableId] = $(selector).DataTable({
+        processing: true,
+        serverSide: true,
+        destroy: true,
+        autoWidth: false,
+
+        ajax: {
+            url: URL_AJAX,
+            type: "POST",
+            data: {
+                action: action
+            }
+        }
+    });
+
+    tables[tableId].columns.adjust();
+}
 
 menuNav();
+
+
 function menuNav() {
     const pages = window.location.pathname.split("/");
     var currentPage = pages[2];
     if (currentPage) {
         $(".current-page").text(currentPage.toUpperCase());
     }
-
 
 
     // var te = window.pathname.
@@ -335,7 +396,6 @@ deconnecter();
 function deconnecter() {
     $('.btn_deconnect').click(function (e) {
         e.preventDefault();
-        alert("deconnecter");
         $.ajax({
             url: URL_AJAX,
             method: 'POST',
@@ -406,7 +466,7 @@ function openModalAddUtilisateur() {
 
 ajouterUtilisateur();
 function ajouterUtilisateur() {
-    $("body").delegate("#frmAddUser", "submit", function (e) {
+    $("body").on("submit", "#frmAddUser", function (e) {
         e.preventDefault();
         var data = $(this).serialize();
 
@@ -435,7 +495,6 @@ function ajouterUtilisateur() {
         })
     });
 }
-
 
 function modalUpdatedUtilisateurr(code) {
     // let btn = btn_action.id;
@@ -470,7 +529,7 @@ function modalUpdatedUtilisateurr(code) {
 
 updatedUtilisateur();
 function updatedUtilisateur() {
-    $("body").delegate("#frmUpdateUser", "submit", function (e) {
+    $("body").on("submit", "#frmUpdateUser", function (e) {
         e.preventDefault();
         var data = $(this).serialize();
 
@@ -545,10 +604,225 @@ function changeStatutUser(code, statut) {
         });
 }
 
+//SEXION ROLE PERMISSIONS AND ROLES
+function ModalAddrolePermissionUser(code) {
+    // let btn = btn_action.id;
+
+    $.ajax({
+        method: "POST",
+        url: URL_AJAX,
+        data: {
+            action: 'btn_showmodal_role_permission_utilisateur',
+            codeUtilisateur: code
+        },
+        dataType: 'JSON',
+        success: function (data) {
+
+            console.log(data);
+
+            // $(".loader_backdrop2").css('display', "none");
+
+            if (data.success) {
+
+                $('.role-permission-data-modal').html(data.data);
+                $('#user-info').text(data.user);
+                $("#role-permission-modal").modal("show");
+
+            } else {
+                $.notify(data.message);
+
+            }
+        }
+    });
+}
+
+
+btnCloseModalPermission();
+
+function btnCloseModalPermission() {
+    $("body").on("click", "#btn-close-modal", function (e) {
+        // e.preventDefault();  
+
+        dataCheck = [];
+
+    });
+}
+
+menuRole();
+
+function menuRole() {
+    $("body").on("change", ".toggle-role", function (e) {
+
+        const permissionsDiv = document.querySelector('#permissions-' + this.id);
+
+        const code = $(this).data("role");
+        const groupe = $(this).data("groupe");
+        const user = $(this).data("user");
+
+
+        if (this.checked) {
+
+            if (!dataCheck.includes(groupe)) {
+                loadDataRole(user, groupe, code, permissionsDiv); // Rendre visible
+            } else {
+
+                permissionsDiv.style.maxHeight = permissionsDiv.scrollHeight + 'px'; // Permet de déployer
+                permissionsDiv.style.opacity = 1; // Rendre visible
+            }
+
+        } else {
+            $("#btn-r" + code).prop("disabled", "true")
+            permissionsDiv.style.maxHeight = 0; // Réduire à 0 pour effacer
+            permissionsDiv.style.opacity = 0; // Rendre invisible
+        }
+
+    });
+}
+
+
+function loadDataRole(user, groupe, code, permissionsDiv) {
+
+    $.ajax({
+        url: URL_AJAX,
+        method: 'POST',
+        data: {
+            action: 'btn_load_data_role',
+            code_user: user,
+            code_role: groupe
+        },
+        dataType: 'JSON',
+        success: function (data) {
+            console.log(data);
+
+            if (data.success) {
+                $("#sexion-r" + code).html(data.data);
+                dataCheck.push(groupe);
+                permissionsDiv.style.maxHeight = permissionsDiv.scrollHeight + 'px'; // Permet de déployer
+                permissionsDiv.style.opacity = 1;
+
+
+            }
+        }
+    });
+
+
+
+
+}
+
+
+
+checkPermission();
+
+function checkPermission() {
+    $("body").on("change", ".perm", function (e) {
+        e.preventDefault();
+
+        let row = $(this).closest("tr");
+        let coderoleId = row.data("id");
+
+
+        let show = $("#show" + coderoleId).is(":checked") ? 1 : 0;
+        let edit = $("#edit" + coderoleId).is(":checked") ? 1 : 0;
+        let create = $("#create" + coderoleId).is(":checked") ? 1 : 0;
+        let deleted = $("#delete" + coderoleId).is(":checked") ? 1 : 0;
+
+
+        let existe = rolesPermissions.some(r => r.role === coderoleId);
+
+        if (!existe) {
+            let roleId = rolesPermissions.length + 1;
+
+            rolesPermissions.push({
+                id: roleId,
+                role: coderoleId,
+                create: create,
+                show: show,
+                edit: edit,
+                delete: deleted,
+            });
+        }
+
+
+        rolesPermissions = rolesPermissions.map(role => {
+
+            if (role.role === coderoleId) {
+                role["create"] = create;
+                role["show"] = show;
+                role["edit"] = edit;
+                role["delete"] = deleted;
+            }
+            return role;
+        });
+
+    });
+}
+
+
+savePermission();
+
+function savePermission() {
+    $("body").on("click", "#btnSavePermissions", function (e) {
+        e.preventDefault();
+        if (rolesPermissions.length === 0) {
+            $.notify('Aucune autoristion accordée')
+            return;
+        } else if (userCode == "") {
+            $.notify("Veuillez reprendre le processus")
+        }
+
+        $.ajax({
+            url: URL_AJAX,
+            method: 'POST',
+            dataType: 'JSON',
+            data: {
+                action: 'btn_add_permission',
+                codeUtilisateur: userCode,
+                roles: JSON.stringify(rolesPermissions)
+            },
+            beforeSend: function () {
+                // $("#spinner").addClass("show");
+                // $("#btn_modifier_user").html(
+                //   '<i class="fa fa-refresh fa-spin fa-2x"></i> &nbsp; Modification...'
+                // );
+                // $("#btn_modifier_user").attr("disabled", "disabled");
+            },
+            success: function (data) {
+
+
+                // $("#spinner").removeClass("show");
+
+                // $("#btn_modifier_user").html(
+                //     '<i class="fa fa-check-circle"></i> &nbsp; Modifier'
+                //   );
+                // $("#btn_modifier_user").attr("disabled", false);
+
+                if (data.code == 200) {
+                    userCode = "";
+                    rolesPermissions = [];
+                    dataCheck = [];
+
+                    $.notify(data.message, "success");
+                    $("#role-modal-permission").modal("hide");
+
+                } else {
+                    $.notify(data.message, "error");
+
+                }
+            }
+        });
+
+    });
+}
+
+
+// END SEXION ROLES PERMISSIONS
+
+
 /** FIN SECTION UTILISATEUR */
 
 /** DEBUT SECTION FONCTION */
-loadDataTable('data-table-fonction', '#data-table-fonction', 'charger_data_fonctions');
+loadDataTableMany('data-table-fonction', '.service-fonction', '#data-table-fonction', 'charger_data_fonctions');
 
 openModalAddFonction();
 function openModalAddFonction() {
@@ -574,7 +848,7 @@ function openModalAddFonction() {
                 $(".loader_backdrop2").css('display', "none");
                 if (data.success) {
                     var output = data.data;
-                    $(".data-modal").html(output.data);
+                    $(".data-fonction-modal").html(output.data);
                     $("#fonction-modal").modal("show");
 
 
@@ -598,7 +872,7 @@ function ajouterFonction() {
             method: "POST",
             url: URL_AJAX,
             data: data,
-            // dataType: "JSON",
+            dataType: "JSON",
             beforeSend: function () {
                 // $(".loader_backdrop2").css('display', "block");
 
@@ -609,7 +883,6 @@ function ajouterFonction() {
                 // $(".loader_backdrop2").css('display', "none");
 
                 btnRes("#btnSubmitFormFonction", "Enregistrer", "fa-save");
-                return;
                 if (data.success) {
                     tables['data-table-fonction'].ajax.reload(null, false);
                     $.notify(data.message, "success");
@@ -622,44 +895,41 @@ function ajouterFonction() {
     });
 }
 
-bOpenModalUpdatedFonction();
-function bOpenModalUpdatedFonction() {
-    $("body").on("click", ".frmModifierFonctionData", function (e) {
-        var code_fonction = $(this).data("fonction");
-        console.log(code_fonction);
 
-        $.ajax({
-            method: "POST",
-            url: URL_AJAX,
-            data: {
-                action: 'frm_modal_modifier_fonction',
-                codeFonction: code_fonction
-            },
-            dataType: "JSON",
-            beforeSend: function () {
-                $(".loader_backdrop2").css('display', "block");
-                // btnReq(".modal_footer", "Traitement...");
+function modalUpdatedFonction(code) {
+    // let btn = btn_action.id;
 
-            },
-            success: function (data) {
-                // btnRes(".modal_footer", 'Enregistrer le fournisseur', 'fa-save');
-                $(".loader_backdrop2").css('display', "none");
-                if (data.code == 200) {
-                    $(".data-modal").html(data.data);
-                    $("#fonction-modal").modal("show");
-                } else {
-                    $.notify("Erreur lors du traitement", "error");
-                }
+    $.ajax({
+        method: "POST",
+        url: URL_AJAX,
+        data: {
+            action: 'btn_showmodal_fonction_update',
+            codeFonction: code
+        },
+        dataType: 'JSON',
+        beforeSend: function () {
+            $(".loader_backdrop2").css('display', "block");
+            // btnReq(".modal_footer", "Traitement...");
+        },
+        success: function (data) {
+
+            $(".loader_backdrop2").css('display', "none");
+
+            if (data.success) {
+                $(".data-fonction-modal").html(data.data);
+                $("#fonction-modal").modal("show");
+
+            } else {
+                $.notify(data.message);
 
             }
-        })
-    }
-    );
+        }
+    });
 }
 
-bUpdatedFonction();
-function bUpdatedFonction() {
-    $("body").delegate("#frmUpdateFonctionData", "submit", function (e) {
+updatedFonction();
+function updatedFonction() {
+    $("body").on("submit", "#frmUpdateFonction", function (e) {
         e.preventDefault();
         var data = $(this).serialize();
 
@@ -668,18 +938,19 @@ function bUpdatedFonction() {
             method: "POST",
             url: URL_AJAX,
             data: data,
-            dataType: "json",
+            dataType: "JSON",
             beforeSend: function () {
-                $(".loader_backdrop2").css('display', "block");
+                // $(".loader_backdrop2").css('display', "block");
 
-                btnReq(".modal_footer", "Mise à jour en cours...");
+                btnReq("#btnSubmitFormFonction", "Mise à jour en cours...");
             },
             success: function (data) {
+                // $(".loader_backdrop2").css('display', "none");
                 console.log(data);
-                $(".loader_backdrop2").css('display', "none");
 
-                btnRes(".modal_footer", "Mettre à jour le fournisseur", "fa-edit");
-                if (data.code == 200) {
+                btnRes("#btnSubmitFormFonction", "Enregistrer", "fa-save");
+
+                if (data.success) {
                     tables['data-table-fonction'].ajax.reload(null, false);
                     $.notify(data.message, "success");
                     $("#fonction-modal").modal("hide");
@@ -692,5 +963,234 @@ function bUpdatedFonction() {
     });
 }
 
-/** FIN SECTION FONCTION */
+function changeStatutFonction(code, statut) {
+    swal({
+        title: "Notification",
+        text: "Voulez-vous vraiment modifier le statut de cette fonction?",
+        icon: "warning",
+        dangerMode: true,
+        closeOnClickOutside: false,
+        buttons: {
+            cancel: true,
+            confirm: "Confirmer",
+        },
+    })
+        .then(willDelete => {
+            if (willDelete) {
 
+
+                $.ajax({
+                    url: URL_AJAX,
+                    method: 'POST',
+                    data: {
+                        action: 'change_statut_fonctions',
+                        code_fonction: code,
+                        statut_fonction: statut
+                    },
+                    dataType: 'JSON',
+                    beforeSend: function () {
+                        $(".loader_backdrop2").css('display', "block");
+                    },
+                    success: function (data) {
+                        $(".loader_backdrop2").css('display', "none");
+
+                        if (data.success) {
+                            $.notify(data.message, "success");
+                            tables['data-table-fonction'].ajax.reload(null, false);
+                        } else {
+                            $.notify(data.message);
+                        }
+                    }
+                });;
+            }
+        });
+}
+/** FIN SECTION FONCTION */
+// 123
+/** DEBUT SECTION SERVICE */
+loadDataTableMany('data-table-service', '.service-fonction', '#data-table-service', 'charger_data_services');
+
+
+openModalAddService();
+function openModalAddService() {
+    $('#btn_service_addModal').click(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: {
+                action: 'btn_showmodal_service_add'
+            },
+            dataType: "JSON",
+            beforeSend: function () {
+                $(".loader_backdrop2").css('display', "block");
+                // btnReq("#ClientAddModal", "Traitement...");
+
+            },
+            success: function (data) {
+                // btnRes("#ClientAddModal", 'Ajouter un client', 'fa-plus');
+                // ;
+
+                $(".loader_backdrop2").css('display', "none");
+                if (data.success) {
+                    var output = data.data;
+                    $(".data-service-modal").html(output.data);
+                    $("#service-modal").modal("show");
+
+
+                } else {
+                    $.notify(data.message);
+
+                }
+
+            }
+        })
+    });
+}
+
+ajouterService();
+function ajouterService() {
+    $("body").on("submit", "#frmAddService", function (e) {
+        e.preventDefault();
+        var data = $(this).serialize();
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: data,
+            dataType: "JSON",
+            beforeSend: function () {
+                // $(".loader_backdrop2").css('display', "block");
+
+                btnReq("#btnSubmitFormService", "Enregistrement...");
+            },
+            success: function (data) {
+                console.log(data);
+                // $(".loader_backdrop2").css('display', "none");
+
+                btnRes("#btnSubmitFormService", "Enregistrer", "fa-save");
+                if (data.success) {
+                    $.notify(data.message, "success");
+                    tables['data-table-service'].ajax.reload(null, false);
+
+                    $("#service-modal").modal("hide");
+                } else {
+                    $.notify(data.message);
+                }
+            }
+        })
+    });
+}
+
+
+function modalUpdatedService(code) {
+    // let btn = btn_action.id;
+
+    $.ajax({
+        method: "POST",
+        url: URL_AJAX,
+        data: {
+            action: 'btn_showmodal_service_update',
+            codeService: code
+        },
+        dataType: 'JSON',
+        beforeSend: function () {
+            $(".loader_backdrop2").css('display', "block");
+            // btnReq(".modal_footer", "Traitement...");
+        },
+        success: function (data) {
+
+            $(".loader_backdrop2").css('display', "none");
+
+            if (data.success) {
+                $(".data-service-modal").html(data.data);
+                $("#service-modal").modal("show");
+
+            } else {
+                $.notify(data.message);
+
+            }
+        }
+    });
+}
+
+updatedService();
+function updatedService() {
+    $("body").on("submit", "#frmUpdateService", function (e) {
+        e.preventDefault();
+        var data = $(this).serialize();
+
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: data,
+            dataType: "JSON",
+            beforeSend: function () {
+                // $(".loader_backdrop2").css('display', "block");
+
+                btnReq("#btnSubmitFormService", "Mise à jour en cours...");
+            },
+            success: function (data) {
+                // $(".loader_backdrop2").css('display', "none");
+                console.log(data);
+
+                btnRes("#btnSubmitFormService", "Enregistrer", "fa-save");
+
+                if (data.success) {
+                    tables['data-table-service'].ajax.reload(null, false);
+                    $.notify(data.message, "success");
+                    $("#service-modal").modal("hide");
+
+                } else {
+                    $.notify(data.message);
+                }
+            }
+        })
+    });
+}
+
+function changeStatutService(code, statut) {
+    swal({
+        title: "Notification",
+        text: "Voulez-vous vraiment modifier le statut de ce service?",
+        icon: "warning",
+        dangerMode: true,
+        closeOnClickOutside: false,
+        buttons: {
+            cancel: true,
+            confirm: "Confirmer",
+        },
+    })
+        .then(willDelete => {
+            if (willDelete) {
+
+
+                $.ajax({
+                    url: URL_AJAX,
+                    method: 'POST',
+                    data: {
+                        action: 'change_statut_services',
+                        code_service: code,
+                        statut_service: statut
+                    },
+                    dataType: 'JSON',
+                    beforeSend: function () {
+                        $(".loader_backdrop2").css('display', "block");
+                    },
+                    success: function (data) {
+                        $(".loader_backdrop2").css('display', "none");
+
+                        if (data.success) {
+                            $.notify(data.message, "success");
+                            tables['data-table-service'].ajax.reload(null, false);
+                        } else {
+                            $.notify(data.message);
+                        }
+                    }
+                });;
+            }
+        });
+}
+/** FIN SECTION SERVICE */

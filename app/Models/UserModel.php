@@ -13,8 +13,152 @@ class UserModel extends Model
     protected string $table = "users";
     public string $id = 'code_user';
 
-    
-        public function getUserByCodeWithFoction($codeUser): ?array
+    public function getUser($field, $value)
+    {
+        $sql = "SELECT * FROM " . TABLES::USERS . " WHERE " . $field . " = :field LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(["field" => $value]);
+
+        return $stmt->fetch() ?: null;
+    }
+
+    public function groupes(): ?array
+    {
+        $data = [];
+        try {
+            $sql = "SELECT * FROM roles r WHERE r.statut_role = :statut GROUP BY r.groupe";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(["statut" => STATUT_ACTIF]);
+            $data = $stmt->fetchAll();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
+    public function createPermission(array $rolePermissions): ?String
+    {
+
+        $data = "";
+        try {
+            $sql = "INSERT INTO user_roles (user_code , role_code, create_permission, edit_permission, show_permission, delete_permission)
+                    VALUES (:user_code, :role_code, :create_permission, :edit_permission, :show_permission, :delete_permission)
+                    ON DUPLICATE KEY UPDATE 
+                    create_permission = VALUES(create_permission), 
+                    edit_permission = VALUES(edit_permission), 
+                    show_permission = VALUES(show_permission), 
+                    delete_permission = VALUES(delete_permission)";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($rolePermissions);
+            $data = $this->db->lastInsertId() ?: $stmt->rowCount();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+    public function deletePermission(string $userCode, string $roleCode): ?bool
+    {
+        $data = false;
+        try {
+            $sql = "DELETE FROM user_roles WHERE user_code = :user_code AND role_code = :role_code";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                'user_code' => $userCode,
+                'role_code' => $roleCode
+            ]);
+            $data = $stmt->rowCount() > 0;
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
+    public function getRolesByGroupe($groupe)
+    {
+        $result = [];
+        try {
+            $sql = "SELECT * FROM " . TABLES::ROLES . " WHERE groupe = :groupe";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(["groupe" => $groupe]);
+            if ($stmt->rowCount() > 0)
+                $result = $stmt->fetchAll();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $result;
+    }
+
+    public function getAllPermissionForUser(string $userCode)
+    {
+        $data = [];
+        $sql = "SELECT * FROM  " . TABLES::USER_ROLES . " ur WHERE ur.user_code =:user_code ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['user_code' => $userCode]);
+        $data =  $stmt->fetchAll();
+        return $data;
+    }
+
+    public function getUserDataForLogin(string $email, string $value)
+    {
+        $data = [];
+        try {
+            $sql = "SELECT fn.libelle_fonction,COALESCE(en.id_enseignant,null) AS enseignant, u.* FROM " . TABLES::USERS . " AS u 
+            LEFT JOIN " . TABLES::FONCTIONS . " AS fn ON fn.code_fonction = u.fonction_code
+            LEFT JOIN " . TABLES::ENSEIGNANTS . " AS en ON en.user_code = u.code_user AND en.statut_enseignant = :statut
+         WHERE {$email} = :email AND statut_user = :statut  LIMIT 1
+
+        ";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['email' => $value, 'statut' => STATUT_ACTIF]);
+            $data = $stmt->rowCount() > 0 ? $stmt->fetch() : [];
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
+    public function updateLastConnexion(string $code): void
+    {
+        $sql = "UPDATE " . TABLES::USERS . " SET last_connexion = NOW() WHERE code_user = ?";
+        $stmt = $this->db->prepare(
+            "UPDATE {$this->table} SET last_connexion = NOW() WHERE code_user = ?"
+        );
+        $stmt->execute([$code]);
+    }
+
+    public function getUserGroups(string $userCode): array
+    {
+        $data = [];
+        try {
+            $sql = "SELECT r.groupe FROM " . TABLES::ROLES . " AS r 
+            JOIN " . TABLES::USER_ROLES . " ur ON r.code_role = ur.role_code WHERE ur.user_code = :userCode GROUP BY r.groupe";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['userCode' => $userCode]);
+            $data = $stmt->fetchAll();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
+    public function getUserRoles(string $userCode): array
+    {
+        $data = [];
+        try {
+            $sql = "SELECT r.code_role, r.libelle_role, r.description, ur.* FROM " . TABLES::ROLES . " AS r 
+            JOIN " . TABLES::USER_ROLES . " ur ON r.code_role = ur.role_code WHERE ur.user_code = :userCode GROUP BY r.code_role";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['userCode' => $userCode]);
+            $data = $stmt->fetchAll();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
+    public function getUserByCodeWithFoction($codeUser): ?array
     {
         $data = [];
         try {
@@ -52,8 +196,8 @@ class UserModel extends Model
     }
 
 
-    
-    function dataTbleCountTotalUsersRow(array $whereParams, $likeParams = [])
+
+    public function dataTbleCountTotalUsersRow(array $whereParams, array $likeParams = [])
     {
 
 
@@ -89,7 +233,7 @@ class UserModel extends Model
         //     $where .= '(' . implode(' OR ', $likes) . ')';
         // }
 
-            
+
         $sql = "SELECT COUNT(*) AS nb FROM " . TABLES::USERS . " us 
             JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code  $where";
 
@@ -98,13 +242,11 @@ class UserModel extends Model
         // return $sql;
         $stmt->execute(array_merge($whereParams, $likeParams));
         $data = $stmt->fetch();
-        return $data['nb'] ?? 0 ;
-
-
+        return $data['nb'] ?? 0;
     }
 
 
-    function DataTableFetchUsersListe($likeParams = [], int $start = 0, int $limit = 10)
+    public function DataTableFetchUsersListe(array $likeParams, string $orderBy, string $orderDir, int $start = 0, int $limit = 10)
     {
 
 
@@ -120,9 +262,9 @@ class UserModel extends Model
         }
 
 
-       
-         $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
-        LEFT JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code $where ORDER BY nom_user ASC, prenom_user ASC LIMIT :start, :limit";
+
+        $sql = "SELECT us.*, fn.* FROM " . TABLES::USERS . " us 
+        LEFT JOIN " . TABLES::FONCTIONS . " fn  ON fn.code_fonction = us.fonction_code $where ORDER BY $orderBy $orderDir LIMIT :start, :limit";
 
         $stmt = $this->db->prepare($sql);
 
@@ -145,5 +287,4 @@ class UserModel extends Model
         $stmt->execute();
         return $stmt->fetchAll();
     }
-
 }
