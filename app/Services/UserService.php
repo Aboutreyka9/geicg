@@ -126,7 +126,7 @@ class UserService
 
         foreach ($UserPermission as $key => $value) {
 
-            $permissions[$value['role_id']] = [
+            $permissions[$value['role_code']] = [
                 'create' => $value['create_permission'],
                 'edit'   => $value['edit_permission'],
                 'show'   => $value['show_permission'],
@@ -144,28 +144,40 @@ class UserService
         return $user_permissions[$role['code_role']] ?? ['create' => 0, 'show' => 0, 'edit' => 0, 'delete' => 0];
     }
 
-    function saveRolesPermissionData($rolesData, $codeUtilisateur)
+    public function saveRolesPermissionData($rolesData, $codeUtilisateur)
     {
 
-        $dataPermissions = [];
+        $dataRolePermissionsAdd = [];
+        $dataRolePermissionsDelete = [];
         foreach ($rolesData as $role) {
 
             if ($role["create"] || $role["show"] || $role["edit"] || $role["delete"]) {
-                $dataPermissions = [
-                    ':user_code' => $codeUtilisateur,
-                    ':role_code' => $role["role"],
-                    ':create_permission' => $role["create"],
-                    ':show_permission' => $role["show"],
-                    ':edit_permission' => $role["edit"],
-                    ':delete_permission' => $role["delete"]
+                $dataRolePermissionsAdd[] = [
+                    'user_code' => $codeUtilisateur,
+                    'role_code' => $role["role"],
+                    'create_permission' => $role["create"],
+                    'show_permission' => $role["show"],
+                    'edit_permission' => $role["edit"],
+                    'delete_permission' => $role["delete"]
                 ];
-                $role = $this->userModel->createPermission($dataPermissions);
+                // $role = $this->userModel->createPermission($dataPermissions);
             } else {
-                $role = $this->userModel->deletePermission($codeUtilisateur, $role["role"]);
+                $dataRolePermissionsDelete[] = ['role_code' => $role["role"]];
+                // $role = $this->userModel->deletePermission($codeUtilisateur, $role["role"]);
             }
         }
-        return ['success' => true, 'data' => '', 'code' => 200];
+
+        return $this->userModel->transactionData(function () use ($dataRolePermissionsAdd, $dataRolePermissionsDelete) {
+
+            if (!empty($dataRolePermissionsAdd))
+                // return $this->userModel->insertOrUpdateMultiplePseudo(TABLES::USER_ROLES, $dataRolePermissionsAdd, ['create_permission', 'show_permission', 'edit_permission', 'delete_permission']);
+                $this->userModel->insertOrUpdateUserRoles($dataRolePermissionsAdd);
+
+            if (!empty($dataRolePermissionsDelete))
+                $this->userModel->deleteMultiple(TABLES::USER_ROLES, $dataRolePermissionsDelete);
+        });
     }
+
     /**
      * ------------------------------------------------------------------------
      * **********************************************************************

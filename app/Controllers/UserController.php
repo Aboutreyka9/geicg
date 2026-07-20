@@ -274,6 +274,7 @@ class UserController extends MainController
 
         $userPermissions = $this->userModel->getAllPermissionForUser($code_user);
 
+
         $userRolesPermissions = $this->userService->resolveTablePermission($userPermissions);
         // $output = $userRolesPermissions;
 
@@ -291,24 +292,16 @@ class UserController extends MainController
     public function ajouterRolesPermissions()
     {
 
-        $_POST = sanitizePostData($_POST);
+        // $_POST = sanitizePostData($_POST);
         extract($_POST);
 
         $rolesData = json_decode($_POST["roles"], true);
+
         if (empty($rolesData)) Response::error("Erreur de traitement de données!", HttpStatusCode::INTERNAL_SERVER_ERROR);
 
+        if ($this->userService->saveRolesPermissionData($rolesData, $codeUtilisateur)) Response::success("Operation effectuée avec succès.", []);
 
-        var_dump($this->userService->saveRolesPermissionData($rolesData, $codeUtilisateur));
-
-
-        // $msg['type'] = "success";
-        // $msg['code'] = 200;
-        // $msg['message'] = "Operation effectuée avec succes. ";
-
-
-        // echo json_encode($msg);
-
-        return;
+        Response::error("Désolé une erreur est survenue lors du traitement.", HttpStatusCode::INTERNAL_SERVER_ERROR);
     }
 
 

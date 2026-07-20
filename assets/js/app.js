@@ -10,6 +10,7 @@ let initialData = $form.serialize(); // capture les valeurs initiales
 let formBtn = '';
 let rolesPermissions = [];
 let dataCheck = [];
+let userCode = null;
 
 $.ajaxSetup({
 
@@ -608,6 +609,9 @@ function changeStatutUser(code, statut) {
 function ModalAddrolePermissionUser(code) {
     // let btn = btn_action.id;
 
+    userCode = code;
+
+
     $.ajax({
         method: "POST",
         url: URL_AJAX,
@@ -657,13 +661,12 @@ function menuRole() {
 
         const code = $(this).data("role");
         const groupe = $(this).data("groupe");
-        const user = $(this).data("user");
-
+        // const user = $(this).data("user");
 
         if (this.checked) {
 
             if (!dataCheck.includes(groupe)) {
-                loadDataRole(user, groupe, code, permissionsDiv); // Rendre visible
+                loadDataRole(userCode, groupe, code, permissionsDiv); // Rendre visible
             } else {
 
                 permissionsDiv.style.maxHeight = permissionsDiv.scrollHeight + 'px'; // Permet de déployer
@@ -788,7 +791,7 @@ function savePermission() {
                 // $("#btn_modifier_user").attr("disabled", "disabled");
             },
             success: function (data) {
-
+                console.log(data);
 
                 // $("#spinner").removeClass("show");
 
@@ -797,13 +800,13 @@ function savePermission() {
                 //   );
                 // $("#btn_modifier_user").attr("disabled", false);
 
-                if (data.code == 200) {
+                if (data.success) {
                     userCode = "";
                     rolesPermissions = [];
                     dataCheck = [];
 
                     $.notify(data.message, "success");
-                    $("#role-modal-permission").modal("hide");
+                    $("#role-permission-modal").modal("hide");
 
                 } else {
                     $.notify(data.message, "error");

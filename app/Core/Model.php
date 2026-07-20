@@ -330,7 +330,7 @@ abstract class Model
         return $result;
     }
 
-       public function upsertMultipleAchat(array $rows)
+    public function upsertMultipleAchat(array $rows)
     {
         if (empty($rows))
             return false;
@@ -412,7 +412,7 @@ abstract class Model
         ]);
     }
 
-     public function inserted($table, array $data)
+    public function inserted($table, array $data)
     {
         if (empty($data)) {
             throw new Exception('Aucune donnée à insérer');
@@ -478,6 +478,133 @@ abstract class Model
 
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param [type] $table
+     * @param array $rows
+     * @param array $colone
+     * @return void
+     * 
+     * Point important : chaque élément de $rows d
+     * oit être un tableau associatif avec les 
+     * vraies clés de colonnes (user_code, role_code, ...),
+     *  pas les noms préfixés :. C'est la  méthode elle-même 
+     * qui génère les :col_0, :col_1, etc.
+     *  en interne pour éviter les collisions entre lignes.
+     * 
+     */
+    public function insertOrUpdateMultiplePseudo($table, array $rows, array $colone)
+    {
+        if (empty($rows)) {
+            throw new Exception('Aucune donnée à insérer');
+        }
+
+        // Colonnes (on prend celles de la première ligne)
+        $columns = array_keys($rows[0]);
+        $columnsList = implode(', ', $columns);
+
+        $allPlaceholders = [];
+        $values = [];
+
+        foreach ($rows as $i => $row) {
+            $rowPlaceholders = [];
+            foreach ($columns as $col) {
+                $paramName = ":{$col}_{$i}";
+                $rowPlaceholders[] = $paramName;
+                $values[$paramName] = $row[$col];
+            }
+            $allPlaceholders[] = '(' . implode(', ', $rowPlaceholders) . ')';
+        }
+
+        $allPlaceholdersList = implode(', ', $allPlaceholders);
+
+        // col = VALUES(col), col2 = VALUES(col2), ...
+        $updateList = implode(', ', array_map(
+            fn($col) => "$col = VALUES($col)",
+            $colone
+        ));
+
+        $sql = "INSERT INTO $table ($columnsList) VALUES $allPlaceholdersList
+            ON DUPLICATE KEY UPDATE $updateList";
+
+        $query = $this->db->prepare($sql);
+
+        return $query->execute($values);
+    }
+
+    /**
+     * Summary of insertOrUpdateMultiple
+     * @param mixed $table
+     * @param array $rows
+     * @param array $colone
+     * @throws Exception
+     * Attention : comme c'est basé sur des ? positionnels (pas des :nom), il faut que chaque ligne de $rows soit un tableau associatif avec des clés = noms de colonnes réelles (pas :user_code), dans le même ordre pour toutes les lignes.
+     */
+    public function insertOrUpdateMultiple($table, array $rows, array $colone)
+    {
+        if (empty($rows)) {
+            throw new Exception('Aucune donnée à insérer');
+        }
+
+        // Colonnes (on prend celles de la première ligne)
+        $columns = array_keys($rows[0]);
+        $columnsList = implode(', ', $columns);
+
+        // (?, ?, ?)
+        $placeholders = '(' . implode(', ', array_fill(0, count($columns), '?')) . ')';
+
+        // Générer (?, ?), (?, ?), (?, ?)
+        $allPlaceholders = implode(', ', array_fill(0, count($rows), $placeholders));
+
+        // col = VALUES(col), col2 = VALUES(col2), ...
+        $updateList = implode(', ', array_map(
+            fn($col) => "$col = VALUES($col)",
+            $colone
+        ));
+
+        $sql = "INSERT INTO $table ($columnsList) VALUES $allPlaceholders
+            ON DUPLICATE KEY UPDATE $updateList";
+
+        // Aplatir les valeurs
+        $values = array_merge(...array_map(fn($row) => array_values($row), $rows));
+
+        $query = $this->db->prepare($sql);
+
+        return $query->execute($values);
+    }
+
+    public function insertOrUpdateUserRoles(array $rows)
+    {
+        if (empty($rows)) {
+            throw new Exception('Aucune donnée à insérer');
+        }
+
+        $placeholders = '(?, ?, ?, ?, ?, ?)';
+        $allPlaceholders = implode(', ', array_fill(0, count($rows), $placeholders));
+
+        $sql = "INSERT INTO " . TABLES::USER_ROLES . " (user_code, role_code, create_permission, show_permission, edit_permission, delete_permission)
+            VALUES $allPlaceholders
+            ON DUPLICATE KEY UPDATE 
+            create_permission = VALUES(create_permission), 
+            show_permission = VALUES(show_permission), 
+            edit_permission = VALUES(edit_permission), 
+            delete_permission = VALUES(delete_permission)";
+
+        $values = array_merge(...array_map(fn($row) => [
+            $row['user_code'],
+            $row['role_code'],
+            $row['create_permission'],
+            $row['show_permission'],
+            $row['edit_permission'],
+            $row['delete_permission']
+        ], $rows));
+
+        $query = $this->db->prepare($sql);
+
+        return $query->execute($values);
     }
 
     public function updated($table, array $data, array $where)
@@ -559,6 +686,36 @@ abstract class Model
         return $stmt->execute([$id]);
     }
 
+    /**
+     * Summary of deleteMultiple
+     * @param mixed $table
+     * @param array $conditionsSet
+     * @throws Exception
+     */
+    public function deleteMultiple($table, array $conditionsSet)
+    {
+        if (empty($conditionsSet)) {
+            throw new Exception('Aucune condition fournie pour la suppression');
+        }
+
+        // Pour chaque groupe de conditions : (col1 = ? AND col2 = ?)
+        $groups = array_map(function ($conditions) {
+            $clauses = array_map(fn($col) => "$col = ?", array_keys($conditions));
+            return '(' . implode(' AND ', $clauses) . ')';
+        }, $conditionsSet);
+
+        $whereClause = implode(' OR ', $groups);
+
+        $sql = "DELETE FROM $table WHERE $whereClause";
+
+        // Aplatir les valeurs dans le même ordre que les clauses générées
+        $values = array_merge(...array_map(fn($conditions) => array_values($conditions), $conditionsSet));
+
+        $query = $this->db->prepare($sql);
+
+        return $query->execute($values);
+    }
+
     public function getEtatCaisseUser($userCode, $boutiqueCode)
     {
         $result = [];
@@ -624,7 +781,7 @@ abstract class Model
         }
     }
 
-        /**
+    /**
      * @param callable $callback
      * @return boolean
      */
