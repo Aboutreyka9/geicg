@@ -1,8 +1,8 @@
 /* body { */
-    /* overflow: auto !important; Pour Chrome, Safari et Edge le scroll reste actif */
-    /* scrollbar-width: none !important; cache la scrollbar Pour Firefox */
-    /* -ms-overflow-style: none !important; Pour IE et Edge Legacy */
-    /* overflow-y: hidden; */
+/* overflow: auto !important; Pour Chrome, Safari et Edge le scroll reste actif */
+/* scrollbar-width: none !important; cache la scrollbar Pour Firefox */
+/* -ms-overflow-style: none !important; Pour IE et Edge Legacy */
+/* overflow-y: hidden; */
 /* } */
 
 
@@ -68,7 +68,7 @@ body::-webkit-scrollbar {
 }
 
 .login-wrapper {
-    
+
     height: 100vh;
     display: flex;
     flex-wrap: nowrap;
@@ -182,6 +182,8 @@ body::-webkit-scrollbar {
 .inscrit-login {
     font-weight: 700;
     color: #464c5c;
+    position: absolute;
+    bottom: 10px;
 }
 
 .divider-login {
@@ -211,12 +213,14 @@ body::-webkit-scrollbar {
     margin-bottom: 10px;
     background: #fff;
 }
+
 .permissions {
     max-height: 0;
     overflow: hidden;
     opacity: 0;
     transition: max-height 0.5s ease, opacity 0.5s ease;
 }
+
 .role-title {
     font-weight: bold;
     /* color: #e91616; */

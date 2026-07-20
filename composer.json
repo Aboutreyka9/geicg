@@ -1,15 +1,15 @@
 {
     "name": "treyka/ecole",
     "autoload": {
-       "psr-4": {
-            "App\\": "app/"  
-       },
-        "files":[
-                "app/configs/const.php",
-                "app/configs/helpers.php",
-                "app/configs/actions.php",
-                "app/classes/helper.php"
-            ]
+        "psr-4": {
+            "App\\": "app/"
+        },
+        "files": [
+            "app/configs/const.php",
+            "app/configs/helpers.php",
+            "app/configs/actions.php",
+            "app/classes/helper.php"
+        ]
     },
     "authors": [
         {
@@ -23,7 +23,8 @@
         "kwn/number-to-words": "^2.11",
         "vlucas/phpdotenv": "^5.6",
         "phpmailer/phpmailer": "^6.10",
-        "endroid/qr-code": "^4.6"
+        "endroid/qr-code": "^4.6",
+        "google/apiclient": "*"
     },
     "config": {
         "optimize-autoloader": true

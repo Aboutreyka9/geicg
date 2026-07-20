@@ -10,6 +10,7 @@ let initialData = $form.serialize(); // capture les valeurs initiales
 let formBtn = '';
 let rolesPermissions = [];
 let dataCheck = [];
+let userCode = null;
 
 $.ajaxSetup({
 
@@ -608,6 +609,9 @@ function changeStatutUser(code, statut) {
 function ModalAddrolePermissionUser(code) {
     // let btn = btn_action.id;
 
+    userCode = code;
+
+
     $.ajax({
         method: "POST",
         url: URL_AJAX,
@@ -651,26 +655,35 @@ function btnCloseModalPermission() {
 menuRole();
 
 function menuRole() {
-    $("body").on("change", ".toggle-role", function (e) {
+    $("body").on("click change", ".toggle-role", function (e) {
+
 
         const permissionsDiv = document.querySelector('#permissions-' + this.id);
 
         const code = $(this).data("role");
         const groupe = $(this).data("groupe");
-        const user = $(this).data("user");
+        var checked = $(this).data("checked");
+        // const user = $(this).data("user");
+
+        console.log(checked);
 
 
-        if (this.checked) {
+        if (!checked) {
 
+            checked = false;
+            $(this).data("checked", true);
             if (!dataCheck.includes(groupe)) {
-                loadDataRole(user, groupe, code, permissionsDiv); // Rendre visible
+                loadDataRole(userCode, groupe, code, permissionsDiv); // Rendre visible
             } else {
 
                 permissionsDiv.style.maxHeight = permissionsDiv.scrollHeight + 'px'; // Permet de déployer
                 permissionsDiv.style.opacity = 1; // Rendre visible
             }
 
+
         } else {
+            $(this).data("checked", false);
+
             $("#btn-r" + code).prop("disabled", "true")
             permissionsDiv.style.maxHeight = 0; // Réduire à 0 pour effacer
             permissionsDiv.style.opacity = 0; // Rendre invisible
@@ -712,9 +725,9 @@ function loadDataRole(user, groupe, code, permissionsDiv) {
 
 
 
-checkPermission();
+// checkPermissionOld();
 
-function checkPermission() {
+function checkPermissionOld() {
     $("body").on("change", ".perm", function (e) {
         e.preventDefault();
 
@@ -758,6 +771,95 @@ function checkPermission() {
     });
 }
 
+function getRolePermission(role) {
+    return rolesPermissions.find(r => r.role === role);
+}
+
+function putRolePermissionData(roleCode, permissions) {
+
+    let role = getRolePermission(roleCode);
+
+    if (!role) {
+
+        rolesPermissions.push({
+            id: rolesPermissions.length + 1,
+            role: roleCode,
+            ...permissions
+        });
+
+        return;
+    }
+
+    Object.assign(role, permissions);
+
+}
+
+
+function getRowPermissions(roleCode) {
+
+    return {
+
+        create: $("#create" + roleCode).is(":checked") ? 1 : 0,
+
+        show: $("#show" + roleCode).is(":checked") ? 1 : 0,
+
+        edit: $("#edit" + roleCode).is(":checked") ? 1 : 0,
+
+        delete: $("#delete" + roleCode).is(":checked") ? 1 : 0
+
+    };
+
+}
+
+checkPermission();
+function checkPermission() {
+
+    $("body").on("change", ".perm", function () {
+
+        let row = $(this).closest("tr");
+
+        let roleCode = row.data("id");
+
+        let permissions = getRowPermissions(roleCode);
+
+        putRolePermissionData(roleCode, permissions);
+        refreshRoleCheckbox(row);
+
+        console.log(rolesPermissions);
+
+    });
+
+    $("body").on("change", ".role-check", function () {
+
+        let row = $(this).closest("tr");
+
+        let checked = $(this).is(":checked");
+
+        row.find(".perm").prop("checked", checked).trigger("change");
+
+    });
+
+}
+
+function refreshRoleCheckbox(row) {
+
+    let allChecked = true;
+
+    row.find(".perm").each(function () {
+
+        if (!$(this).is(":checked")) {
+
+            allChecked = false;
+
+            return false;
+
+        }
+
+    });
+
+    row.find(".role-check").prop("checked", allChecked);
+
+}
 
 savePermission();
 
@@ -788,7 +890,7 @@ function savePermission() {
                 // $("#btn_modifier_user").attr("disabled", "disabled");
             },
             success: function (data) {
-
+                console.log(data);
 
                 // $("#spinner").removeClass("show");
 
@@ -797,13 +899,13 @@ function savePermission() {
                 //   );
                 // $("#btn_modifier_user").attr("disabled", false);
 
-                if (data.code == 200) {
+                if (data.success) {
                     userCode = "";
                     rolesPermissions = [];
                     dataCheck = [];
 
                     $.notify(data.message, "success");
-                    $("#role-modal-permission").modal("hide");
+                    $("#role-permission-modal").modal("hide");
 
                 } else {
                     $.notify(data.message, "error");

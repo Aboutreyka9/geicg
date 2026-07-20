@@ -126,7 +126,7 @@ class UserService
 
         foreach ($UserPermission as $key => $value) {
 
-            $permissions[$value['role_id']] = [
+            $permissions[$value['role_code']] = [
                 'create' => $value['create_permission'],
                 'edit'   => $value['edit_permission'],
                 'show'   => $value['show_permission'],
@@ -144,28 +144,40 @@ class UserService
         return $user_permissions[$role['code_role']] ?? ['create' => 0, 'show' => 0, 'edit' => 0, 'delete' => 0];
     }
 
-    function saveRolesPermissionData($rolesData, $codeUtilisateur)
+    public function saveRolesPermissionData($rolesData, $codeUtilisateur)
     {
 
-        $dataPermissions = [];
+        $dataRolePermissionsAdd = [];
+        $dataRolePermissionsDelete = [];
         foreach ($rolesData as $role) {
 
             if ($role["create"] || $role["show"] || $role["edit"] || $role["delete"]) {
-                $dataPermissions = [
-                    ':user_code' => $codeUtilisateur,
-                    ':role_code' => $role["role"],
-                    ':create_permission' => $role["create"],
-                    ':show_permission' => $role["show"],
-                    ':edit_permission' => $role["edit"],
-                    ':delete_permission' => $role["delete"]
+                $dataRolePermissionsAdd[] = [
+                    'user_code' => $codeUtilisateur,
+                    'role_code' => $role["role"],
+                    'create_permission' => $role["create"],
+                    'show_permission' => $role["show"],
+                    'edit_permission' => $role["edit"],
+                    'delete_permission' => $role["delete"]
                 ];
-                $role = $this->userModel->createPermission($dataPermissions);
+                // $role = $this->userModel->createPermission($dataPermissions);
             } else {
-                $role = $this->userModel->deletePermission($codeUtilisateur, $role["role"]);
+                $dataRolePermissionsDelete[] = ['role_code' => $role["role"]];
+                // $role = $this->userModel->deletePermission($codeUtilisateur, $role["role"]);
             }
         }
-        return ['success' => true, 'data' => '', 'code' => 200];
+
+        return $this->userModel->transactionData(function () use ($dataRolePermissionsAdd, $dataRolePermissionsDelete) {
+
+            if (!empty($dataRolePermissionsAdd))
+                // return $this->userModel->insertOrUpdateMultiplePseudo(TABLES::USER_ROLES, $dataRolePermissionsAdd, ['create_permission', 'show_permission', 'edit_permission', 'delete_permission']);
+                $this->userModel->insertOrUpdateUserRoles($dataRolePermissionsAdd);
+
+            if (!empty($dataRolePermissionsDelete))
+                $this->userModel->deleteMultiple(TABLES::USER_ROLES, $dataRolePermissionsDelete);
+        });
     }
+
     /**
      * ------------------------------------------------------------------------
      * **********************************************************************
@@ -449,10 +461,10 @@ class UserService
         foreach ($groupes as $data) {
             $output .= ' 
             <div class="role-container">
-                    <div class="d-flex">
-                    <div class="">
-                    <input data-user="' . $code . '" data-groupe="' . $data['groupe'] . '" data-role="' . $data['code_role'] . '" type="checkbox" class="form-check-input me-2 toggle-role" id="r' . $data['code_role'] . '"> &nbsp;
-                    <label for="r' . $data['code_role'] . '" class="role-title">' .  strtoupper($data['module']) . '</label>
+                    <div class="role-header  toggle-role"  data-user="' . $code . '" data-groupe="' . $data['groupe'] . '" data-role="' . $data['code_role'] . '" id="r' . $data['code_role'] . '" data-checked="false">
+                    <div class="" >
+                    <h5> <i class="fa fa-check-circle"></i> ' .  strtoupper($data['module']) . '</h5>
+                   
                     </div>
                         <div class="">
                         </div>
@@ -483,8 +495,17 @@ class UserService
     public function DataTableRoles($userRolesPermissions, $roles)
     {
         $output = '';
+        $checked = '';
         foreach ($roles as $data) {
             $equal = $this->checkIfExistRole($userRolesPermissions, $data);
+            // $checked = rolePermissionChecked($userRolesPermissions[$data['code_role']]) ? 'checked' : '';
+            if (array_key_exists($data['code_role'], $userRolesPermissions))
+                $checked = isAllPermissionsChecked($userRolesPermissions[$data['code_role']], [
+                    'create',
+                    'show',
+                    'edit',
+                    'delete'
+                ]) ? 'checked' : '';
 
             $c = $equal['create'] ? 'checked' : '';
             $s = $equal['show'] ? 'checked' : '';
@@ -493,7 +514,11 @@ class UserService
 
             $output .= '
                 <tr data-id="' . $data['code_role'] . '" >
-                    <td> &nbsp; &nbsp;' . $data['libelle_role'] . '</td>
+                    <td> 
+                    <input ' . $checked . ' type="checkbox" class="form-check-input me-2 role-check" id="role' . $data['code_role'] . '"> &nbsp;
+                        <label for="role' . $data['code_role'] . '">' .  strtoupper($data['libelle_role']) . '
+                        </label> </td>
+
                     <td><input id="create' . $data['code_role'] . '" ' . $c . ' class="perm" data-type="create" type="checkbox"></td>
                     <td><input id="show' . $data['code_role'] . '" ' . $s . ' class="perm" data-type="show" type="checkbox"></td>
                     <td><input id="edit' . $data['code_role'] . '" ' . $e . ' class="perm" data-type="edit" type="checkbox"></td>

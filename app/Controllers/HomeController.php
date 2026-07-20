@@ -25,8 +25,16 @@ class HomeController extends MainController
     {
 
         $result = "";
-       
+
         return $this->view('welcome', ['title' => "Mon espace"]);
     }
 
+    public function googleAuth()
+    {
+
+        var_dump($_GET);
+        $result = "";
+
+        // return $this->view('welcome', ['title' => "Mon espace"]);
+    }
 }

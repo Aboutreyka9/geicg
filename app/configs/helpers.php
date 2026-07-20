@@ -408,13 +408,13 @@ function money($montant)
 
 function checkModePaiement(string $mode)
 {
-  $modes = PAYMENT_MODE_SHOW;
+    $modes = PAYMENT_MODE_SHOW;
 
-  if (!isset($modes[$mode])) {
-    return '';
-  }
+    if (!isset($modes[$mode])) {
+        return '';
+    }
 
-  return '<span class="text-light badge bg-' . $modes[$mode]['class'] . '">
+    return '<span class="text-light badge bg-' . $modes[$mode]['class'] . '">
                 ' . $modes[$mode]['label'] . '
             </span>';
 }
@@ -422,157 +422,157 @@ function checkModePaiement(string $mode)
 
 function checkStatusCommande(string $etat, array $data = STATUT_COMMANDE)
 {
-  $result = "";
-  switch ($etat) {
-    case $data[0]:
-      $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> ' . $data[0] . '</span>';
-      break;
-    case $data[1]:
-      $result = '<span class="badge badge-statut statut-info"><span class="dot"></span> ' . $data[1] . '</span>';
-      break;
-    case $data[2]:
-      $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> ' . $data[2] . '</span>';
-      break;
-    case $data[3]:
-      $result = '<span class="badge badge-statut statut-default"><span class="dot"></span> ' . $data[3] . '</span>';
-      break;
-    case $data[4]:
-      $result = '<span class="badge badge-statut statut-danger"><span class="dot"></span> ' . $data[4] . '</span>';
-      break;
-    default:
-      $result = '';
-      break;
-  }
-  return $result;
+    $result = "";
+    switch ($etat) {
+        case $data[0]:
+            $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> ' . $data[0] . '</span>';
+            break;
+        case $data[1]:
+            $result = '<span class="badge badge-statut statut-info"><span class="dot"></span> ' . $data[1] . '</span>';
+            break;
+        case $data[2]:
+            $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> ' . $data[2] . '</span>';
+            break;
+        case $data[3]:
+            $result = '<span class="badge badge-statut statut-default"><span class="dot"></span> ' . $data[3] . '</span>';
+            break;
+        case $data[4]:
+            $result = '<span class="badge badge-statut statut-danger"><span class="dot"></span> ' . $data[4] . '</span>';
+            break;
+        default:
+            $result = '';
+            break;
+    }
+    return $result;
 }
 function checkEtat(string $status, array $data = ETATS)
 {
-  $result = "";
-  switch ($status) {
-    case $data[0]:
-      $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> ' . 'En attente' . '</span>';
-      break;
-    case $data[1]:
-      $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> ' . 'confirmé' . '</span>';
-      break;
-    default:
-      $result = 1;
-      break;
-  }
+    $result = "";
+    switch ($status) {
+        case $data[0]:
+            $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> ' . 'En attente' . '</span>';
+            break;
+        case $data[1]:
+            $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> ' . 'confirmé' . '</span>';
+            break;
+        default:
+            $result = 1;
+            break;
+    }
 
 
-  return $result;
+    return $result;
 }
 
 
 function checkEtatData(string $status, array $data = STATUT_DATA)
 {
-  $result = "";
-  switch ($status) {
-    case $data[0]:
-      $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> actif </span>';
-      break;
-    default:
-     $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> inactif </span>';
-      break;
-  }
+    $result = "";
+    switch ($status) {
+        case $data[0]:
+            $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> actif </span>';
+            break;
+        default:
+            $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> inactif </span>';
+            break;
+    }
 
 
-  return $result;
+    return $result;
 }
 
 function checkEtatDispo(string $status, array $data = ETATS)
 {
-  $result = "";
-  switch ($status) {
-    case $data[0]:
-      $result = '<span class="badge badge-statut statut-warning"> NON </span>';
-      break;
-    case $data[1]:
-      $result = '<span class="badge badge-statut statut-success"> OUI </span>';
-      break;
-    default:
-      $result = 1;
-      break;
-  }
+    $result = "";
+    switch ($status) {
+        case $data[0]:
+            $result = '<span class="badge badge-statut statut-warning"> NON </span>';
+            break;
+        case $data[1]:
+            $result = '<span class="badge badge-statut statut-success"> OUI </span>';
+            break;
+        default:
+            $result = 1;
+            break;
+    }
 
 
-  return $result;
+    return $result;
 }
 
 function checkEtatStock(string $stock, $stockAlerte)
 {
-  $result = "";
+    $result = "";
 
-  if ($stock >= ($stockAlerte + 20)) {
-    $result = ' <i class="fas fa-arrow-up text-icon-success"></i> ' . $stock;
-  } elseif ($stock < ($stockAlerte + 20) && $stock > $stockAlerte) {
-    $result = ' <i class="fas fa-arrow-down text-icon-warning"></i> ' . $stock;
-  } else {
-    $result = ' <i class="fas fa-arrow-down text-icon-danger"></i> ' . $stock;
-  }
+    if ($stock >= ($stockAlerte + 20)) {
+        $result = ' <i class="fas fa-arrow-up text-icon-success"></i> ' . $stock;
+    } elseif ($stock < ($stockAlerte + 20) && $stock > $stockAlerte) {
+        $result = ' <i class="fas fa-arrow-down text-icon-warning"></i> ' . $stock;
+    } else {
+        $result = ' <i class="fas fa-arrow-down text-icon-danger"></i> ' . $stock;
+    }
 
 
 
-  return $result;
+    return $result;
 }
 function checkEtatEcart($ecart)
 {
-  $result = "";
+    $result = "";
 
-  if ($ecart > 0) {
-    $result = ' <i class="fas fa-arrow-circle-up text-icon-primary"></i> ' . $ecart;
-  } elseif ($ecart < 0) {
-    $result = ' <i class="fas fa-arrow-circle-down text-icon-danger"></i> ' . $ecart;
-  } else {
-    $result = ' <i class="fas fa-check-circle text-icon-success"></i> ' . $ecart;
-  }
+    if ($ecart > 0) {
+        $result = ' <i class="fas fa-arrow-circle-up text-icon-primary"></i> ' . $ecart;
+    } elseif ($ecart < 0) {
+        $result = ' <i class="fas fa-arrow-circle-down text-icon-danger"></i> ' . $ecart;
+    } else {
+        $result = ' <i class="fas fa-check-circle text-icon-success"></i> ' . $ecart;
+    }
 
 
 
-  return $result;
+    return $result;
 }
 
 function checkEtatPaiement(string $status)
 {
-  $result = "";
-  switch ($status) {
-    case 'Non payé':
-      $result = '<span class="badge badge-statut statut-danger"> ' . $status . ' </span>';
-      break;
-    case 'Payé':
-      $result = '<span class="badge badge-statut statut-success"> ' . $status . ' </span>';
-      break;
-    default:
-      $result = '<span class="badge badge-statut statut-warning"> En cour... </span>';
-      break;
-  }
+    $result = "";
+    switch ($status) {
+        case 'Non payé':
+            $result = '<span class="badge badge-statut statut-danger"> ' . $status . ' </span>';
+            break;
+        case 'Payé':
+            $result = '<span class="badge badge-statut statut-success"> ' . $status . ' </span>';
+            break;
+        default:
+            $result = '<span class="badge badge-statut statut-warning"> En cour... </span>';
+            break;
+    }
 
 
-  return $result;
+    return $result;
 }
 
 
 function checkStatusDepense(string $etat, array $data = STATUT_DEPENSE)
 {
-  $result = "";
-  switch ($etat) {
-    case $data[0]:
-      $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> ' . $data[0] . '</span>';
-      break;
-    case $data[1]:
-      $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> ' . $data[1] . '</span>';
-      break;
-    case $data[2]:
-      $result = '<span class="badge badge-statut statut-danger"><span class="dot"></span> ' . $data[2] . '</span>';
-      break;
-    default:
-      $result = '';
-      break;
-  }
+    $result = "";
+    switch ($etat) {
+        case $data[0]:
+            $result = '<span class="badge badge-statut statut-warning"><span class="dot"></span> ' . $data[0] . '</span>';
+            break;
+        case $data[1]:
+            $result = '<span class="badge badge-statut statut-success"><span class="dot"></span> ' . $data[1] . '</span>';
+            break;
+        case $data[2]:
+            $result = '<span class="badge badge-statut statut-danger"><span class="dot"></span> ' . $data[2] . '</span>';
+            break;
+        default:
+            $result = '';
+            break;
+    }
 
 
-  return $result;
+    return $result;
 }
 
 function showHtmlElement($item = 1, $equal = 2, $return = 'active show')
@@ -602,6 +602,28 @@ function textLimit(string | null $text, int $limit = 30, string $suffix = '...')
     return rtrim($result) . $suffix;
 }
 
+function isAllPermissionsChecked(array $permissions, array $fields, $symbole = 0): bool
+{
+    // if (array_key_exists()) return false;
+
+    foreach ($fields as $field) {
+
+        if (empty($permissions[$field]) || $permissions[$field] == $symbole) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function rolePermissionChecked(array $role): bool
+{
+    return
+        !empty($role['create_permission']) &&
+        !empty($role['show_permission']) &&
+        !empty($role['edit_permission']) &&
+        !empty($role['delete_permission']);
+}
 
 /**
  * Returns the string "disabled" if the two provided values are equal.
