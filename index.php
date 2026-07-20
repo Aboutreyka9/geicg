@@ -28,7 +28,7 @@ use App\Core\Router;
 use App\Middlewares\RouteMiddleWare;
 use Phroute\Phroute\Dispatcher;
 
-        
+
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $title = "";
@@ -81,11 +81,11 @@ $router->group(['before' => '', 'prefix' => 'geicg'], function ($router) {
 
 
 
-/**
- * ************************************************
- * SEXION ROUTE MAIL 
- * ************************************************
- */
+    /**
+     * ************************************************
+     * SEXION ROUTE MAIL 
+     * ************************************************
+     */
 
 
 // $router->group(['before' => 'auth', 'prefix' => 'gestocks/t'], function ($router) {
@@ -93,63 +93,67 @@ $router->group(['before' => '', 'prefix' => 'geicg'], function ($router) {
 //     $router->get('/testd', [UserController::class, 'acueil']);
 // });
 
-/**
- * ************************************************
- * FIN SEXION ROUTE MAIL 
- * ************************************************
- */
+    /**
+     * ************************************************
+     * FIN SEXION ROUTE MAIL 
+     * ************************************************
+     */
 
 
 
-/**
- * ************************************************
- * SEXION ROUTE PRINTER 
- * ************************************************
- */
+    /**
+     * ************************************************
+     * SEXION ROUTE PRINTER 
+     * ************************************************
+     */
 
 
 
 
-/**
- * ************************************************
- *  Routes SEXION HOTEL LISTE RECAP
- * ************************************************
- */
+    /**
+     * ************************************************
+     *  Routes SEXION HOTEL LISTE RECAP
+     * ************************************************
+     */
 
-/**
- * ************************************************
- *  Routes SEXION VUES 
- * ************************************************
- */
+    /**
+     * ************************************************
+     *  Routes SEXION VUES 
+     * ************************************************
+     */
 
-$router->get('login', [AuthController::class, 'login'], ['before' => 'guest']);
-// <!-- sexion utilisateur  -->
-$router->group(['before' => 'auth', 'prefix' => '/'], function ($router) {
-    
-    $router->get('dashboard', [HomeController::class, 'acueil']);
-    $router->get('/', [HomeController::class, 'acueil'], ['before' => 'auth']);
+    // $router->get('/', function () {
+    //     $client = new Google_Client();
+    // });
 
-    $router->get('recrutements/personnel',[UserController::class, 'recrutement']);
-    $router->get('personnel-enseignants',[UserController::class, 'enseignants']);
-    $router->get('personnel-administratifs',[UserController::class, 'administratif']);
+    $router->get('login', [AuthController::class, 'login'], ['before' => 'guest']);
+    $router->get('auth', [AuthController::class, 'googleAuth'], ['before' => 'guest']);
+    // <!-- sexion utilisateur  -->
+    $router->group(['before' => 'auth', 'prefix' => '/'], function ($router) {
 
-    // <!-- parametrage -->
-    $router->get('services-fonctions',[SettingController::class, 'fonction']);
+        $router->get('dashboard', [HomeController::class, 'acueil']);
+        $router->get('/', [HomeController::class, 'acueil'], ['before' => 'auth']);
 
-});
+        $router->get('recrutements/personnel', [UserController::class, 'recrutement']);
+        $router->get('personnel-enseignants', [UserController::class, 'enseignants']);
+        $router->get('personnel-administratifs', [UserController::class, 'administratif']);
+
+        // <!-- parametrage -->
+        $router->get('services-fonctions', [SettingController::class, 'fonction']);
+    });
 
 
-/**
- * Page not found
- */
-$router->get('page-not-found', [ControllerException::class, 'notFound']);
 
-/**
- * ************************************************
- *  FIN Routes SEXION HOTEL AUTRES
- * ************************************************
- */
+    /**
+     * Page not found
+     */
+    $router->get('page-not-found', [ControllerException::class, 'notFound']);
 
+    /**
+     * ************************************************
+     *  FIN Routes SEXION HOTEL AUTRES
+     * ************************************************
+     */
 });
 
 

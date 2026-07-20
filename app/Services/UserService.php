@@ -461,10 +461,10 @@ class UserService
         foreach ($groupes as $data) {
             $output .= ' 
             <div class="role-container">
-                    <div class="d-flex">
-                    <div class="">
-                    <input data-user="' . $code . '" data-groupe="' . $data['groupe'] . '" data-role="' . $data['code_role'] . '" type="checkbox" class="form-check-input me-2 toggle-role" id="r' . $data['code_role'] . '"> &nbsp;
-                    <label for="r' . $data['code_role'] . '" class="role-title">' .  strtoupper($data['module']) . '</label>
+                    <div class="role-header  toggle-role"  data-user="' . $code . '" data-groupe="' . $data['groupe'] . '" data-role="' . $data['code_role'] . '" id="r' . $data['code_role'] . '" data-checked="false">
+                    <div class="" >
+                    <h5> <i class="fa fa-check-circle"></i> ' .  strtoupper($data['module']) . '</h5>
+                   
                     </div>
                         <div class="">
                         </div>
@@ -495,8 +495,17 @@ class UserService
     public function DataTableRoles($userRolesPermissions, $roles)
     {
         $output = '';
+        $checked = '';
         foreach ($roles as $data) {
             $equal = $this->checkIfExistRole($userRolesPermissions, $data);
+            // $checked = rolePermissionChecked($userRolesPermissions[$data['code_role']]) ? 'checked' : '';
+            if (array_key_exists($data['code_role'], $userRolesPermissions))
+                $checked = isAllPermissionsChecked($userRolesPermissions[$data['code_role']], [
+                    'create',
+                    'show',
+                    'edit',
+                    'delete'
+                ]) ? 'checked' : '';
 
             $c = $equal['create'] ? 'checked' : '';
             $s = $equal['show'] ? 'checked' : '';
@@ -505,7 +514,11 @@ class UserService
 
             $output .= '
                 <tr data-id="' . $data['code_role'] . '" >
-                    <td> &nbsp; &nbsp;' . $data['libelle_role'] . '</td>
+                    <td> 
+                    <input ' . $checked . ' type="checkbox" class="form-check-input me-2 role-check" id="role' . $data['code_role'] . '"> &nbsp;
+                        <label for="role' . $data['code_role'] . '">' .  strtoupper($data['libelle_role']) . '
+                        </label> </td>
+
                     <td><input id="create' . $data['code_role'] . '" ' . $c . ' class="perm" data-type="create" type="checkbox"></td>
                     <td><input id="show' . $data['code_role'] . '" ' . $s . ' class="perm" data-type="show" type="checkbox"></td>
                     <td><input id="edit' . $data['code_role'] . '" ' . $e . ' class="perm" data-type="edit" type="checkbox"></td>
