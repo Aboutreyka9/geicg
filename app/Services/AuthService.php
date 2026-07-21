@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Core\Auth;
 use App\Models\UserModel;
+use Google_Client;
+use Google_Service_Oauth2;
 
 class AuthService
 {
@@ -33,6 +35,89 @@ class AuthService
 
         // Mise à jour de la dernière connexion
         $this->userModel->updateLastConnexion($user['code_user']);
+
+        // Récupérer les rôles de l'utilisateur
+        $rolesuser = $this->userModel->getUserRoles($user['code_user']);
+        $groupesuser = $this->userModel->getUserGroups($user['code_user']);
+
+        if (!empty($groupesuser)) {
+            foreach ($groupesuser as $groupe) {
+                $groupes[] = $groupe['groupe'];
+            }
+        }
+
+        if (!empty($rolesuser)) {
+            foreach ($rolesuser as $role) {
+
+                $roles[$role['code_role']] = [
+                    'create' => (bool) $role['create_permission'],
+                    'edit'   => (bool) $role['edit_permission'],
+                    'show'   => (bool) $role['show_permission'],
+                    'delete' => (bool) $role['delete_permission'],
+                ];
+            }
+        }
+
+
+        // Démarrer la session si pas encore démarrée
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Régénérer l'ID de session pour éviter la fixation de session
+        session_regenerate_id(true);
+        Auth::login($user, $groupes, $roles);
+
+        return [
+            'success' => true,
+            'message' => 'Connexion réussie.'
+        ];
+    }
+
+    public function setupGoogleAuth()
+    {
+
+        $client = new Google_Client();
+        $client->setClientId(getDataEnv('GOOGLE_CLIENT_ID'));
+        $client->setClientSecret(getDataEnv('GOOGLE_CLIENT_SECRET'));
+        $client->setRedirectUri(getDataEnv('GOOGLE_REDIRECT_URI'));
+        $client->addScope('email');
+        $client->addScope('profile');
+
+        if (!isset($_GET['code'])) {
+            $authUrl = $client->createAuthUrl();
+            return ['success' => false, 'url' => $authUrl, 'message' => 'Erreur de verification des données!'];
+        }
+
+        $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+        $client->setAccessToken($token);
+        $oauth2 = new Google_Service_Oauth2($client);
+        $googleUser = $oauth2->userinfo->get();
+        return ['success' => true, 'data' => $googleUser];
+    }
+
+    public function loginWithGoogleAuth($googleUser)
+    {
+        // extract($data);
+
+        $user = $this->userModel->getUserDataForLogin('email_user', $googleUser->email);
+        $groupes = [];
+        $roles = [];
+
+        // if (empty($user)) {
+        //     return ['success' => false, 'message' => 'Email ou mot de passe incorrect.'];
+        // }
+
+        if (empty($user)) {
+            return ['success' => false, 'message' => "Désolé, vous n'avez de compte associé à cette adresse mail."];
+        }
+
+        if (!empty($user["oauth_uid"]) && $user["auth_uid"] != $googleUser->id) {
+            return ['success' => false, 'message' => "Désolé, vous n'avez de compte associé à cette adresse mail."];
+        }
+
+        // Mise à jour de la dernière connexion
+        $this->userModel->updateLastGoogleUidConnexion($user['code_user'], $googleUser->id);
 
         // Récupérer les rôles de l'utilisateur
         $rolesuser = $this->userModel->getUserRoles($user['code_user']);

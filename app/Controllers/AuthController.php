@@ -9,7 +9,8 @@ use App\Helpers\Response;
 use App\Helpers\Validator;
 use App\Models\UserModel;
 use App\Services\AuthService;
-
+use Google_Client;
+use Google_Service_Oauth2;
 
 class AuthController extends MainController
 {
@@ -35,57 +36,6 @@ class AuthController extends MainController
         return $this->viewGuest('auth/login', ["title" => "Connexion"]);
     }
 
-    public function googleAuth()
-    {
-
-
-        $client = new Google_Client();
-        $client->setClientId(GOOGLE_CLIENT_ID);
-        $client->setClientSecret(GOOGLE_CLIENT_SECRET);
-        $client->setRedirectUri(GOOGLE_REDIRECT_URI);
-        $client->addScope('email');
-        $client->addScope('profile');
-
-        if (!isset($_GET['code'])) {
-            $authUrl = $client->createAuthUrl();
-            header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));
-            exit();
-        } else {
-
-            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-
-
-            $client->setAccessToken($token);
-            $oauth2 = new Google_Service_Oauth2($client);
-            $googleUser = $oauth2->userinfo->get();
-
-            // Stocker les informations de l'utilisateur dans la session ou la base de données
-
-            // $stmt = $db->prepare("SELECT * FROM users WHERE google_id = :google_id");
-            $stmt = $db->prepare("SELECT * FROM users WHERE oauth_uid = :google_id AND oauth_provider = 'google'");
-            $stmt->bindValue(':google_id', $googleUser->id);
-            $stmt->execute();
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            if (!$user) {
-                // Si l'utilisateur n'existe pas, on le crée
-                $stmt = $db->prepare("INSERT INTO users (oauth_uid, oauth_provider, name, email, picture) VALUES (:oauth_uid, :oauth_provider, :name, :email, :picture)");
-                $stmt->bindValue(':oauth_uid', $googleUser->id);
-                $stmt->bindValue(':oauth_provider', 'google');
-                $stmt->bindValue(':name', $googleUser->name);
-                $stmt->bindValue(':email', $googleUser->email);
-                $stmt->bindValue(':picture', $googleUser->picture);
-                $stmt->execute();
-            }
-            $_SESSION['user'] = [
-                'name' => $googleUser->name,
-                'email' => $googleUser->email,
-                'picture' => $googleUser->picture
-            ];
-            // Rediriger vers la page d'accueil
-            header('Location: index.php');
-            exit();
-        }
-    }
 
     public function register()
     {
@@ -137,6 +87,26 @@ class AuthController extends MainController
 
         Response::success($result['message'], []);
     }
+
+    public function googleAuth()
+    {
+
+        $result = [];
+        $result = $this->authService->setupGoogleAuth();
+        if (!$result['success']) Response::error($result['message'], HttpStatusCode::BAD_REQUEST);
+        // header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));
+
+
+        if (!$this->authService->loginWithGoogleAuth($result['data']))
+
+            Response::error('', HttpStatusCode::BAD_REQUEST);
+
+        Response::success($result['message']);
+        // header('Location: index.php');
+        // exit();
+
+    }
+
 
     public function deconnexion()
     {
