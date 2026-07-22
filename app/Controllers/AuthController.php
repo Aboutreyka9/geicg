@@ -91,20 +91,33 @@ class AuthController extends MainController
     public function googleAuth()
     {
 
-        $result = [];
-        $result = $this->authService->setupGoogleAuth();
-        if (!$result['success']) Response::error($result['message'], HttpStatusCode::BAD_REQUEST);
-        // header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));
+        $client = new Google_Client();
+        $client->setClientId(getDataEnv('GOOGLE_CLIENT_ID'));
+        $client->setClientSecret(getDataEnv('GOOGLE_CLIENT_SECRET'));
+        $client->setRedirectUri(getDataEnv('GOOGLE_REDIRECT_URI'));
+        $client->addScope('email');
+        $client->addScope('profile');
 
 
-        if (!$this->authService->loginWithGoogleAuth($result['data']))
+        var_dump($_GET);
+        return;
 
-            Response::error('', HttpStatusCode::BAD_REQUEST);
 
-        Response::success($result['message']);
-        // header('Location: index.php');
-        // exit();
+        if (!isset($_GET['code'])) {
+            $authUrl = $client->createAuthUrl();
+            // header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));
+            // exit();
+            // var_dump("ghjfghjghjgjgjd");
+        } else {
 
+            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+
+
+            $client->setAccessToken($token);
+            $oauth2 = new Google_Service_Oauth2($client);
+            $googleUser = $oauth2->userinfo->get();
+            var_dump($googleUser);
+        }
     }
 
 
