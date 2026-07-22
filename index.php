@@ -140,6 +140,7 @@ $router->group(['before' => '', 'prefix' => 'geicg'], function ($router) {
 
         // <!-- parametrage -->
         $router->get('services-fonctions', [SettingController::class, 'fonction']);
+        $router->get('annees-semestres', [SettingController::class, 'annee']);
     });
 
 

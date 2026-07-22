@@ -74,7 +74,7 @@ switch ($action) {
 
     //end Actions pour les utilisateurs
 
-    // Debut Actions pour les fonctions et services
+    // Debut Actions pour les fonctions 
     case 'charger_data_fonctions':
         $ajx = new SettingController();
         $ajx->GetListeFonction();
@@ -103,7 +103,7 @@ switch ($action) {
     //end Actions pour les fonctions
 
 
-    // Debut Actions pour les fonctions et services
+    // Debut Actions pour services
     case 'charger_data_services':
         $ajx = new SettingController();
         $ajx->GetListeServices();
@@ -130,6 +130,34 @@ switch ($action) {
         break;
 
     //end Actions pour les fonctions
+
+    // Debut Actions pour les annees 
+    case 'charger_data_annees':
+        $ajx = new SettingController();
+        $ajx->GetListeAnnee();
+        break;
+    case 'change_statut_annees':
+        $ajx = new SettingController();
+        $ajx->changeStatutAnnee();
+        break;
+    case 'btn_showmodal_annee_add':
+        $ajx = new SettingController();
+        $ajx->modalAddAnnee();
+        break;
+    case 'btn_showmodal_annee_update':
+        $ajx = new SettingController();
+        $ajx->modalUpdatedAnnee();
+        break;
+    case 'btn_add_annee':
+        $ajx = new SettingController();
+        $ajx->addAnnee();
+        break;
+    case 'btn_update_annee':
+        $ajx = new SettingController();
+        $ajx->updateAnnee();
+        break;
+
+    //end Actions pour les annees
 
     // Autres cas...
     default:

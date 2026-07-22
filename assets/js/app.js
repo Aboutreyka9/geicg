@@ -1108,7 +1108,8 @@ function changeStatutFonction(code, statut) {
         });
 }
 /** FIN SECTION FONCTION */
-// 123
+
+
 /** DEBUT SECTION SERVICE */
 loadDataTableMany('data-table-service', '.service-fonction', '#data-table-service', 'charger_data_services');
 
@@ -1296,3 +1297,190 @@ function changeStatutService(code, statut) {
         });
 }
 /** FIN SECTION SERVICE */
+
+
+/** DEBUT SECTION ANNEE */
+loadDataTableMany('data-table-annee', '.semestre-annee', '#data-table-annee', 'charger_data_annees');
+
+openModalAddAnnee();
+function openModalAddAnnee() {
+    $('#btn_annee_addModal').click(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: {
+                action: 'btn_showmodal_annee_add'
+            },
+            dataType: "JSON",
+            beforeSend: function () {
+                $(".loader_backdrop2").css('display', "block");
+                // btnReq("#ClientAddModal", "Traitement...");
+
+            },
+            success: function (data) {
+                // btnRes("#ClientAddModal", 'Ajouter un client', 'fa-plus');
+                // ;
+
+                $(".loader_backdrop2").css('display', "none");
+                if (data.success) {
+                    var output = data.data;
+                    $(".data-annee-modal").html(output.data);
+                    $("#annee-modal").modal("show");
+
+
+                } else {
+                    $.notify(data.message);
+
+                }
+
+            }
+        })
+    });
+}
+
+ajouterAnnee();
+function ajouterAnnee() {
+    $("body").on("submit", "#frmAddAnnee", function (e) {
+        e.preventDefault();
+        var data = $(this).serialize();
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: data,
+            dataType: "JSON",
+            beforeSend: function () {
+                // $(".loader_backdrop2").css('display', "block");
+
+                btnReq("#btnSubmitFormAnnee", "Enregistrement...");
+            },
+            success: function (data) {
+                console.log(data);
+                // $(".loader_backdrop2").css('display', "none");
+
+                btnRes("#btnSubmitFormAnnee", "Enregistrer", "fa-save");
+                if (data.success) {
+                    tables['data-table-annee'].ajax.reload(null, false);
+                    $.notify(data.message, "success");
+                    $("#annee-modal").modal("hide");
+                } else {
+                    $.notify(data.message);
+                }
+            }
+        })
+    });
+}
+
+
+function modalUpdatedAnnee(code) {
+    // let btn = btn_action.id;
+
+    $.ajax({
+        method: "POST",
+        url: URL_AJAX,
+        data: {
+            action: 'btn_showmodal_annee_update',
+            codeannee: code
+        },
+        dataType: 'JSON',
+        beforeSend: function () {
+            $(".loader_backdrop2").css('display', "block");
+            // btnReq(".modal_footer", "Traitement...");
+        },
+        success: function (data) {
+
+            $(".loader_backdrop2").css('display', "none");
+
+            if (data.success) {
+                $(".data-annee-modal").html(data.data);
+                $("#annee-modal").modal("show");
+
+            } else {
+                $.notify(data.message);
+
+            }
+        }
+    });
+}
+
+updatedAnnee();
+function updatedAnnee() {
+    $("body").on("submit", "#frmUpdateAnnee", function (e) {
+        e.preventDefault();
+        var data = $(this).serialize();
+
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: data,
+            dataType: "JSON",
+            beforeSend: function () {
+                // $(".loader_backdrop2").css('display', "block");
+
+                btnReq("#btnSubmitFormAnnee", "Mise à jour en cours...");
+            },
+            success: function (data) {
+                // $(".loader_backdrop2").css('display', "none");
+                console.log(data);
+
+                btnRes("#btnSubmitFormAnnee", "Enregistrer", "fa-save");
+
+                if (data.success) {
+                    tables['data-table-annee'].ajax.reload(null, false);
+                    $.notify(data.message, "success");
+                    $("#annee-modal").modal("hide");
+
+                } else {
+                    $.notify(data.message);
+                }
+            }
+        })
+    });
+}
+
+function changeStatutAnnee(code, statut) {
+    swal({
+        title: "Notification",
+        text: "Voulez-vous vraiment modifier le statut de cette annee?",
+        icon: "warning",
+        dangerMode: true,
+        closeOnClickOutside: false,
+        buttons: {
+            cancel: true,
+            confirm: "Confirmer",
+        },
+    })
+        .then(willDelete => {
+            if (willDelete) {
+
+
+                $.ajax({
+                    url: URL_AJAX,
+                    method: 'POST',
+                    data: {
+                        action: 'change_statut_annees',
+                        code_annee: code,
+                        statut_annee: statut
+                    },
+                    dataType: 'JSON',
+                    beforeSend: function () {
+                        $(".loader_backdrop2").css('display', "block");
+                    },
+                    success: function (data) {
+                        $(".loader_backdrop2").css('display', "none");
+
+                        if (data.success) {
+                            $.notify(data.message, "success");
+                            tables['data-table-annee'].ajax.reload(null, false);
+                        } else {
+                            $.notify(data.message);
+                        }
+                    }
+                });;
+            }
+        });
+}
+/** FIN SECTION annee */
