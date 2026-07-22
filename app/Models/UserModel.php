@@ -121,11 +121,16 @@ class UserModel extends Model
 
     public function updateLastConnexion(string $code): void
     {
-        $sql = "UPDATE " . TABLES::USERS . " SET last_connexion = NOW() WHERE code_user = ?";
-        $stmt = $this->db->prepare(
-            "UPDATE {$this->table} SET last_connexion = NOW() WHERE code_user = ?"
-        );
-        $stmt->execute([$code]);
+        $sql = "UPDATE " . TABLES::USERS . " SET last_connexion = NOW() WHERE code_user = :code";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['code' => $code]);
+    }
+
+    public function updateLastGoogleUidConnexion(string $code, string $auth_uid): void
+    {
+        $sql = "UPDATE " . TABLES::USERS . " SET auth_uid = :auth_uid, last_connexion = NOW() WHERE code_user = :code_user";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['code_user' => $code, 'auth_uid' => $auth_uid]);
     }
 
     public function getUserGroups(string $userCode): array

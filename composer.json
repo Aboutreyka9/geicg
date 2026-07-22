@@ -23,8 +23,8 @@
         "kwn/number-to-words": "^2.11",
         "vlucas/phpdotenv": "^5.6",
         "phpmailer/phpmailer": "^6.10",
-        "endroid/qr-code": "^4.6",
-        "google/apiclient": "*"
+        "google/apiclient": "^2.19",
+        "endroid/qr-code": "^4.6"
     },
     "config": {
         "optimize-autoloader": true
