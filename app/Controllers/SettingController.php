@@ -156,7 +156,7 @@ class SettingController extends MainController
 
         $v->required('libelle_fonction', $libelle_fonction, 'libelle fonction');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNPROCESSABLE_ENTITY);
 
         $result = $this->settingService->saveFonctionData($_POST);
 
@@ -176,7 +176,7 @@ class SettingController extends MainController
 
         $v->required('libelle_fonction', $libelle_fonction, 'Libellé fonction');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNPROCESSABLE_ENTITY);
 
         $result = $this->settingService->updateFonctionData($_POST);
 
@@ -296,7 +296,7 @@ class SettingController extends MainController
 
         $v->required('libelle_service', $libelle_service, 'libelle service');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNPROCESSABLE_ENTITY);
 
         $result = $this->settingService->saveServiceData($_POST);
 
@@ -316,7 +316,7 @@ class SettingController extends MainController
 
         $v->required('libelle_service', $libelle_service, 'Libellé service');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNPROCESSABLE_ENTITY);
 
         $result = $this->settingService->updateServiceData($_POST);
 
@@ -434,9 +434,18 @@ class SettingController extends MainController
 
         $v = new Validator();
 
-        $v->required('libelle_annee', $libelle_annee, 'libelle annee');
+        $v->required('libelle_annee', $libelle_annee, 'libelle année')->valideYear('libelle_annee', $libelle_annee, 'libelle année')
+            ->required('debut_annee', $debut_annee, 'Date debut')->inferieur('debut_annee', $debut_annee, 'Date debut', $fin_annee, 'Date fin')
+            ->required('fin_annee', $fin_annee, 'Date fin')->superieur('fin_annee', $fin_annee, 'Date fin', $debut_annee, 'Date debut');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        // ->valideAcademieYear($libelle_annee, $debut_annee, $fin_annee);
+
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
+
+        if ($v->valideAcademieYear($libelle_annee, $debut_annee, $fin_annee) != 0) Response::error('Désolé, les dates selectionnées sont differentes de Libelle année', HttpStatusCode::UNAUTHORIZED);
+
+        // var_dump($v->valideAcademieYear($libelle_annee, $debut_annee, $fin_annee));
+        // return;
 
         $result = $this->settingService->saveAnneeData($_POST);
 
@@ -454,9 +463,9 @@ class SettingController extends MainController
         extract($_POST);
         $v = new Validator();
 
-        $v->required('libelle_annee', $libelle_annee, 'Libellé annee');
+        $v->required('libelle_annee', $libelle_annee, 'Libellé année');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNPROCESSABLE_ENTITY);
 
         $result = $this->settingService->updateAnneeData($_POST);
 

@@ -155,6 +155,7 @@ class SettingService
         extract($post);
 
 
+        $libelle_annee = shiftSpaceBlank($libelle_annee);
         if (!empty(self::$settingModel->getFieldsForParams(TABLES::ANNEES, ['libelle_annee' => $libelle_annee, 'etablissement_code' => Auth::user('etablissement_code')]))) {
             return ['success' => false, 'message' => "Desolé! Ce libelle de l'annee existe déjà."];
         }
@@ -162,9 +163,10 @@ class SettingService
         $code = self::$settingModel->generatorCode(TABLES::ANNEES, 'code_annee');
 
         $data_annee = [
-            'libelle_annee' => strtoupper($libelle_annee),
-            'description_annee' => $description_annee,
+            'libelle_annee' => $libelle_annee,
             'code_annee' => $code,
+            'date_fin_annee' => $fin_annee,
+            'date_debut_annee' => $debut_annee,
             'statut_annee' => STATUT_ACTIF,
             'etablissement_code' => Auth::user('etablissement_code'),
             'user_code' => Auth::user('id'),
@@ -177,7 +179,7 @@ class SettingService
 
         return [
             'success' => true,
-            'message' => 'annee enregistrée avec succès.',
+            'message' => 'Annee enregistrée avec succès.',
         ];
     }
 
@@ -464,10 +466,17 @@ class SettingService
                         <label for="libelle_annee" class="form-label">Libelle annee <strong class="text-danger">*</strong></label>
                         <input type="text" class="form-control" id="libelle_annee" name="libelle_annee" required>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="description_annee" class="form-label">Description </label>
-                        <textarea rows="3" class="form-control" name="description_annee" id="description_annee"></textarea>
+                     <div class="col-md-6 mb-3">
+                        
+                        <label for="debut_annee" class="form-label">Date debut <strong class="text-danger">*</strong></label>
+                        <input type="date" class="form-control" id="debut_annee" name="debut_annee" required>
                     </div>
+                      <div class="col-md-6 mb-3">
+                        
+                        <label for="fin_annee" class="form-label">Date fin <strong class="text-danger">*</strong></label>
+                        <input type="date" class="form-control" id="fin_annee" name="fin_annee" required>
+                    </div>
+
                 </div>
 
                 <div class="row mb-3">

@@ -29,6 +29,27 @@ use App\Middlewares\RouteMiddleWare;
 use Phroute\Phroute\Dispatcher;
 
 
+function valideAcademieYear(mixed $libelle_anne, mixed $date_debut, mixed $date_fin, string $field = 'libelle_annee', string $label = 'Libelle année')
+{
+    $date_debut = date('Y', strtotime($date_debut));
+    $date_fin = date('Y', strtotime($date_fin));
+    $year = "$date_debut-$date_fin";
+
+    // var_dump(compareAcademicYears($libelle_anne, $year));
+    $result = compareAcademicYears($libelle_anne, $year);
+
+    if (!$result) {
+        var_dump("Le champ « {$label} » est invalide.");
+    } elseif ($result != 0) {
+        var_dump("Désolé, les dates selectionnées sont differentes de {$label} . ");
+    }
+}
+
+
+// valideAcademieYear('2024 2025', '2026/05/10', '2027/05/23', 'libelle_annee', 'Libelle année');
+// return;
+
+
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $title = "";

@@ -1358,9 +1358,9 @@ function ajouterAnnee() {
             },
             success: function (data) {
                 console.log(data);
+                btnRes("#btnSubmitFormAnnee", "Enregistrer", "fa-save");
                 // $(".loader_backdrop2").css('display', "none");
 
-                btnRes("#btnSubmitFormAnnee", "Enregistrer", "fa-save");
                 if (data.success) {
                     tables['data-table-annee'].ajax.reload(null, false);
                     $.notify(data.message, "success");

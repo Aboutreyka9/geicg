@@ -580,7 +580,100 @@ function showHtmlElement($item = 1, $equal = 2, $return = 'active show')
     return $item == $equal ? $return : '';
 }
 
+/**
+ * Summary of compareSchoolYears
+ * @param string $schoolYear
+ * @return int
+ * Undocumented function
+ *  echo compareSchoolYears('2025-2026');      // -1
+ * echo compareSchoolYears('2026 - 2025');    // 1
+ * echo compareSchoolYears('2025 - 2025');    // 0
+ * DESCRIPTION 
+ * -1 → la première année est inférieure à la deuxième.
+ * 0 → les deux années sont identiques.
+ * 1 → la première année est supérieure à la deuxième.
+ */
+function compareSchoolYears(string $schoolYear): int
+{
+    // Supprime les espaces inutiles
+    $schoolYear = preg_replace('/\s+/', '', $schoolYear);
 
+    // verifier si le symbole existe avant de separer 
+
+
+    // Sépare les deux années
+    [$startYear, $endYear] = explode('-', $schoolYear);
+
+    return (int)$startYear <=> (int)$endYear;
+}
+
+/**
+ * Summary of compareAcademicYears
+ * @param string $year1
+ * @param string $year2
+ * @return int| bool
+ * compareAcademicYears('2025 - 2026', '2024 - 2025'); // 1
+ * compareAcademicYears('2025 - 2026', '2025 - 2026'); // 0
+ * compareAcademicYears('2023 - 2024', '2025 - 2026'); // -1
+ * DESCRIPTION 
+ * -1 → la première année est inférieure à la deuxième.
+ * 0 → les deux années sont identiques.
+ * 1 → la première année est supérieure à la deuxième.
+ */
+function compareAcademicYears(string $year1, string $year2): int| bool
+{
+
+    $extract = function ($year) {
+
+        $year = preg_replace('/\s+/', '', $year);
+
+
+        if (!preg_match('/^(\d{4})-(\d{4})$/', $year, $matches)) {
+            return false;
+        }
+
+        [$start, $end] = explode('-', $year);
+        return [(int)$start, (int)$end];
+    };
+
+    // if (!is_array($extract($year1))) return false;
+
+
+    [$start1, $end1] = $extract($year1);
+    [$start2, $end2] = $extract($year2);
+
+    // Comparaison d'abord sur l'année de début puis sur l'année de fin
+    return [$start1, $end1] <=> [$start2, $end2];
+}
+
+/**
+ * Summary of isValidSchoolYear
+ * @param string $schoolYear
+ * @return bool
+ */
+function isValidSchoolYear(string $schoolYear): bool
+{
+    $schoolYear = preg_replace('/\s+/', '', $schoolYear);
+
+    if (!preg_match('/^(\d{4})-(\d{4})$/', $schoolYear, $matches)) {
+        return false;
+    }
+
+    $startYear = (int) $matches[1];
+    $endYear   = (int) $matches[2];
+
+    return $endYear === ($startYear + 1);
+}
+
+/**
+ * Summary of function shiftSpaceBlank(string $text): string
+ * @param string $text
+ * @return array|string|null
+ */
+function shiftSpaceBlank(string $text): string
+{
+    return preg_replace('/\s+/', '', trim($text));
+}
 
 function textLimit(string | null $text, int $limit = 30, string $suffix = '...'): string
 {
