@@ -262,7 +262,7 @@ class SettingModel extends Model
     {
         $data = [];
         try {
-            $sql = "SELECT * FROM " . TABLES::ANNEES . " AS fn WHERE fn.code_annee = :code LIMIT 1";
+            $sql = "SELECT * FROM " . TABLES::ANNEES . " AS an WHERE an.code_annee = :code LIMIT 1";
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['code' => $code]);
             $data = $stmt->fetch();
@@ -277,7 +277,7 @@ class SettingModel extends Model
     {
         $data = [];
         try {
-            $sql = "SELECT * FROM " . TABLES::ANNEES . " AS fn WHERE fn.etablissement_code = :etablissement_code AND statut_annee = :statut ORDER BY libelle_annee";
+            $sql = "SELECT * FROM " . TABLES::ANNEES . " AS an WHERE an.etablissement_code = :etablissement_code AND statut_annee = :statut ORDER BY libelle_annee";
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['etablissement_code' => $etablissement_code, 'statut' => STATUT_ACTIF]);
             $data = $stmt->fetchAll();
@@ -297,7 +297,7 @@ class SettingModel extends Model
         //     );
         // }
 
-        $where = "WHERE fn.etablissement_code = :etablissement_code";
+        $where = "WHERE an.etablissement_code = :etablissement_code";
 
         if (!empty($likeParams)) {
             $likes = [];
@@ -321,7 +321,7 @@ class SettingModel extends Model
         // }
 
 
-        $sql = "SELECT COUNT(*) AS nb FROM " . TABLES::ANNEES . " fn $where";
+        $sql = "SELECT COUNT(*) AS nb FROM " . TABLES::ANNEES . " an $where";
 
         $stmt = $this->db->prepare($sql);
 
@@ -336,7 +336,7 @@ class SettingModel extends Model
     {
 
 
-        $where = "WHERE fn.etablissement_code = :etablissement_code";
+        $where = "WHERE an.etablissement_code = :etablissement_code";
 
         if (!empty($likeParams)) {
             $likes = [];
@@ -349,7 +349,7 @@ class SettingModel extends Model
 
 
 
-        $sql = "SELECT fn.* FROM " . TABLES::ANNEES . " fn $where ORDER BY $orderBy $orderDir LIMIT :start, :limit";
+        $sql = "SELECT an.* FROM " . TABLES::ANNEES . " an $where ORDER BY $orderBy $orderDir LIMIT :start, :limit";
 
         $stmt = $this->db->prepare($sql);
 

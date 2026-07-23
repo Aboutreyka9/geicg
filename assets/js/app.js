@@ -1382,7 +1382,7 @@ function modalUpdatedAnnee(code) {
         url: URL_AJAX,
         data: {
             action: 'btn_showmodal_annee_update',
-            codeannee: code
+            codeAnnee: code
         },
         dataType: 'JSON',
         beforeSend: function () {
@@ -1427,7 +1427,7 @@ function updatedAnnee() {
                 console.log(data);
 
                 btnRes("#btnSubmitFormAnnee", "Enregistrer", "fa-save");
-
+                return
                 if (data.success) {
                     tables['data-table-annee'].ajax.reload(null, false);
                     $.notify(data.message, "success");

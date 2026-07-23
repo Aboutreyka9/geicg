@@ -44,7 +44,8 @@
                                             <th> # </th>
                                             <th> STATUT </th>
                                             <th> LIBELLE </th>
-                                            <th> DESCRIPTION </th>
+                                            <th> DEBUT </th>
+                                            <th> FIN </th>
                                             <th> ENREGISTRER </th>
                                             <th> ACTION </th>
                                         </tr>

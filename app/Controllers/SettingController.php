@@ -156,7 +156,7 @@ class SettingController extends MainController
 
         $v->required('libelle_fonction', $libelle_fonction, 'libelle fonction');
 
-        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNPROCESSABLE_ENTITY);
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->settingService->saveFonctionData($_POST);
 
@@ -176,7 +176,7 @@ class SettingController extends MainController
 
         $v->required('libelle_fonction', $libelle_fonction, 'Libellé fonction');
 
-        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNPROCESSABLE_ENTITY);
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->settingService->updateFonctionData($_POST);
 
@@ -296,7 +296,7 @@ class SettingController extends MainController
 
         $v->required('libelle_service', $libelle_service, 'libelle service');
 
-        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNPROCESSABLE_ENTITY);
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->settingService->saveServiceData($_POST);
 
@@ -316,7 +316,7 @@ class SettingController extends MainController
 
         $v->required('libelle_service', $libelle_service, 'Libellé service');
 
-        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNPROCESSABLE_ENTITY);
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->settingService->updateServiceData($_POST);
 
@@ -359,14 +359,15 @@ class SettingController extends MainController
         $limit  = (int) ($_POST['length'] ?? 10);
         $start  = (int) ($_POST['start'] ?? 0);
         $orderColumn = (int) ($_POST['order'][0]['column'] ?? 0);
-        $orderDir    = strtolower($_POST['order'][0]['dir'] ?? 'asc');
+        $orderDir    = strtolower($_POST['order'][0]['dir'] ?? 'desc');
         $search = trim($_POST['search']['value'] ?? '');
         // $search = $_POST['search'] ?? '';
         $columns = [
-            0 => 'created_at_annee',
+            0 => 'libelle_annee',
             1 => 'statut_annee',
             2 => 'libelle_annee',
-            3 => 'description_annee',
+            3 => 'date_debut_annee',
+            3 => 'date_fin_annee',
             4 => 'created_at_annee',
         ];
 
@@ -379,7 +380,7 @@ class SettingController extends MainController
         if (!empty($search)) {
             // $likeParams = ['nom_user' => $search,'prenom_user' => $search,'email_user' => $search,'telephone_user' => $search,'matricule_user' => $search,'sexe_user' => $search];
 
-            $likeParams = ['libelle_annee' => $search, 'created_at_annee' => $search, 'statut_annee' => $search];
+            $likeParams = ['libelle_annee' => $search, 'date_debut_annee' => $search, 'date_fin_annee' => $search, 'created_at_annee' => $search];
         }
 
         // 🔢 Total
@@ -419,7 +420,7 @@ class SettingController extends MainController
         extract($_POST);
 
         // $users = getAllusers();
-        $annee = $this->settingModel->getSingleAnneeByCode($codeannee);
+        $annee = $this->settingModel->getSingleAnneeByCode($codeAnnee);
 
 
         $output = $this->settingService->anneeUpdateModalService($annee);
@@ -464,8 +465,13 @@ class SettingController extends MainController
         $v = new Validator();
 
         $v->required('libelle_annee', $libelle_annee, 'Libellé année');
+        $v->required('libelle_annee', $libelle_annee, 'libelle année')->valideYear('libelle_annee', $libelle_annee, 'libelle année')
+            ->required('debut_annee', $debut_annee, 'Date debut')->inferieur('debut_annee', $debut_annee, 'Date debut', $fin_annee, 'Date fin')
+            ->required('fin_annee', $fin_annee, 'Date fin')->superieur('fin_annee', $fin_annee, 'Date fin', $debut_annee, 'Date debut');
 
-        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNPROCESSABLE_ENTITY);
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
+
+        if ($v->valideAcademieYear($libelle_annee, $debut_annee, $fin_annee) != 0) Response::error('Désolé, les dates selectionnées sont differentes de Libelle année', HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->settingService->updateAnneeData($_POST);
 

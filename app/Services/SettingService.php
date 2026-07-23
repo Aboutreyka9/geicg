@@ -189,16 +189,19 @@ class SettingService
         extract($post);
 
 
+        $libelle_annee = shiftSpaceBlank($libelle_annee);
+
         $libelle = self::$settingModel->getFieldsForParams(TABLES::ANNEES, ['libelle_annee' => $libelle_annee, 'etablissement_code' => Auth::user('etablissement_code')]);
         if (!empty($libelle) && $libelle['code_annee'] != $code_annee) {
-            return ['success' => false, 'message' => 'Desolé! Ce libellé de annee existe déjà.'];
+            return ['success' => false, 'message' => "Desolé! Ce libellé de l'annee existe déjà."];
         }
 
 
         $data_annee = [
-            'libelle_annee' => strtoupper($libelle_annee),
-            'description_annee' => $description_annee,
-            'updated_at_annee' => date('Y-m-d H:i:s'),
+            'libelle_annee' => $libelle_annee,
+            'date_fin_annee' => $fin_annee,
+            'date_debut_annee' => $debut_annee,
+            'updated_at_annee' => date('Y-m-d H:i:s')
         ];
 
         if (!self::$settingModel->update(TABLES::ANNEES, 'code_annee', $code_annee, $data_annee)) {
@@ -481,7 +484,7 @@ class SettingService
 
                 <div class="row mb-3">
                     <div class="col-md-12 modal_footer">
-                        <button type="submit" class="btn btn-primary" id="btnSubmitFormAnnee"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
+                        <button type="submit" class="btn btn-secondary" id="btnSubmitFormAnnee"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
                         <button type="button" class="btn btn-light dismiss_modal">Close</button>
 
                     </div>
@@ -506,15 +509,21 @@ class SettingService
                         <label for="libelle_annee" class="form-label">Libelle annee <strong class="text-danger">*</strong></label>
                         <input type="text" class="form-control" id="libelle_annee" name="libelle_annee" value="' . $annee['libelle_annee'] . '" required>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="description_annee" class="form-label">Description </label>
-                        <textarea rows="3" class="form-control" name="description_annee" id="description_annee">' . $annee['description_annee'] . '</textarea>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="debut_annee" class="form-label">Date debut <strong class="text-danger">*</strong></label>
+                        <input type="date" class="form-control" id="debut_annee" name="debut_annee" value="' . $annee['date_debut_annee'] . '" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="fin_annee" class="form-label">Date fin <strong class="text-danger">*</strong></label>
+                        <input type="date" class="form-control" id="fin_annee" name="fin_annee" value="' . $annee['date_fin_annee'] . '" required>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-12 modal_footer">
-                        <button type="submit" class="btn btn-primary" id="btnSubmitFormAnnee"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
+                        <button type="submit" class="btn btn-secondary" id="btnSubmitFormAnnee"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
                         <button type="button" class="btn btn-light dismiss_modal">Close</button>
 
                     </div>
@@ -565,8 +574,9 @@ class SettingService
             $data[] = [
                 $i,
                 $etat,
-                strtoupper($annee['libelle_annee']),
-                textLimit($annee['description_annee']),
+                $annee['libelle_annee'],
+                date_formater($annee['date_debut_annee']),
+                date_formater($annee['date_fin_annee']),
                 date_formater($annee['created_at_annee']),
                 $actions
             ];
