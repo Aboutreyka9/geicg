@@ -101,6 +101,7 @@ const PROJECT_NAME = "geicg";
 // CONST SEXE = ['G','F'];
 
 const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+const SEMESTRE_DATA = ['SEMESTRE 1', 'SEMESTRE 2'];
 
 
 const MONTHS = [

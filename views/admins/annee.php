@@ -56,13 +56,28 @@
 
                     </div>
                     <div class="tab-pane fade " id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                        <div class="row">
-                            <div class="col-md-12 d-flex justify-content-end">
-                                <button type="button" id="btn_semestre_addModal"
-                                    class="btn btn-primary mb-3 w-25 text-uppercase" title="Ajouter semestre"
-                                    aria-label="Close"> <i class="fa fa-plus-circle"></i> &nbsp;
-                                    Créer</button>
-
+                        <div class="row pb-4">
+                            <div class="col-md-9 d-flex gap-5 check-semestre-search ">
+                                <div class="form-inlign">
+                                    <label for="">Annee</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="form-inlign">
+                                    <label for="">Annee</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="form-inlign">
+                                    <label for="">Annee</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3 d-flex justify-content-end">
+                                <div class="form-inlign">
+                                    <button type="button" id="btn_semestre_addModal"
+                                        class="btn btn-primary  text-uppercase" title="Ajouter semestre"
+                                        aria-label="Close"> <i class="fa fa-plus-circle"></i> &nbsp;
+                                        Créer</button>
+                                </div>
                             </div>
                             <div class="table-responsive">
                                 <!-- .table -->
@@ -72,8 +87,10 @@
                                         <tr>
                                             <th> # </th>
                                             <th> STATUT </th>
+                                            <th> ANNEE </th>
                                             <th> LIBELLE </th>
-                                            <th> DESCRIPTION </th>
+                                            <th> DEBUT </th>
+                                            <th> FIN </th>
                                             <th> ENREGISTRER </th>
                                             <th> ACTION </th>
                                         </tr>

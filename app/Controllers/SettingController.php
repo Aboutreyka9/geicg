@@ -496,4 +496,156 @@ class SettingController extends MainController
 
         Response::error("Echec de l'opération", HttpStatusCode::INTERNAL_SERVER_ERROR);
     }
+
+    // SEXION SEMESTRE
+
+
+    public function GetListeSemestre()
+    {
+
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+        $f = new SettingModel();
+
+        $likeParams = [];
+        $whereParams = ['etablissement_code' => Auth::user('etablissement_code')];
+
+
+        $limit  = (int) ($_POST['length'] ?? 10);
+        $start  = (int) ($_POST['start'] ?? 0);
+        $orderColumn = (int) ($_POST['order'][0]['column'] ?? 0);
+        $orderDir    = strtolower($_POST['order'][0]['dir'] ?? 'desc');
+        $search = trim($_POST['search']['value'] ?? '');
+        // $search = $_POST['search'] ?? '';
+        $columns = [
+            0 => 'libelle_semestre',
+            1 => 'statut_semestre',
+            2 => 'libelle_semestre',
+            3 => 'date_debut_semestre',
+            3 => 'date_fin_semestre',
+            4 => 'created_at_semestre',
+        ];
+
+        $orderBy = $columns[$orderColumn] ?? 'libelle_semestre';
+        $orderDir = $orderDir === 'desc' ? 'DESC' : 'ASC';
+
+
+
+        // 🔎 Recherche
+        if (!empty($search)) {
+            // $likeParams = ['nom_user' => $search,'prenom_user' => $search,'email_user' => $search,'telephone_user' => $search,'matricule_user' => $search,'sexe_user' => $search];
+
+            $likeParams = ['libelle_semestre' => $search, 'date_debut_semestre' => $search, 'date_fin_semestre' => $search, 'created_at_semestre' => $search];
+        }
+
+        // 🔢 Total
+        $total = $f->dataTbleCountTotalSemestresRow($whereParams);
+        // 🔢 Total filtré
+
+        $totalFiltered = $f->dataTbleCountTotalSemestresRow($whereParams, $likeParams);
+        // 📄 Données
+
+        $semestreList = $f->DataTableFetchSemestresListe($likeParams, $orderBy, $orderDir, $start, $limit);
+        $data = [];
+
+
+        $data = $this->settingService->semestreDataService($semestreList);
+        // Response::success('operation reussie',);
+        echo json_encode([
+            "draw"            => intval($_POST['draw']),
+            "recordsTotal"    => $total,
+            "recordsFiltered" => $totalFiltered,
+            "data"            => $data
+            // "data"            => $semestreList
+        ]);
+        // // echo json_encode(['data' => $total, 'code' => 200]);
+        return;
+    }
+
+    public function modalAddSemestre()
+    {
+        $annees = $this->settingModel->getAllAnnees(Auth::user('etablissement_code'));
+        if (empty($annees)) Response::error('Désolé, aucune année enregistrée!');
+
+        $output = $this->settingService->semestreAddModalService($annees);
+        Response::success('', ['data' => $output]);
+    }
+
+    public function modalUpdatedSemestre()
+    {
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+
+        // $users = getAllusers();
+        $semestre = $this->settingModel->getSingleSemestreByCode($codesemestre);
+
+        $annees = $this->settingModel->getAllAnnees(Auth::user('etablissement_code'));
+
+        if (empty($semestre) || empty($annees)) Response::error('Désolé, une erreur est survenue lors du traitement!');
+
+        $output = $this->settingService->semestreUpdateModalService($semestre, $annees);
+        echo json_encode(['data' => $output, 'code' => 200, 'message' => 'operation reussie', 'success' => true]);
+    }
+
+    public function addSemestre()
+    {
+
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+
+        $v = new Validator();
+
+        $v->required('libelle_semestre', $libelle_semestre, 'libelle année')
+            ->required('debut_semestre', $debut_semestre, 'Date debut')->inferieur('debut_semestre', $debut_semestre, 'Date debut', $fin_semestre, 'Date fin')
+            ->required('fin_semestre', $fin_semestre, 'Date fin')->superieur('fin_semestre', $fin_semestre, 'Date fin', $debut_semestre, 'Date debut');
+
+
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
+
+        $result = $this->settingService->saveSemestreData($_POST);
+
+
+        if (!$result['success']) {
+            Response::error($result['message'], HttpStatusCode::UNAUTHORIZED);
+        }
+
+        Response::success($result['message'], []);
+    }
+
+    public function updateSemestre()
+    {
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+        $v = new Validator();
+
+        $v->required('libelle_annee', $libelle_annee, 'Libellé année')
+            ->required('libelle_semestre', $libelle_semestre, 'libelle semestre')
+            ->required('debut_semestre', $debut_semestre, 'Date debut')->inferieur('debut_semestre', $debut_semestre, 'Date debut', $fin_semestre, 'Date fin')
+            ->required('fin_semestre', $fin_semestre, 'Date fin')->superieur('fin_semestre', $fin_semestre, 'Date fin', $debut_semestre, 'Date debut');
+
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
+
+        $result = $this->settingService->updateSemestreData($_POST);
+
+
+        if (!$result['success']) {
+            Response::error($result['message'], HttpStatusCode::UNAUTHORIZED);
+        }
+
+        Response::success($result['message'], []);
+    }
+
+    public function changeStatutSemestre()
+    {
+
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+
+        // $statut_user = (isset($statut_utilisateur) && $statut_utilisateur != STATUT_INACTIF) ? STATUT_ACTIF : STATUT_INACTIF;
+
+
+        if ($this->settingModel->update(TABLES::SEMESTRES, 'code_semestre', $code_semestre, ['statut_semestre' => $statut_semestre])) Response::success('Statut modifié avec succès', []);
+
+        Response::error("Echec de l'opération", HttpStatusCode::INTERNAL_SERVER_ERROR);
+    }
 }

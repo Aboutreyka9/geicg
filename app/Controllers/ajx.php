@@ -159,6 +159,34 @@ switch ($action) {
 
     //end Actions pour les annees
 
+    // Debut Actions pour les semestre 
+    case 'charger_data_semestres':
+        $ajx = new SettingController();
+        $ajx->GetListeSemestre();
+        break;
+    case 'change_statut_semestres':
+        $ajx = new SettingController();
+        $ajx->changeStatutSemestre();
+        break;
+    case 'btn_showmodal_semestre_add':
+        $ajx = new SettingController();
+        $ajx->modalAddSemestre();
+        break;
+    case 'btn_showmodal_semestre_update':
+        $ajx = new SettingController();
+        $ajx->modalUpdatedSemestre();
+        break;
+    case 'btn_add_semestre':
+        $ajx = new SettingController();
+        $ajx->addSemestre();
+        break;
+    case 'btn_update_semestre':
+        $ajx = new SettingController();
+        $ajx->updateSemestre();
+        break;
+
+    //end Actions pour les semestre
+
     // Autres cas...
     default:
         echo json_encode(['status' => 'error', 'message' => 'Action inconnue']);

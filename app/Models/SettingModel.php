@@ -277,9 +277,9 @@ class SettingModel extends Model
     {
         $data = [];
         try {
-            $sql = "SELECT * FROM " . TABLES::ANNEES . " AS an WHERE an.etablissement_code = :etablissement_code AND statut_annee = :statut ORDER BY libelle_annee";
+            $sql = "SELECT an.* FROM " . TABLES::ANNEES . " an WHERE an.etablissement_code = :etablissement_code  ORDER BY libelle_annee DESC";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(['etablissement_code' => $etablissement_code, 'statut' => STATUT_ACTIF]);
+            $stmt->execute(['etablissement_code' => $etablissement_code]);
             $data = $stmt->fetchAll();
         } catch (Exception $e) {
             die($e->getMessage());
@@ -374,4 +374,125 @@ class SettingModel extends Model
     }
 
     // END SEXION ANNEES
+
+    // SEXION SEMESTRE
+
+    public function getSingleSemestreByCode(string $code): array
+    {
+        $data = [];
+        try {
+            $sql = "SELECT * FROM " . TABLES::SEMESTRES . " AS se WHERE se.code_semestre = :code LIMIT 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['code' => $code]);
+            $data = $stmt->fetch();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
+    // get all semestre
+    public function getAllSemestres($etablissement_code): array
+    {
+        $data = [];
+        try {
+            $sql = "SELECT * FROM " . TABLES::SEMESTRES . " AS se WHERE se.etablissement_code = :etablissement_code AND statut_semestre = :statut ORDER BY libelle_semestre";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['etablissement_code' => $etablissement_code, 'statut' => STATUT_ACTIF]);
+            $data = $stmt->fetchAll();
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+        return $data;
+    }
+
+    public function dataTbleCountTotalSemestresRow(array $whereParams, $likeParams = [])
+    {
+        // if (!empty($whereParams)) {
+        //     $where = 'WHERE ';
+        //     $where .=  implode(
+        //         ' AND ',
+        //         array_map(fn($f) => "$f = :$f ", array_keys($whereParams))
+        //     );
+        // }
+
+        $where = "WHERE se.etablissement_code = :etablissement_code";
+
+        if (!empty($likeParams)) {
+            $likes = [];
+            foreach ($likeParams as $field => $search) {
+                $likes[] = "$field LIKE :$field";
+                $likeParams[$field] = "%$search%";
+            }
+            $where .= " AND (" . implode(' OR ', $likes) . ")";
+        }
+
+        // if (!empty($likeParams)) {
+        //     $where .= empty($where) ? ' WHERE ' : ' AND ';
+        //     $likes = [];
+        //     foreach ($likeParams as $field => $search) {
+        //         // $key = "$field";
+        //         $likes[] = "$field LIKE :$field";
+        //         $likeParams[$field] = "%$search%";
+        //     }
+        //     // return $likeParams;
+        //     $where .= '(' . implode(' OR ', $likes) . ')';
+        // }
+
+
+        $sql = "SELECT COUNT(*) AS nb FROM " . TABLES::SEMESTRES . " se $where";
+
+        $stmt = $this->db->prepare($sql);
+
+        // return $sql;
+        $stmt->execute(array_merge($whereParams, $likeParams));
+        $data = $stmt->fetch();
+        return $data['nb'] ?? 0;
+    }
+
+
+    public function DataTableFetchSemestresListe(array $likeParams, string $orderBy, string $orderDir, int $start = 0, int $limit = 10)
+    {
+
+
+        $where = "WHERE se.etablissement_code = :etablissement_code";
+
+        if (!empty($likeParams)) {
+            $likes = [];
+            foreach ($likeParams as $field => $search) {
+                $likes[] = "$field LIKE :$field";
+                $likeParams[$field] = "%$search%";
+            }
+            $where .= " AND (" . implode(' OR ', $likes) . ")";
+        }
+
+
+
+        $sql = "SELECT se.*, an.libelle_annee FROM " . TABLES::SEMESTRES . " se 
+        JOIN ". TABLES::ANNEES ."  an ON an.code_annee = se.annee_code 
+        $where ORDER BY $orderBy $orderDir LIMIT :start, :limit";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->bindValue(":etablissement_code", Auth::user('etablissement_code'));
+
+        // Bind les parametreslike
+        $like = [];
+        if (!empty($likeParams)) {
+
+            foreach ($likeParams as $key => $value) {
+                $like[] = "$key => $value";
+                $stmt->bindValue(":$key", $value, PDO::PARAM_STR);
+            }
+        }
+
+        // ✅ Bind LIMIT params correctement
+        $stmt->bindValue(':start', $start, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // END SEXION SEMESTRE
 }

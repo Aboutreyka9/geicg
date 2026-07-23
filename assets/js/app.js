@@ -132,7 +132,6 @@ function searchTestInput() {
 
 function testDatable(action, selector, search = "") {
     // var se = $(selector).DataTable().search().value;
-    alert('test')
     $.ajax({
         method: "POST",
         url: URL_AJAX,
@@ -165,7 +164,7 @@ function loadDataTableMany(tableId, visibility, selector, action) {
 
     // testDatable(action, selector);
 
-    // // return;
+    // return;
 
     ajaxTable(tableId, selector, action);
 
@@ -1427,7 +1426,6 @@ function updatedAnnee() {
                 console.log(data);
 
                 btnRes("#btnSubmitFormAnnee", "Enregistrer", "fa-save");
-                return
                 if (data.success) {
                     tables['data-table-annee'].ajax.reload(null, false);
                     $.notify(data.message, "success");
@@ -1483,4 +1481,194 @@ function changeStatutAnnee(code, statut) {
             }
         });
 }
-/** FIN SECTION annee */
+/** FIN SECTION ANNEE */
+
+
+
+/** DEBUT SECTION SEMESTRES */
+
+loadDataTableMany('data-table-semestre', '.semestre-annee', '#data-table-semestre', 'charger_data_semestres');
+
+openModalAddSemestre();
+function openModalAddSemestre() {
+    $('#btn_semestre_addModal').click(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: {
+                action: 'btn_showmodal_semestre_add'
+            },
+            dataType: "JSON",
+            beforeSend: function () {
+                $(".loader_backdrop2").css('display', "block");
+                // btnReq("#ClientAddModal", "Traitement...");
+
+            },
+            success: function (data) {
+                console.log(data);
+
+                // btnRes("#ClientAddModal", 'Ajouter un client', 'fa-plus');
+                // ;
+
+                $(".loader_backdrop2").css('display', "none");
+                if (data.success) {
+                    var output = data.data;
+                    $(".data-semestre-modal").html(output.data);
+                    $("#semestre-modal").modal("show");
+
+
+                } else {
+                    $.notify(data.message);
+
+                }
+
+            }
+        })
+    });
+}
+
+ajouterSemestre();
+function ajouterSemestre() {
+    $("body").on("submit", "#frmAddSemestre", function (e) {
+        e.preventDefault();
+        var data = $(this).serialize();
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: data,
+            dataType: "JSON",
+            beforeSend: function () {
+                // $(".loader_backdrop2").css('display', "block");
+
+                btnReq("#btnSubmitFormSemestre", "Enregistrement...");
+            },
+            success: function (data) {
+                console.log(data);
+                btnRes("#btnSubmitFormSemestre", "Enregistrer", "fa-save");
+                // $(".loader_backdrop2").css('display', "none");
+
+                if (data.success) {
+                    tables['data-table-semestre'].ajax.reload(null, false);
+                    $.notify(data.message, "success");
+                    $("#semestre-modal").modal("hide");
+                } else {
+                    $.notify(data.message);
+                }
+            }
+        })
+    });
+}
+
+
+function modalUpdatedSemestre(code) {
+    // let btn = btn_action.id;
+
+    $.ajax({
+        method: "POST",
+        url: URL_AJAX,
+        data: {
+            action: 'btn_showmodal_semestre_update',
+            codesemestre: code
+        },
+        dataType: 'JSON',
+        beforeSend: function () {
+            $(".loader_backdrop2").css('display', "block");
+            // btnReq(".modal_footer", "Traitement...");
+        },
+        success: function (data) {
+
+            $(".loader_backdrop2").css('display', "none");
+
+            if (data.success) {
+                $(".data-semestre-modal").html(data.data);
+                $("#semestre-modal").modal("show");
+
+            } else {
+                $.notify(data.message);
+
+            }
+        }
+    });
+}
+
+updatedSemestre();
+function updatedSemestre() {
+    $("body").on("submit", "#frmUpdateSemestre", function (e) {
+        e.preventDefault();
+        var data = $(this).serialize();
+
+
+        $.ajax({
+            method: "POST",
+            url: URL_AJAX,
+            data: data,
+            dataType: "JSON",
+            beforeSend: function () {
+                // $(".loader_backdrop2").css('display', "block");
+
+                btnReq("#btnSubmitFormSemestre", "Mise à jour en cours...");
+            },
+            success: function (data) {
+                // $(".loader_backdrop2").css('display', "none");
+                console.log(data);
+
+                btnRes("#btnSubmitFormSemestre", "Enregistrer", "fa-save");
+                return
+                if (data.success) {
+                    tables['data-table-semestre'].ajax.reload(null, false);
+                    $.notify(data.message, "success");
+                    $("#semestre-modal").modal("hide");
+
+                } else {
+                    $.notify(data.message);
+                }
+            }
+        })
+    });
+}
+
+function changeStatutSemestre(code, statut) {
+    swal({
+        title: "Notification",
+        text: "Voulez-vous vraiment modifier le statut de cette semestre?",
+        icon: "warning",
+        dangerMode: true,
+        closeOnClickOutside: false,
+        buttons: {
+            cancel: true,
+            confirm: "Confirmer",
+        },
+    })
+        .then(willDelete => {
+            if (willDelete) {
+
+                $.ajax({
+                    url: URL_AJAX,
+                    method: 'POST',
+                    data: {
+                        action: 'change_statut_semestres',
+                        code_semestre: code,
+                        statut_semestre: statut
+                    },
+                    dataType: 'JSON',
+                    beforeSend: function () {
+                        $(".loader_backdrop2").css('display', "block");
+                    },
+                    success: function (data) {
+                        $(".loader_backdrop2").css('display', "none");
+
+                        if (data.success) {
+                            $.notify(data.message, "success");
+                            tables['data-table-semestre'].ajax.reload(null, false);
+                        } else {
+                            $.notify(data.message);
+                        }
+                    }
+                });;
+            }
+        });
+}
+/** FIN SECTION SEMESTRES */
