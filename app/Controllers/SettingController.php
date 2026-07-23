@@ -44,7 +44,12 @@ class SettingController extends MainController
 
     public function fonction()
     {
-        $this->view('admins/fonction', ['title' => "fonction"]);
+        $this->view('admins/fonction', ['title' => "fonctions et services"]);
+    }
+
+    public function annee()
+    {
+        $this->view('admins/annee', ['title' => "Années et semestres"]);
     }
 
 
@@ -58,6 +63,7 @@ class SettingController extends MainController
      */
 
 
+    // SEXION FONCTIO
 
     public function GetListeFonction()
     {
@@ -150,7 +156,7 @@ class SettingController extends MainController
 
         $v->required('libelle_fonction', $libelle_fonction, 'libelle fonction');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->settingService->saveFonctionData($_POST);
 
@@ -170,7 +176,7 @@ class SettingController extends MainController
 
         $v->required('libelle_fonction', $libelle_fonction, 'Libellé fonction');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->settingService->updateFonctionData($_POST);
 
@@ -197,6 +203,7 @@ class SettingController extends MainController
     }
 
 
+    // SEXION SERVICES
 
     public function GetListeServices()
     {
@@ -289,7 +296,7 @@ class SettingController extends MainController
 
         $v->required('libelle_service', $libelle_service, 'libelle service');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->settingService->saveServiceData($_POST);
 
@@ -309,7 +316,7 @@ class SettingController extends MainController
 
         $v->required('libelle_service', $libelle_service, 'Libellé service');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->settingService->updateServiceData($_POST);
 
@@ -331,6 +338,161 @@ class SettingController extends MainController
 
 
         if ($this->settingModel->update(TABLES::SERVICES, 'code_service', $code_service, ['statut_service' => $statut_service])) Response::success('Statut modifié avec succès', []);
+
+        Response::error("Echec de l'opération", HttpStatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    // SEXION ANNEE
+
+
+    public function GetListeAnnee()
+    {
+
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+        $f = new SettingModel();
+
+        $likeParams = [];
+        $whereParams = ['etablissement_code' => Auth::user('etablissement_code')];
+
+
+        $limit  = (int) ($_POST['length'] ?? 10);
+        $start  = (int) ($_POST['start'] ?? 0);
+        $orderColumn = (int) ($_POST['order'][0]['column'] ?? 0);
+        $orderDir    = strtolower($_POST['order'][0]['dir'] ?? 'desc');
+        $search = trim($_POST['search']['value'] ?? '');
+        // $search = $_POST['search'] ?? '';
+        $columns = [
+            0 => 'libelle_annee',
+            1 => 'statut_annee',
+            2 => 'libelle_annee',
+            3 => 'date_debut_annee',
+            3 => 'date_fin_annee',
+            4 => 'created_at_annee',
+        ];
+
+        $orderBy = $columns[$orderColumn] ?? 'libelle_annee';
+        $orderDir = $orderDir === 'desc' ? 'DESC' : 'ASC';
+
+
+
+        // 🔎 Recherche
+        if (!empty($search)) {
+            // $likeParams = ['nom_user' => $search,'prenom_user' => $search,'email_user' => $search,'telephone_user' => $search,'matricule_user' => $search,'sexe_user' => $search];
+
+            $likeParams = ['libelle_annee' => $search, 'date_debut_annee' => $search, 'date_fin_annee' => $search, 'created_at_annee' => $search];
+        }
+
+        // 🔢 Total
+        $total = $f->dataTbleCountTotalAnneesRow($whereParams);
+        // 🔢 Total filtré
+
+        $totalFiltered = $f->dataTbleCountTotalAnneesRow($whereParams, $likeParams);
+        // 📄 Données
+
+        $anneeList = $f->DataTableFetchAnneesListe($likeParams, $orderBy, $orderDir, $start, $limit);
+        $data = [];
+
+
+        $data = $this->settingService->anneeDataService($anneeList);
+        // Response::success('operation reussie',);
+        echo json_encode([
+            "draw"            => intval($_POST['draw']),
+            "recordsTotal"    => $total,
+            "recordsFiltered" => $totalFiltered,
+            "data"            => $data
+            // "data"            => $anneeList
+        ]);
+        // // echo json_encode(['data' => $total, 'code' => 200]);
+        return;
+    }
+
+    public function modalAddAnnee()
+    {
+
+        $output = $this->settingService->anneeAddModalService();
+        Response::success('', ['data' => $output]);
+    }
+
+    public function modalUpdatedAnnee()
+    {
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+
+        // $users = getAllusers();
+        $annee = $this->settingModel->getSingleAnneeByCode($codeAnnee);
+
+
+        $output = $this->settingService->anneeUpdateModalService($annee);
+        echo json_encode(['data' => $output, 'code' => 200, 'message' => 'operation reussie', 'success' => true]);
+    }
+
+    public function addAnnee()
+    {
+
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+
+        $v = new Validator();
+
+        $v->required('libelle_annee', $libelle_annee, 'libelle année')->valideYear('libelle_annee', $libelle_annee, 'libelle année')
+            ->required('debut_annee', $debut_annee, 'Date debut')->inferieur('debut_annee', $debut_annee, 'Date debut', $fin_annee, 'Date fin')
+            ->required('fin_annee', $fin_annee, 'Date fin')->superieur('fin_annee', $fin_annee, 'Date fin', $debut_annee, 'Date debut');
+
+        // ->valideAcademieYear($libelle_annee, $debut_annee, $fin_annee);
+
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
+
+        if ($v->valideAcademieYear($libelle_annee, $debut_annee, $fin_annee) != 0) Response::error('Désolé, les dates selectionnées sont differentes de Libelle année', HttpStatusCode::UNAUTHORIZED);
+
+        // var_dump($v->valideAcademieYear($libelle_annee, $debut_annee, $fin_annee));
+        // return;
+
+        $result = $this->settingService->saveAnneeData($_POST);
+
+
+        if (!$result['success']) {
+            Response::error($result['message'], HttpStatusCode::UNAUTHORIZED);
+        }
+
+        Response::success($result['message'], []);
+    }
+
+    public function updateAnnee()
+    {
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+        $v = new Validator();
+
+        $v->required('libelle_annee', $libelle_annee, 'Libellé année');
+        $v->required('libelle_annee', $libelle_annee, 'libelle année')->valideYear('libelle_annee', $libelle_annee, 'libelle année')
+            ->required('debut_annee', $debut_annee, 'Date debut')->inferieur('debut_annee', $debut_annee, 'Date debut', $fin_annee, 'Date fin')
+            ->required('fin_annee', $fin_annee, 'Date fin')->superieur('fin_annee', $fin_annee, 'Date fin', $debut_annee, 'Date debut');
+
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
+
+        if ($v->valideAcademieYear($libelle_annee, $debut_annee, $fin_annee) != 0) Response::error('Désolé, les dates selectionnées sont differentes de Libelle année', HttpStatusCode::UNAUTHORIZED);
+
+        $result = $this->settingService->updateAnneeData($_POST);
+
+
+        if (!$result['success']) {
+            Response::error($result['message'], HttpStatusCode::UNAUTHORIZED);
+        }
+
+        Response::success($result['message'], []);
+    }
+
+    public function changeStatutAnnee()
+    {
+
+        $_POST = sanitizePostData($_POST);
+        extract($_POST);
+
+        // $statut_user = (isset($statut_utilisateur) && $statut_utilisateur != STATUT_INACTIF) ? STATUT_ACTIF : STATUT_INACTIF;
+
+
+        if ($this->settingModel->update(TABLES::ANNEES, 'code_annee', $code_annee, ['statut_annee' => $statut_annee])) Response::success('Statut modifié avec succès', []);
 
         Response::error("Echec de l'opération", HttpStatusCode::INTERNAL_SERVER_ERROR);
     }

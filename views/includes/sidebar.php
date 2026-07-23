@@ -346,7 +346,8 @@
                             <?php //if(auth()->hasRole(Roles::ADMIN_H)): 
                             ?>
                             <!-- <li>
-                                <a class="item-link" href="<?php // url('congés') ?>">
+                                <a class="item-link" href="<?php // url('congés') 
+                                                            ?>">
                                     <span class="sub-item"> Congés</span>
                                 </a>
                             </li> -->
@@ -388,8 +389,8 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="item-link" href="<?= url('services') ?>">
-                                    <span class="sub-item"> Services</span>
+                                <a class="item-link" href="<?= url('annees-semestres') ?>">
+                                    <span class="sub-item"> Années & Semestres</span>
                                 </a>
                             </li>
 

@@ -200,7 +200,7 @@ class UserController extends MainController
             ->required('telephone_user', $telephone_user, 'Telephone')->phoneNumber('telephone_user', $telephone_user, 10, 'Telephone')
             ->required('email_user', $email_user, 'Email')->email('email_user', $email_user, 'Email')->required('sexe_user', $sexe_user, 'Civilité')->required('fonction_user', $fonction_user, 'Fonction')->required('service_user', $service_user, 'Service')->required('matricule_user', $matricule_user, 'Matricule');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->userService->saveUserData($_POST);
 
@@ -232,7 +232,7 @@ class UserController extends MainController
             ->required('telephone_user', $telephone_user, 'Telephone')->phoneNumber('telephone_user', $telephone_user, 10, 'Telephone')
             ->required('email_user', $email_user, 'Email')->email('email_user', $email_user, 'Email')->required('sexe_user', $sexe_user, 'Civilité')->required('fonction_user', $fonction_user, 'Fonction')->required('service_user', $service_user, 'Service')->required('matricule_user', $matricule_user, 'Matricule');
 
-        if ($v->fails()) Response::error('Données invalides.', HttpStatusCode::UNPROCESSABLE_ENTITY, $v->errors());
+        if ($v->fails()) Response::error($v->errors(), HttpStatusCode::UNAUTHORIZED);
 
         $result = $this->userService->updateUserData($_POST);
 

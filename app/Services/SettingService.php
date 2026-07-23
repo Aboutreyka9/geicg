@@ -26,6 +26,7 @@ class SettingService
      * --------------------------------------------------------------------------
      */
 
+    // SEXION FONCTIONS
     public static function saveFonctionData(array $post)
     {
         extract($post);
@@ -86,6 +87,7 @@ class SettingService
         ];
     }
 
+    // SEXION SERVICES
     public static function saveServiceData(array $post)
     {
         extract($post);
@@ -146,6 +148,73 @@ class SettingService
         ];
     }
 
+    // SEXION ANNEES
+
+    public static function saveAnneeData(array $post)
+    {
+        extract($post);
+
+
+        $libelle_annee = shiftSpaceBlank($libelle_annee);
+        if (!empty(self::$settingModel->getFieldsForParams(TABLES::ANNEES, ['libelle_annee' => $libelle_annee, 'etablissement_code' => Auth::user('etablissement_code')]))) {
+            return ['success' => false, 'message' => "Desolé! Ce libelle de l'annee existe déjà."];
+        }
+
+        $code = self::$settingModel->generatorCode(TABLES::ANNEES, 'code_annee');
+
+        $data_annee = [
+            'libelle_annee' => $libelle_annee,
+            'code_annee' => $code,
+            'date_fin_annee' => $fin_annee,
+            'date_debut_annee' => $debut_annee,
+            'statut_annee' => STATUT_ACTIF,
+            'etablissement_code' => Auth::user('etablissement_code'),
+            'user_code' => Auth::user('id'),
+            'created_at_annee' => date('Y-m-d H:i:s'),
+        ];
+
+        if (!self::$settingModel->create(TABLES::ANNEES, $data_annee)) {
+            return ['success' => false, 'message' => "Desolé! echec d'operation."];
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Annee enregistrée avec succès.',
+        ];
+    }
+
+
+    public static function updateAnneeData($post)
+    {
+        extract($post);
+
+
+        $libelle_annee = shiftSpaceBlank($libelle_annee);
+
+        $libelle = self::$settingModel->getFieldsForParams(TABLES::ANNEES, ['libelle_annee' => $libelle_annee, 'etablissement_code' => Auth::user('etablissement_code')]);
+        if (!empty($libelle) && $libelle['code_annee'] != $code_annee) {
+            return ['success' => false, 'message' => "Desolé! Ce libellé de l'annee existe déjà."];
+        }
+
+
+        $data_annee = [
+            'libelle_annee' => $libelle_annee,
+            'date_fin_annee' => $fin_annee,
+            'date_debut_annee' => $debut_annee,
+            'updated_at_annee' => date('Y-m-d H:i:s')
+        ];
+
+        if (!self::$settingModel->update(TABLES::ANNEES, 'code_annee', $code_annee, $data_annee)) {
+            return ['success' => false, 'message' => "Desolé! echec d'operation."];
+        }
+
+
+        return [
+            'success' => true,
+            'message' => 'Modification effectuée avec succès.',
+        ];
+    }
+
     /**
      * ------------------------------------------------------------------------
      * **********************************************************************
@@ -154,6 +223,8 @@ class SettingService
      * --------------------------------------------------------------------------
      */
 
+
+    // SEXION FONCTIONS
 
     public static function fonctionAddModalService()
     {
@@ -269,6 +340,7 @@ class SettingService
         return $data;
     }
 
+    // SEXION SERVICES
     public static function serviceAddModalService()
     {
         $output = "";
@@ -376,6 +448,136 @@ class SettingService
                 strtoupper($service['libelle_service']),
                 textLimit($service['description_service']),
                 date_formater($service['created_at_service']),
+                $actions
+            ];
+        }
+
+        return $data;
+    }
+
+    // SEXION ANNEES
+
+    public static function anneeAddModalService()
+    {
+        $output = "";
+        $output .= '
+            <form action="#" method="post" id="frmAddAnnee">
+                <div class="row mb-3">
+                    <div class="col-md-12 mb-3">
+                        <input type="hidden" value="btn_add_annee" name="action">
+                        <input type="hidden" value="' . csrfToken()::token() . '" name="csrf_token">
+                        <label for="libelle_annee" class="form-label">Libelle annee <strong class="text-danger">*</strong></label>
+                        <input type="text" class="form-control" id="libelle_annee" name="libelle_annee" required>
+                    </div>
+                     <div class="col-md-6 mb-3">
+                        
+                        <label for="debut_annee" class="form-label">Date debut <strong class="text-danger">*</strong></label>
+                        <input type="date" class="form-control" id="debut_annee" name="debut_annee" required>
+                    </div>
+                      <div class="col-md-6 mb-3">
+                        
+                        <label for="fin_annee" class="form-label">Date fin <strong class="text-danger">*</strong></label>
+                        <input type="date" class="form-control" id="fin_annee" name="fin_annee" required>
+                    </div>
+
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12 modal_footer">
+                        <button type="submit" class="btn btn-secondary" id="btnSubmitFormAnnee"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
+                        <button type="button" class="btn btn-light dismiss_modal">Close</button>
+
+                    </div>
+                </div>
+
+
+            </form> ';
+        return $output;
+    }
+
+
+    public static function anneeUpdateModalService(array $annee)
+    {
+        $output = "";
+        $output .= '
+            <form action="#" method="post" id="frmUpdateAnnee">
+                <div class="row mb-3">
+                    <div class="col-md-12 mb-3">
+                        <input type="hidden" value="btn_update_annee" name="action">
+                        <input type="hidden" value="' . $annee['code_annee'] . '" name="code_annee">
+                        <input type="hidden" value="' . csrfToken()::token() . '" name="csrf_token">
+                        <label for="libelle_annee" class="form-label">Libelle annee <strong class="text-danger">*</strong></label>
+                        <input type="text" class="form-control" id="libelle_annee" name="libelle_annee" value="' . $annee['libelle_annee'] . '" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="debut_annee" class="form-label">Date debut <strong class="text-danger">*</strong></label>
+                        <input type="date" class="form-control" id="debut_annee" name="debut_annee" value="' . $annee['date_debut_annee'] . '" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="fin_annee" class="form-label">Date fin <strong class="text-danger">*</strong></label>
+                        <input type="date" class="form-control" id="fin_annee" name="fin_annee" value="' . $annee['date_fin_annee'] . '" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12 modal_footer">
+                        <button type="submit" class="btn btn-secondary" id="btnSubmitFormAnnee"><i class="fas fa-save"></i> &nbsp;  Enregistrer </button>
+                        <button type="button" class="btn btn-light dismiss_modal">Close</button>
+
+                    </div>
+                </div>
+
+
+            </form> ';
+        return $output;
+    }
+
+    public static function anneeDataService($annees)
+    {
+
+        $i = 0;
+        $data = [];
+
+        foreach ($annees as $annee) {
+            $i++;
+
+            $etat = checkEtatData($annee['statut_annee']);
+
+            $actions = '
+            <button class="btn btn-light btn-link " type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h"></i>
+            </button>
+            <div class="dropdown-menu">
+
+        <button class="dropdown-item " id="Modifier" onclick="modalUpdatedAnnee(\'' . $annee['code_annee'] . '\')" 
+            data-toggle="tooltip" title="" data-original-title="Modifier annee">
+        <i class="fa fa-edit text-icon-primary"></i> &nbsp; &nbsp; Modifier annee </button>
+        ';
+            if ($annee['statut_annee'] == STATUT_ACTIF) {
+                $actions .= '
+        <button class="dropdown-item " id="" onclick="changeStatutAnnee(\'' . $annee['code_annee'] . '\',\'' . STATUT_INACTIF . '\')" 
+            data-toggle="tooltip" title="" data-original-title="Désactiver annee ">
+            <i class="fa fa-times text-icon-danger"></i> &nbsp; &nbsp; Désactiver annee </button>
+        ';
+            } else {
+                $actions .= '
+        <button class="dropdown-item " id="" onclick="changeStatutAnnee(\'' . $annee['code_annee'] . '\',\'' . STATUT_ACTIF . '\')" 
+            data-toggle="tooltip" title="" data-original-title="Activer annee ">
+            <i class="fa fa-check text-icon-success"></i> &nbsp; &nbsp; Activer annee </button>
+        ';
+            }
+            $actions .= ' </div>
+            ';
+
+            $data[] = [
+                $i,
+                $etat,
+                $annee['libelle_annee'],
+                date_formater($annee['date_debut_annee']),
+                date_formater($annee['date_fin_annee']),
+                date_formater($annee['created_at_annee']),
                 $actions
             ];
         }
